@@ -273,8 +273,7 @@ mod tests {
 
     #[test]
     fn text_arrows_use_japanese_outlines_and_emoji_keep_color() {
-        let assets =
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../web/assets/fonts");
+        let assets = crate::test_font_directory();
         let mut renderer = Renderer::new(
             std::fs::read(assets.join("NotoSansJP.ttf")).unwrap(),
             std::fs::read(assets.join("NotoColorEmoji.ttf")).unwrap(),

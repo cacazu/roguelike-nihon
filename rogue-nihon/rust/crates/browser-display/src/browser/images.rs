@@ -1,6 +1,6 @@
 //! PNG bytes and decoded RGBA rasters are owned and transformed in Rust.
 use super::*;
-use rogue_raster::{Image, ImageSet};
+use roguelike_common::{Image, ImageSet};
 use std::{future::Future, task::Poll};
 pub(super) type Tiles = ImageSet;
 pub(super) async fn load(plan: &Value) -> Result<(Tiles, Value), JsValue> {

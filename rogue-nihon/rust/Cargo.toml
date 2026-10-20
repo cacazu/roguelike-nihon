@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/contract", "crates/display", "crates/input", "crates/platform", "crates/browser-display", "crates/raster"]
+members = [".", "crates/contract", "crates/display", "crates/input", "crates/platform", "crates/browser-display"]
 resolver = "3"
 
 [workspace.package]
@@ -55,7 +55,7 @@ opt-level = 1
 panic = "abort"
 
 # These crates run on the browser input thread, including per-pixel loops.
-[profile.release.package.rogue-raster]
+[profile.release.package.roguelike-common]
 opt-level = 3
 
 [profile.release.package.rogue-browser-display]

@@ -3,9 +3,9 @@ use serde_json::Value;
 use std::{cell::RefCell, collections::BTreeMap, io::Cursor};
 use tiny_skia::{FilterQuality, IntSize, Mask, Pixmap, PixmapPaint, Transform};
 
-const MAX_IMAGE_DIMENSION: u32 = 4096;
-const MAX_IMAGE_PIXELS: usize = 4 * 1024 * 1024;
-const MAX_IMAGE_BYTES: usize = 16 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION: u32 = 8192;
+const MAX_IMAGE_PIXELS: usize = 16 * 1024 * 1024;
+const MAX_IMAGE_BYTES: usize = 64 * 1024 * 1024;
 const MAX_SCALED_PIXELS: usize = 256 * 256;
 
 struct ScaledPixels {
@@ -578,9 +578,11 @@ mod tests {
 
     #[test]
     fn oversized_png_ihdr_is_rejected_before_output_allocation() {
+        assert_eq!(byte_count(2048, 5568).unwrap(), 2048 * 5568 * 4);
+        assert_eq!(byte_count(4096, 4096).unwrap(), MAX_IMAGE_BYTES);
         for (width, height, expected) in [
-            (8192, 1, "Image exceeds raster dimension limit"),
-            (4096, 2048, "Image exceeds raster pixel limit"),
+            (8193, 1, "Image exceeds raster dimension limit"),
+            (8192, 4096, "Image exceeds raster pixel limit"),
         ] {
             let mut bytes = Vec::new();
             {
