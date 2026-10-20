@@ -80,12 +80,22 @@ test('actual Japanese More wait saves and resumes in a fresh module with identic
   assert.ok(continued.length > 0);
   assertEquivalent(originalFrames(continued), originalFrames(resumed), 'Every C frame after acknowledging actual More');
   assert.deepEqual(original.frames.at(-1).ui, restored.frames.at(-1).ui, 'Restored Japanese presentation history');
-  assert.equal(original.frames.at(-1).sha256, restored.frames.at(-1).sha256);
+  // Actor animation steps belong to the display instance and reset on import
+  // (MAP-DISPLAY-ja.md). Keep every other public frame field identical.
+  const {map_actor_step: originalStep, sha256: originalHash, ...originalPresentation} = original.frames.at(-1);
+  const {map_actor_step: restoredStep, sha256: restoredHash, ...restoredPresentation} = restored.frames.at(-1);
+  assert.deepEqual(originalPresentation, restoredPresentation, 'Restored public frame excluding display lifetime counters');
   assert.ok(restored.frames.some((frame) => frame.cells.includes('--More--') && frame.ui?.more?.id === 'ui.more'),
     'Replay must actually reconstruct the More screen before accepting live Space');
   completeJapanese(original);
   completeJapanese(restored);
+});
 
+test('Japanese and English More output match the original-rule baseline', async () => {
+  const prefix = 'qf', suffix = ' l';
+  const config = { fixture: 'double-haste', seed: 17, name: '勇者',
+    events: [...textEvents(prefix), SAVE_EVENT, ...textEvents(suffix)] };
+  const original = await recorded('actual-more-ja-reference', split, { ...config, locale: 'ja' });
   const english = await recorded('actual-more-en-original', split, { ...config, locale: 'en' });
   const expected = await recorded('actual-more-baseline', baseline, {
     fixture: config.fixture, seed: config.seed, name: config.name, locale: 'en', text: prefix + suffix,
