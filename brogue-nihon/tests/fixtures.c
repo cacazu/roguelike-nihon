@@ -203,9 +203,9 @@ const char *brogue_check_features(void) {
         featureAppend(",\"maxStatuses\":");
         featureStatuses(monst->maxStatus);
         featureAppend(",\"poisonAmount\":%d,\"movementSpeed\":%d,\"attackSpeed\":%d,"
-               "\"newPowerCount\":%d,\"totalPowerCount\":%d,\"mode\":%d,\"mutationIndex\":%d,\"leaderIndex\":%d,\"carriedItem\":", monst->poisonAmount,
+               "\"newPowerCount\":%d,\"totalPowerCount\":%d,\"mode\":%d,\"mutationIndex\":%d,\"leaderIndex\":%d,\"turnsUntilRegen\":%ld,\"regenPerTurn\":%d,\"carriedItem\":", monst->poisonAmount,
                monst->movementSpeed, monst->attackSpeed, monst->newPowerCount, monst->totalPowerCount,
-               monst->creatureMode, monst->mutationIndex, featureLeaderIndex(monst->leader));
+               monst->creatureMode, monst->mutationIndex, featureLeaderIndex(monst->leader), monst->turnsUntilRegen, monst->regenPerTurn);
         if (monst->carriedItem) featureItem(monst->carriedItem); else featureAppend("null");
         featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d,\"defense\":%d}}",
                monst->info.damage.lowerBound, monst->info.damage.upperBound, monst->info.accuracy, monst->info.defense);
@@ -717,6 +717,63 @@ static void fixtureArmorRunic(int kind, boolean plain, int condition) {
     updateEncumbrance();
 }
 
+/* Native attack abilities; preparation sets positions, gear and clocks only. */
+static void fixtureMonsterAbility(int code) {
+    const int kind = code / 2;
+    const boolean negative = code % 2;
+    const short actors[] = {MK_ACID_MOUND, MK_TOAD, MK_CENTIPEDE, MK_VAMPIRE_BAT,
+                            MK_OGRE, MK_GOBLIN, MK_NAGA};
+    fixtureSafeWorld();
+    creature *attacker = fixtureTarget(actors[kind], 41, 14);
+    attacker->ticksUntilTurn = kind == 0 ? 10000 : 1;
+    attacker->turnsUntilRegen = 100000;
+    attacker->regenPerTurn = 0;
+    if (kind == 0) {
+        item *weapon = give(WEAPON, DAGGER, 'a', true);
+        weapon->enchant1 = 0;
+        weapon->strengthRequired = rogue.strength;
+        weapon->flags |= ITEM_EQUIPPED;
+        if (negative) weapon->flags |= ITEM_PROTECTED;
+        rogue.weapon = weapon;
+        fixtureMonsterStatus(attacker, STATUS_STUCK, 50);
+        pmapAt(attacker->loc)->layers[SURFACE] = SPIDERWEB;
+    } else {
+        fixtureStatus(STATUS_STUCK, 50);
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+        if (kind <= 3) {
+            item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+            armor->flags |= ITEM_EQUIPPED;
+            armor->enchant1 = 0;
+            armor->armor = kind == 2 ? 30 : 0;
+            armor->strengthRequired = rogue.strength;
+            if (negative) {
+                armor->flags |= ITEM_RUNIC;
+                armor->flags &= ~(ITEM_RUNIC_IDENTIFIED | ITEM_RUNIC_HINTED);
+                armor->enchant2 = A_IMMUNITY;
+                armor->vorpalEnemy = 2; /* Original animal class includes Toad/Centipede/Bat. */
+            }
+            rogue.armor = armor;
+            fixtureStatus(STATUS_DONNING, 0);
+        }
+        if (kind == 3) {
+            attacker->currentHP = 1; /* Original maxHP18 and flitting/flying remain. */
+            for (int x = 40; x <= 42; x++) for (int y = 13; y <= 15; y++) {
+                if ((x != 41 || y != 14) && (x != 40 || y != 14)) pmap[x][y].layers[DUNGEON] = WALL;
+            }
+        } else if (kind == 4 && negative) pmap[39][14].layers[DUNGEON] = WALL;
+        else if (kind == 5 || kind == 6) {
+            creature *ally = fixtureFrozenTarget(MK_OGRE, kind == 5 ? 39 : 41,
+                                                kind == 5 ? (negative ? 15 : 14) : (negative ? 16 : 15));
+            ally->creatureState = MONSTER_ALLY;
+            ally->leader = &player;
+            ally->bookkeepingFlags |= MB_FOLLOWER;
+            fixtureMonsterStatus(ally, STATUS_STUCK, 50);
+            pmapAt(ally->loc)->layers[SURFACE] = SPIDERWEB;
+        }
+    }
+    updateEncumbrance();
+}
+
 /* Unworn known rings and native actors/charge clocks; effects follow real equip. */
 static void fixtureRing(short kind, int condition) {
     fixtureSafeWorld();
@@ -960,10 +1017,13 @@ int brogue_check_fixture(int scene) {
                 || (condition == 3 && kind != RING_TRANSFERENCE && kind != RING_REAPING)) return -1;
             category = RING;
         }
+        else if (group == CHECK_MONSTER_ABILITIES) {
+            if (kind < 0 || kind >= 14) return -1;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
-        if (category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
+        if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
     } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
     if (scene == CHECK_NATIVE_LEVELS) {
         pos destination;
@@ -979,6 +1039,7 @@ int brogue_check_fixture(int scene) {
     else if (category == WEAPON) fixtureWeaponRunic(kind, group == CHECK_WEAPON_PLAIN, group == CHECK_WEAPON_INANIMATE);
     else if (category == ARMOR) fixtureArmorRunic(kind, group == CHECK_ARMOR_PLAIN, condition);
     else if (category == RING) fixtureRing(kind, condition);
+    else if (group == CHECK_MONSTER_ABILITIES) fixtureMonsterAbility(kind);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

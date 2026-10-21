@@ -23,6 +23,7 @@ export function createArmorRunicCases({variants=['brogue','rapid_brogue','bullet
   const fixture_id=(plain?S.ARMOR_PLAIN:condition?S.ARMOR_CONDITION+condition*100:S.ARMOR_RUNIC)+kind,key=variant+'-'+mode+'-'+symbol;
   const targets=positive?[{domain:'armorEnchants',symbol:'A_'+symbol}]:[];
   if(inanimate)targets.push({domain:'monsterBehaviorFlags',symbol:'MONST_INANIMATE'});
+  if(symbol==='DAMPENING')targets.push({domain:'monsterTypes',symbol:'MK_EXPLOSIVE_BLOAT'},{domain:'monsterAbilityFlags',symbol:'MA_DF_ON_DEATH'});
   if(symbol==='REFLECTION'&&condition===2)targets.push({domain:'boltFlags',symbol:'BF_NEVER_REFLECTS'});
   cases.push({id:variant+'-'+input_path+'-'+mode+'-'+symbol.toLowerCase(),variant,input_path,fixture_id,feature_ids:['items.runics','combat','items.knowledge','turn.environment',...(symbol==='DAMPENING'?['cmd.move','ai.monsters','ai.flags_bolts']:['cmd.rest']),...(['REFLECTION','MULTIPLICITY','IMMOLATION'].includes(symbol)?['ai.flags_bolts']:[])],targets,assertions:[
    'Known leather/raw30, unknown native runic, DONNING0, HP100/regen0; melee uses original attacker/ticks1 and web/STUCK, environmental/caster scenes have no unrelated attacker.',

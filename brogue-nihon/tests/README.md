@@ -133,3 +133,11 @@ Clairは壁裏CARPETの現在透視と解除後の発見記憶。Lightは人工b
 Awarenessは開始床だけ既検索にし、実装備後の未検索床への移動から隣接隠しtrapを発見する。2個+4の強度110と未踏隣接42,15の確定安全flag、-2の自動検索停止を区別し、plainの確率発見は許容する。Wisdomはstaff timer31の実充填、stack/negativeは高timer1000で28/5、解除10を測り、charmは通常1のまま。Reapingはstaff timer1000/charm100から最大20実hitで充填/readyを必須にし、実Health charm使用まで接続する。充填前の抽選Nは0..2D、timer差10(1+N)/cooldown差1+N、充填後の乱数timerと末尾pairRNGは比較しない。解除後追加gain停止はstaffの10差で示す。
 
 負ringは既に呪いを解いた人工状態で、呪いによる固定・全強化値・全相互作用・自然生成までの完了とは呼ばない。追加observerは直接読む8bonus/保持stealthRange/再生間隔（千分の1turn）とring種類数。初期派生計算以外にeffect/RNG helperをfixtureで呼ばない。`BROGUE_RING_EFFECTS` は完全case IDのCSV。実行は`node brogue-nihon/tests/ring-effects.mjs`、原作比較は結果`brogue-nihon/.local/feature-verification/ring-effects/results.json`、`BROGUE_COMPARE_NAME=ring-effects`、`BROGUE_COMPARE_DOMAINS=none`。
+
+
+`monster-abilities.mjs` は新7能力の正負14条件を3variant・PC/touchで84件実行する。元Acid Moundの武器腐食/保護、Toad幻覚、Centipede弱体、Vampire Bat敵90%吸血とanimal class2 Immunity対照、Ogre押出/壁、Goblin貫通/射線外、Naga全隣接/範囲外を実攻撃・待機で検証する。純正info/能力/速度/AIを保持し、HP100・web/STUCK・回復停止・防具raw30/0・配置は明示的な準備。麻痺倍増や効果helper/RNG再設定は使わない。Batのnative max18、被害役の元Ogre max55も保持する。
+
+幻覚はCE/Rapid20・Bullet10、弱体は300/100/50の付与と直後tickを確認する。自然解除、継続被弾、味方40%吸血、全耐性・全配置・全monster相互作用・自然生成は未確認。player/allyの各被害を個別に判定し、対照の末尾RNG同値は要求しない。追加observerはmonsterのturnsUntilRegen/regenPerTurnを直接読むだけ。`BROGUE_MONSTER_ABILITIES` は完全case IDのCSV。実行は `node brogue-nihon/tests/monster-abilities.mjs`、原作比較には `brogue-nihon/.local/feature-verification/monster-abilities/results.json` と `BROGUE_COMPARE_NAME=monster-abilities`、`BROGUE_COMPARE_DOMAINS=none` を指定する。
+
+
+酸の正条件は原作の確認画面で一度取消し、全観測状態/RNGが不変のまま再攻撃を確定して腐食を起こす。Immunity対照は被害0だけでなく未鑑定→実命中によるrunic鑑定も必須。正負の初期対照は明示した装備フィールド・壁と派生視界・味方位置/web/占有だけを正規化し、残り全観測状態とRNGを比較する。関連Dampening回帰では、既存の実Bloat kill→death DFのassertionをMK_EXPLOSIVE_BLOAT/MA_DF_ON_DEATHへ明示対応する。以前の動作を新規発見とは扱わない。
