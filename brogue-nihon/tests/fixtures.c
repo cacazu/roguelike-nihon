@@ -743,6 +743,16 @@ static void fixtureMonsterReflection(int scene) {
     subject->regenPerTurn = 0;
 }
 
+/* Native kamikaze contact, with FLITS retained and no death/effect helper. */
+static void fixtureMonsterKamikaze(int scene) {
+    const short actors[] = {MK_BLOAT, MK_EXPLOSIVE_BLOAT, MK_RAT};
+    const pos walls[] = {{40,13},{41,13},{42,13},{42,14},{42,15},{41,15},{40,15}};
+    fixtureSafeWorld();
+    creature *subject = fixtureTarget(actors[scene - CHECK_KAMIKAZE_BLOAT], 41, 14);
+    subject->ticksUntilTurn = 1;
+    for (int i = 0; i < 7; i++) pmapAt(walls[i])->layers[DUNGEON] = WALL;
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1520,7 +1530,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_REFLECT_GOLEM) return -1;
+    } else if (scene < 1 || scene > CHECK_KAMIKAZE_RAT) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1556,6 +1566,7 @@ int brogue_check_fixture(int scene) {
     else if (group == CHECK_MONSTER_SPELLS) fixtureMonsterSpell(kind);
     else if (scene >= CHECK_FLIGHT_OPEN && scene <= CHECK_FLIGHT_FEAR_PERMANENT) fixtureMonsterFlight(scene);
     else if (scene >= CHECK_REFLECT_GUARDIAN && scene <= CHECK_REFLECT_GOLEM) fixtureMonsterReflection(scene);
+    else if (scene >= CHECK_KAMIKAZE_BLOAT && scene <= CHECK_KAMIKAZE_RAT) fixtureMonsterKamikaze(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
