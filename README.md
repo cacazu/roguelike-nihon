@@ -13,7 +13,7 @@ RogueはCのゲームロジックとRustの表示・入力・プラットフォ�
 
 ローカル配信には、作品フォルダー外の開発・テスト用 [tools/server.mjs](tools/server.mjs) を使います。各作品の `start.ps1` が配信対象を指定します。直接起動する場合は `node tools/server.mjs --root rogue-nihon 4173`、Brogueは `node tools/server.mjs --root brogue-nihon 4174` です。本番公開は各作品の静的ファイルを配信し、このツールを含めません。
 
-BrogueのWeb版はPCのキー入力・スマートフォンのタッチ操作と、オリジナル・ドット絵・イラストの表示に対応します。Cの原作がゲーム状態・乱数・保存を所有し、ブラウザーの入力・表示・保存ファイルの管理は作品固有Rustが担当します。英語・日本語表示に対応し、ゲームデータ、録画、診断出力は英語を保持します。[翻訳辞書](brogue-nihon/locales/README.md)と[Web実装・検証](brogue-nihon/docs/WEB-ja.md)を参照してください。
+BrogueのWeb版はPCのキー入力・スマートフォンのタッチ操作と、オリジナル・ドット絵・イラストの表示に対応します。Cの原作がゲーム状態・乱数・保存を所有し、ブラウザーの入力・表示・保存ファイルの管理は作品固有Rustが担当します。英語・日本語表示に対応し、ゲームデータ、録画、診断出力は英語を保持します。[翻訳辞書](brogue-nihon/locales/README.md)、[Web実装](brogue-nihon/docs/WEB-ja.md)、[原作機能と受け入れ基準](brogue-nihon/docs/FEATURES-ja.md)を参照してください。
 
 - Brogue upstream: https://github.com/tmewett/BrogueCE
 - Brogue source release: https://github.com/tmewett/BrogueCE/releases/tag/v1.15.1

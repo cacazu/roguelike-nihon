@@ -22,6 +22,7 @@
 
 - ゲーム非依存の描画APIは [rust-common](rust-common/README.md)。ゲームの命令、ABI、記号と画像の対応、可視性、保存形式は作品側へ置く。
 - BrogueのC/Rust境界、入力待ち、3表示、保存・配布の契約は [Web実装](brogue-nihon/docs/WEB-ja.md)、ビルドは [BUILD.md](brogue-nihon/BUILD.md)、検証入口は [tests/README.md](brogue-nihon/tests/README.md) を参照する。
+- Brogue原作の全コマンド・内容定義と検証の単位は [機能と受け入れ基準](brogue-nihon/docs/FEATURES-ja.md) を参照する。通常プレイ、fixture、ソース確認、未確認を区別する。
 - 作品固有の検証に加え、共通Rustを変更したら共通クレートの単体検査と両作品の関連ブラウザー操作を確認する。
 
 ## 一時スクリプトの後始末
