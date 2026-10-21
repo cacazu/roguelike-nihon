@@ -709,6 +709,24 @@ static void fixtureSafeWorld(void) {
     player.regenPerTurn = 0;
 }
 
+/* Initial flight conditions only. Original updateMonsterState, safety maps,
+ * fear decay and attacks run later through actual rest input, never here. */
+static void fixtureMonsterFlight(int scene) {
+    fixtureSafeWorld();
+    creature *subject = fixtureTarget(MK_MONKEY, 41, 14);
+    subject->creatureState = MONSTER_FLEEING;
+    subject->creatureMode = scene == CHECK_FLIGHT_FEAR_NORMAL ? MODE_NORMAL : MODE_PERM_FLEEING;
+    subject->ticksUntilTurn = 1;
+    subject->carriedItem = generateItem(WEAPON, DART);
+    subject->carriedItem->quantity = 3;
+    if (scene != CHECK_FLIGHT_OPEN) {
+        const pos blocked[] = {{40,13},{41,13},{42,13},{42,14},{42,15},{41,15},{40,15}};
+        for (int i = 0; i < 7; i++) pmapAt(blocked[i])->layers[DUNGEON] = WALL;
+    }
+    if (scene == CHECK_FLIGHT_FEAR_NORMAL || scene == CHECK_FLIGHT_FEAR_PERMANENT)
+        subject->status[STATUS_MAGICAL_FEAR] = subject->maxStatus[STATUS_MAGICAL_FEAR] = 4;
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1486,7 +1504,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_ORIGINAL_SYMBOL_COLORS) return -1;
+    } else if (scene < 1 || scene > CHECK_FLIGHT_FEAR_PERMANENT) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1520,6 +1538,7 @@ int brogue_check_fixture(int scene) {
     else if (group == CHECK_TERRAIN_EXPOSURE) fixtureTerrainExposure(kind);
     else if (group == CHECK_TERRAIN_HAZARDS) fixtureTerrainHazard(kind);
     else if (group == CHECK_MONSTER_SPELLS) fixtureMonsterSpell(kind);
+    else if (scene >= CHECK_FLIGHT_OPEN && scene <= CHECK_FLIGHT_FEAR_PERMANENT) fixtureMonsterFlight(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

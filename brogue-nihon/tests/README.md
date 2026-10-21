@@ -194,3 +194,8 @@ CHECKの`nativeAIProbe`は未準備・turn0だけで適格NPCの数値ID/index�
 ### Original植物記号の色（CHECK専用）
 
 `node brogue-nihon/tests/original-symbol-colors.mjs` は3variant×PC/タッチエミュレーション6件。Cの公開フレームにFOLIAGE/BLOODWORT_STALKのU+2648と緑・紫・暗い緑、非黒背景を明示するUI専用fixtureを使う。実際のRust canvasで前景色の同一alpha合成・十分な色応答・透明な背景・上下左右のセル境界を検査し、fit/14/24倍率でOriginal→Dot→Illustration→OriginalをDOM操作する。各操作後にC状態・RNG・入力待ちserial・消費入力数の不変を検査する。最後の実入力restのみがCのturnを進める。自然な地形配置・治癒・照明・全記号・実機Safariの合格には使わない。`BROGUE_ORIGINAL_SYMBOL_COLORS` は完全case IDのCSV。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/original-symbol-colors/results.json`、`BROGUE_COMPARE_NAME=original-symbol-colors`、`BROGUE_COMPARE_DOMAINS=none` を指定し `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。原作比較はC状態と入力の一致で、canvas色はブラウザpixel検査の証拠を使う。
+
+
+### 逃走・追詰め反撃・魔法恐怖の期限（CHECK専用）
+
+`node brogue-nihon/tests/monster-flight.mjs` は3variant×PC/タッチ×4初期条件の24件。原作Monkey情報を保持し、初期FLEEING・mode・盗品dart3本・時計1と任意の7壁/魔法恐怖4を明示する。実restで安全mapによる最初の退避、追詰め反撃、恐怖中の反撃禁止、実期限切れ後のNORMAL/PERM状態差を検証する。恐怖0直後は両modeの一時TRACKINGを許し、公開攻撃文/HP低下/位置固定/fear0を伴う実NPC行動後に状態差を評価する。減衰はrest番号と固定対応させない。最大8rest未到達はFAIL。恐怖2条件の両方が選ばれた場合はfixture/mode以外の全初期state/RNG一致、PC/touchも両方が選ばれた場合は全初期/最終state/RNG一致を検査する。単独IDで対照未選択なら未比較と記録する。初期状態の存在だけ、自然な恐怖付与・配置・群れ生成・実機Safariの証拠にはしない。`BROGUE_MONSTER_FLIGHT` は完全ID CSV。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/monster-flight/results.json`、`BROGUE_COMPARE_NAME=monster-flight`、`BROGUE_COMPARE_DOMAINS=none` を指定し `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。
