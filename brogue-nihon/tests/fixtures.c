@@ -19,6 +19,8 @@ extern void brogue_check_publish(void);
 static int preparedScene;
 static creature *nativeAISubject;
 static creature *enteredSubject;
+static creature *corridorSubject;
+static creature *corridorCompanion;
 static pos nativeAIRoute[9];
 static int nativeAIRouteCount;
 #if defined(BROGUE_BROWSER)
@@ -132,6 +134,28 @@ static void featureCarriedMonster(creature *monst) {
     featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d,\"defense\":%d}}",
                   monst->info.damage.lowerBound, monst->info.damage.upperBound,
                   monst->info.accuracy, monst->info.defense);
+}
+
+/* Pure shape/scent/FOV evidence for the corridor scenes; never ask the AI
+ * to choose a direction. The prepared pointers are compared, not dereferenced. */
+static void featureCorridorObservation(creature *monst) {
+    featureAppend(",\"corridorSubject\":%d,\"corridorCompanion\":%d,\"passableArcs\":%d,"
+                  "\"scent\":%d,\"fieldOfView\":%d,\"publicVisible\":%d,\"adjacent\":[",
+                  monst == corridorSubject, monst == corridorCompanion,
+                  passableArcCount(monst->loc.x, monst->loc.y), scentMap[monst->loc.x][monst->loc.y],
+                  !!(pmapAt(monst->loc)->flags & IN_FIELD_OF_VIEW), canSeeMonster(monst));
+    int count = 0;
+    if (monst == corridorSubject) for (int dir = 0; dir < DIRECTION_COUNT; dir++) {
+        pos loc = {monst->loc.x + nbDirs[dir][0], monst->loc.y + nbDirs[dir][1]};
+        if (!isPosInMap(loc)) continue;
+        if (count++) featureAppend(",");
+        featureAppend("{\"arc\":%d,\"scent\":%d,\"fieldOfView\":%d,\"cell\":",
+                      passableArcCount(loc.x,loc.y), scentMap[loc.x][loc.y],
+                      !!(pmapAt(loc)->flags & IN_FIELD_OF_VIEW));
+        featureCell(loc);
+        featureAppend("}");
+    }
+    featureAppend("]");
 }
 
 /* Native-AI observation is read-only: never select a destination, diffuse
@@ -296,6 +320,8 @@ const char *brogue_check_features(void) {
             featureAppend(",\"preparedSubject\":%d,\"carriedMonster\":", monst == enteredSubject);
             featureCarriedMonster(monst->carriedMonster);
         }
+        if (preparedScene >= CHECK_CORRIDOR_GROUP && preparedScene <= CHECK_CORRIDOR_WIDE)
+            featureCorridorObservation(monst);
         featureAppend("}");
     }
     featureAppend("],\"cells\":[");
@@ -361,6 +387,7 @@ static void fixtureInventory(void) {
 
 static void fixtureRoom(void) {
     enteredSubject = NULL;
+    corridorSubject = corridorCompanion = NULL;
     freeCreatureList(monsters);
     freeCreatureList(dormantMonsters);
     rogue.lastTarget = NULL;
@@ -834,6 +861,28 @@ static void fixtureMonsterNegation(int scene) {
     if (scene == CHECK_NEGATE_PHANTOM) give(POTION, POTION_TELEPATHY, 'b', true);
     creature *subject = fixtureTarget(scene == CHECK_NEGATE_PHANTOM ? MK_PHANTOM : MK_PHYLACTERY, 42, 14);
     subject->ticksUntilTurn = 10000;
+}
+
+/* Artificial group membership and a passable gate, not natural horde creation.
+ * The isolated original companion is held by a long initial clock only. */
+static void fixtureMonsterCorridor(int scene) {
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    for (int y = 10; y <= 18; y++) pmap[41][y].layers[DUNGEON] = y == 14 ? FLOOR : WALL;
+    if (scene == CHECK_CORRIDOR_WIDE) {
+        pmap[41][13].layers[DUNGEON] = FLOOR;
+        pmap[41][15].layers[DUNGEON] = FLOOR;
+    }
+    corridorSubject = fixtureTarget(scene == CHECK_CORRIDOR_KOBOLD ? MK_KOBOLD : MK_OGRE, 44, 14);
+    corridorSubject->ticksUntilTurn = 1;
+    pmap[20][14].layers[DUNGEON] = FLOOR;
+    corridorCompanion = fixtureTarget(MK_KOBOLD, 20, 14);
+    corridorCompanion->ticksUntilTurn = 10000;
+    if (scene != CHECK_CORRIDOR_SOLO) {
+        corridorSubject->bookkeepingFlags |= MB_LEADER;
+        corridorCompanion->bookkeepingFlags |= MB_FOLLOWER;
+        corridorCompanion->leader = corridorSubject;
+    }
 }
 
 /* Native runic preparation only. Combat and proc RNG are never called here. */
@@ -1613,7 +1662,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_NEGATE_PHYLACTERY) return -1;
+    } else if (scene < 1 || scene > CHECK_CORRIDOR_WIDE) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1654,6 +1703,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_WHIP_RANGE4 && scene <= CHECK_WHIP_OGRE) fixtureMonsterWhip(scene);
     else if (scene >= CHECK_ENTER_SUMMONS && scene <= CHECK_ENTER_PHOENIX) fixtureMonsterEnter(scene);
     else if (scene == CHECK_NEGATE_PHANTOM || scene == CHECK_NEGATE_PHYLACTERY) fixtureMonsterNegation(scene);
+    else if (scene >= CHECK_CORRIDOR_GROUP && scene <= CHECK_CORRIDOR_WIDE) fixtureMonsterCorridor(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
