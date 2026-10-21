@@ -141,3 +141,8 @@ Awarenessは開始床だけ既検索にし、実装備後の未検索床への�
 
 
 酸の正条件は原作の確認画面で一度取消し、全観測状態/RNGが不変のまま再攻撃を確定して腐食を起こす。Immunity対照は被害0だけでなく未鑑定→実命中によるrunic鑑定も必須。正負の初期対照は明示した装備フィールド・壁と派生視界・味方位置/web/占有だけを正規化し、残り全観測状態とRNGを比較する。関連Dampening回帰では、既存の実Bloat kill→death DFのassertionをMK_EXPLOSIVE_BLOAT/MA_DF_ON_DEATHへ明示対応する。以前の動作を新規発見とは扱わない。
+
+
+`node brogue-nihon/tools/play-browser.mjs --seed 43 --out normal-play-04-seed43-replay --replay .local/feature-verification/normal-play-03-seed43/actions.jsonl` は通常配布のみを使う公開画面・入力の記録ツール。新しい別試行として開始し、production manifest/4artifact/seedを照合してから、保存済み各操作の前後で公開テキスト・入力待ち・候補を比較し、最初の差異で再生を停止する。RGBの揺らぎは比較対象外で、公開HPは保存PNGから確認する。CHECK・game module・非公開地図・未識別品の内部値を読まない。`--out` は未使用の `normal-play-*` 名に限る。操作/画面/実frontendイベントと不確定な要求を逐次保存し、完了・勝利・全機能合格を自動判定しない。
+
+出力先の `live-controller.json` に専用localhost URLと能力tokenがある。Bearer token付きGET `/state` は実ブラウザーの公開状態を読み、POST `/action` は `request_id`（UUID）と `commands`（`key`/`expect`/`reason` の公開キー入力のみ）を受ける。同じIDと命令の再送は保存結果を返して二重入力しない。通信不明時はGET `/request/<id>` と操作ログを先に確認し、新IDで盲目に再送しない。並行入力、再生差異後、要求失敗後、終了処理中の追加入力は拒否する。selector操作は扱わない。POST `/close` はゲーム内で保存・終了してから行い、ゲーム途中で閉じる場合は `abandon: true` と理由を明記して技術中断として記録する。端末切断でcontrollerが失われた場合は、その試行を技術中断として残し、再生/ロード/新規試行を区別する。操作数とターン数、通常攻略とfixture、保存テキスト同値と全内部状態同値を混同しない。
