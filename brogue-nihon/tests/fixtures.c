@@ -18,10 +18,12 @@ extern void brogue_check_publish(void);
 
 static int preparedScene;
 static creature *nativeAISubject;
+static pos nativeAIRoute[9];
+static int nativeAIRouteCount;
 #if defined(BROGUE_BROWSER)
 static SavedDisplayBuffer *initialCommandDisplay;
 void brogue_check_bind_command_display(SavedDisplayBuffer *saved) {
-    if (!preparedScene && rogue.seed == 42 && rogue.playerTurnNumber == 0
+    if (!preparedScene && rogue.playerTurnNumber == 0
         && !rogue.playbackMode && !rogue.cursorMode && rogue.cursorLoc.x < 0 && rogue.cursorLoc.y < 0)
         initialCommandDisplay = saved;
 }
@@ -115,7 +117,8 @@ static int featureLeaderIndex(creature *leader) {
  * scent or refresh a waypoint here. A stale pointer is compared, not read. */
 static boolean fixtureIsNativeWorld(void) {
     return !preparedScene || preparedScene == CHECK_NATIVE_LEVELS
-        || preparedScene / 1000 * 1000 == CHECK_NATIVE_AI;
+        || preparedScene / 1000 * 1000 == CHECK_NATIVE_AI
+        || preparedScene / 1000 * 1000 == CHECK_NATIVE_SCENT;
 }
 static unsigned long long fixtureHashWord(unsigned long long h, unsigned long value) {
     for (int i = 0; i < 4; i++) { h ^= value & 255; h *= 1099511628211ULL; value >>= 8; }
@@ -142,7 +145,8 @@ static void featureNativeWorld(void) {
 }
 static void featureNativeAI(void) {
     creature *subject = NULL; int index = 0, subjectIndex = -1;
-    if (preparedScene / 1000 * 1000 == CHECK_NATIVE_AI && rogue.gameInProgress && monsters) {
+    if ((preparedScene / 1000 * 1000 == CHECK_NATIVE_AI
+        || preparedScene / 1000 * 1000 == CHECK_NATIVE_SCENT) && rogue.gameInProgress && monsters) {
         for (creatureIterator it = iterateCreatures(monsters); hasNextCreature(it); index++) {
             creature *m = nextCreature(&it);
             if (m == nativeAISubject) { subject = m; subjectIndex = index; break; }
@@ -160,6 +164,9 @@ static void featureNativeAI(void) {
         for (int i = 0; i < rogue.wpCount; i++) featureAppend("%s%d",i ? "," : "",rogue.wpDistance[i] ? rogue.wpDistance[i][cell.x][cell.y] : -1);
         featureAppend("]}");
     }
+    featureAppend("],\"route\":[");
+    if (preparedScene / 1000 * 1000 == CHECK_NATIVE_SCENT)
+        for (int i=0;i<nativeAIRouteCount;i++) featureAppend("%s[%d,%d]",i ? "," : "",nativeAIRoute[i].x,nativeAIRoute[i].y);
     featureAppend("]}");
 }
 
@@ -1299,6 +1306,93 @@ static boolean fixtureNativeAIStart(int kind, creature **selected, pos *destinat
     return false;
 }
 
+/* Pure bounded path search. Local FOV caches do not touch world state.
+ * Safe steps may turn at native corners; no AI or scent helper is called. */
+typedef struct {
+    creature *subject;
+    pos cell;
+    char safe[DCOLS][DROWS];
+    short visibility[DCOLS][DROWS]; /* -1 unknown; bit1 other-hidden, bit2 subject-neighbours-hidden, bit4 initial-subject-visible */
+    int *stats;
+} fixtureScentSearch;
+static int fixtureScentVisibility(fixtureScentSearch *search, pos cell) {
+    if (search->visibility[cell.x][cell.y]>=0) return search->visibility[cell.x][cell.y];
+    char fov[DCOLS][DROWS]={{0}};
+    getFOVMask(fov,cell.x,cell.y,(DCOLS+DROWS)*FP_FACTOR,T_OBSTRUCTS_VISION,0,false);
+    int value=fixtureAIOthersHidden(fov,search->subject)?1:0;
+    if (fov[search->cell.x][search->cell.y]) value|=4;
+    if (!fov[search->cell.x][search->cell.y] && fixtureAIHiddenNeighbours(search->cell,fov)) value|=2;
+    search->visibility[cell.x][cell.y]=value;return value;
+}
+static boolean fixtureScentRoute(fixtureScentSearch *search, pos route[9], int count, int goal) {
+    if (count==goal) {
+        if (search->stats) search->stats[3]++;
+        /* Geometry heuristic only: form a real visible trail first and turn
+         * early enough to leave later hidden pursuit inputs. Runtime effect
+         * oracles still require actual subject motion, not this estimate. */
+        int firstHidden=count;
+        for (int i=1;i<count;i++) if (!(fixtureScentVisibility(search,route[i])&4)) { firstHidden=i;break; }
+        if (firstHidden<=count-3 && (fixtureScentVisibility(search,route[count-1])&2)) { if (search->stats) search->stats[4]++;return true; }
+        return false;
+    }
+    for (int dir=0;dir<4;dir++) {
+        pos last=route[count-1],next={last.x+nbDirs[dir][0],last.y+nbDirs[dir][1]};
+        if (!isPosInMap(next) || !search->safe[next.x][next.y] || distanceBetween(next,search->cell)<=2) continue;
+        boolean repeated=false;for (int i=0;i<count;i++) if (posEq(next,route[i])) { repeated=true;break; }
+        if (repeated || !(fixtureScentVisibility(search,next)&1)
+            || (count==1 && !(fixtureScentVisibility(search,next)&4))) continue;
+        route[count]=next;if (fixtureScentRoute(search,route,count+1,goal)) return true;
+    }
+    return false;
+}
+/* Both conditions choose identical subject/start/path/end on the unchanged
+ * native world. Only outputs are assigned on success; rejection is pure. */
+static boolean fixtureNativeScentStart(creature **selected, pos *destination, pos route[9], int *routeCount, int *stats) {
+    const short preferred[]={MK_KOBOLD,MK_RAT};
+    for (int preference=0;preference<2;preference++) for (creatureIterator it=iterateCreatures(monsters);hasNextCreature(it);) {
+        creature *subject=nextCreature(&it);
+        if (subject->info.monsterID!=preferred[preference] || !fixtureAIEligible(subject)) continue;
+        fixtureScentSearch search={0};search.subject=subject;search.stats=stats;
+        for (int y=0;y<DROWS;y++) for (int x=0;x<DCOLS;x++) {
+            pos cell={x,y};search.safe[x][y]=fixtureAIPlayerCell(cell,subject);search.visibility[x][y]=-1;
+        }
+        for (int y=1;y<DROWS-1;y++) for (int x=1;x<DCOLS-1;x++) {
+            pos cell={x,y};if (!fixtureAISafeCell(cell,subject)) continue;
+            if (stats) stats[0]++;
+            boolean clean=true;
+            for (int dir=0;dir<DIRECTION_COUNT;dir++) {
+                pos next={x+nbDirs[dir][0],y+nbDirs[dir][1]};
+                if (!isPosInMap(next) || scentMap[next.x][next.y]) { clean=false;break; }
+                if (!(terrainFlags(next)&T_OBSTRUCTS_PASSABILITY) && !diagonalBlocked(x,y,next.x,next.y,false)
+                    && !fixtureAISafeCell(next,subject)) { clean=false;break; }
+            }
+            if (!clean || scentMap[x][y]) continue;
+            if (stats) stats[1]++;
+            search.cell=cell;
+            /* Subject-dependent geometric cache is local to this candidate. */
+            for (int py=0;py<DROWS;py++) for (int px=0;px<DCOLS;px++) search.visibility[px][py]=-1;
+            for (int gap=5;gap>=3;gap--) for (int dir=0;dir<4;dir++) {
+                pos start={x+gap*nbDirs[dir][0],y+gap*nbDirs[dir][1]};
+                if (!isPosInMap(start) || !search.safe[start.x][start.y]) continue;
+                clean=true;
+                for (int n=1;n<gap;n++) { pos mid={x+n*nbDirs[dir][0],y+n*nbDirs[dir][1]};if (!fixtureAISafeCell(mid,subject)) { clean=false;break; } }
+                if (!clean) continue;
+                char initialFov[DCOLS][DROWS]={{0}};
+                getFOVMask(initialFov,start.x,start.y,(DCOLS+DROWS)*FP_FACTOR,T_OBSTRUCTS_VISION,0,false);
+                if (!initialFov[x][y] || !fixtureAIOthersHidden(initialFov,subject)) continue;
+                if (stats) stats[2]++;
+                for (int goal=9;goal>=4;goal--) {
+                    pos trial[9];trial[0]=start;
+                    if (!fixtureScentRoute(&search,trial,1,goal)) continue;
+                    *selected=subject;*destination=cell;*routeCount=goal;
+                    memcpy(route,trial,goal*sizeof(pos));return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 /* CHECK-only diagnosis of preparation reachability, without changing the
  * rejected world/RNG or exposing anything to the playable game. */
 static void featureNativeAIProbe(void) {
@@ -1318,12 +1412,15 @@ static void featureNativeAIProbe(void) {
     }
     featureAppend("],\"sceneAvailable\":[");
     for (int kind=0;kind<3;kind++) { creature *subject;pos cell,playerCell;featureAppend("%s%d",kind ? "," : "",fixtureNativeAIStart(kind,&subject,&cell,&playerCell)); }
-    featureAppend("]}");
+    creature *subject;pos cell,route[9];int routeCount=0,stats[5]={0};
+    boolean available=fixtureNativeScentStart(&subject,&cell,route,&routeCount,stats);
+    featureAppend("],\"scentPlan\":{\"available\":%d,\"safeCells\":%d,\"cleanCells\":%d,\"starts\":%d,\"safeRoutes\":%d,\"hiddenEnds\":%d}}",available,stats[0],stats[1],stats[2],stats[3],stats[4]);
 }
 
 int brogue_check_fixture(int scene) {
     if (preparedScene || !gameConst || brogue_check_wait_kind() != BROWSER_COMMAND
-        || rogue.seed != 42 || rogue.playerTurnNumber != 0 || rogue.playbackMode || rogue.cursorMode
+        || (rogue.seed != 42 && scene / 1000 * 1000 != CHECK_NATIVE_SCENT)
+        || rogue.playerTurnNumber != 0 || rogue.playbackMode || rogue.cursorMode
         || rogue.cursorLoc.x >= 0 || rogue.cursorLoc.y >= 0 || !rogue.gameInProgress) return -1;
 #if defined(BROGUE_BROWSER)
     if (!initialCommandDisplay) return -1;
@@ -1382,20 +1479,27 @@ int brogue_check_fixture(int scene) {
         else if (group == CHECK_NATIVE_AI) {
             if (kind < 0 || kind >= 3) return -1;
         }
+        else if (group == CHECK_NATIVE_SCENT) {
+            if (kind < 0 || kind >= 2) return -1;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
     } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
-    if (group == CHECK_NATIVE_AI) {
-        creature *subject; pos destination, playerDestination;
-        if (!fixtureNativeAIStart(kind,&subject,&destination,&playerDestination)) return -1;
+    if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
+        creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
+        if (group == CHECK_NATIVE_SCENT) {
+            if (!fixtureNativeScentStart(&subject,&destination,route,&routeCount,NULL)) return -1;
+            playerDestination=route[kind ? routeCount-1 : 0];
+        } else if (!fixtureNativeAIStart(kind,&subject,&destination,&playerDestination)) return -1;
         pmapAt(player.loc)->flags &= ~HAS_PLAYER;
         pmapAt(subject->loc)->flags &= ~HAS_MONSTER;
         player.loc = playerDestination; subject->loc = destination;
         pmapAt(player.loc)->flags |= HAS_PLAYER; pmapAt(subject->loc)->flags |= HAS_MONSTER;
-        subject->creatureState = kind == 0 ? MONSTER_WANDERING : MONSTER_SLEEPING;
-        if (kind == 0) subject->targetWaypointIndex = -1;
+        subject->creatureState = group == CHECK_NATIVE_SCENT ? MONSTER_TRACKING_SCENT : kind == 0 ? MONSTER_WANDERING : MONSTER_SLEEPING;
+        if (group == CHECK_NATIVE_AI && kind == 0) subject->targetWaypointIndex = -1;
+        if (group == CHECK_NATIVE_SCENT) { nativeAIRouteCount=routeCount;memcpy(nativeAIRoute,route,routeCount*sizeof(pos)); }
         nativeAISubject = subject;
     } else if (scene == CHECK_NATIVE_LEVELS) {
         pos destination;
@@ -1470,7 +1574,7 @@ int brogue_check_fixture(int scene) {
     }
     /* Native-AI preparation does not change inventory; retain even the
      * original generated floor-item identification flags exactly. */
-    if (group != CHECK_NATIVE_AI) updateIdentifiableItems();
+    if (group != CHECK_NATIVE_AI && group != CHECK_NATIVE_SCENT) updateIdentifiableItems();
     updateMapToShore();
     updateVision(false);
     displayLevel();

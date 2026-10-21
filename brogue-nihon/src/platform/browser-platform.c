@@ -154,7 +154,7 @@ static void checkEnterEvent(boolean textInput) {
     if (inputWait.values[0] == BROWSER_COMMAND) {
         checkCommandWaits++;
         checkFirstCommandBoundary = checkCommandWaits == 1 && !textInput
-            && rogue.seed == 42 && rogue.playerTurnNumber == 0
+            && rogue.playerTurnNumber == 0
             && rogue.gameInProgress && !rogue.playbackMode
             && !rogue.cursorMode && rogue.cursorLoc.x < 0 && rogue.cursorLoc.y < 0;
     }

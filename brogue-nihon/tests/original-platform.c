@@ -26,7 +26,7 @@ static void prepare_fixture(boolean textInput) {
     char *end;
     errno = 0;
     long scene = value ? strtol(value, &end, 10) : 0;
-    if (textInput || !rogue.gameInProgress || rogue.seed != 42 || rogue.playerTurnNumber != 0
+    if (textInput || !rogue.gameInProgress || rogue.playerTurnNumber != 0
         || !value || !*value || *end || errno || scene < 1 || scene > INT_MAX
         || brogue_check_fixture((int) scene) != scene) {
         fputs("Invalid or rejected native comparison fixture\n", stderr);

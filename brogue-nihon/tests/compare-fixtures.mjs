@@ -104,14 +104,14 @@ try{
     try{
       assert.equal(row.status,'pass');assert.equal(row.fixture,true);
       assert.ok(Array.isArray(row.native_trace)&&row.native_trace.length,'Missing consumed-input fixture trace');
-      assert.equal(row.seed,'42');
+      assert.ok(/^[1-9][0-9]*$/.test(row.seed)&&BigInt(row.seed)<=18446744073709551615n,'Fixture seed must be explicit reproducible uint64');
       assert.ok(Number.isInteger(row.fixture_id)&&row.fixture_id>0,'Missing fixture ID');
       assert.ok(['brogue','rapid_brogue','bullet_brogue'].includes(row.variant),'Unknown variant');
-      assert.equal(row.initial_state.seed,'42');
+      assert.equal(row.initial_state.seed,row.seed);
       assert.deepEqual(normalize(row.native_trace[0].before),normalize(row.initial_state),'First trace is not the post-prepare baseline');
       const events=row.native_trace.map(entry=>{assert.ok(Array.isArray(entry.event)&&entry.event.length===5);for(const value of entry.event)assert.ok(Number.isInteger(value)&&value>=-2147483648&&value<=2147483647);return entry.event;});
       const expected=[...row.native_trace.map(entry=>normalize(entry.before)),normalize(row.final_state)];
-      const args=[...(row.variant==='brogue'?[]:['--variant',row.variant]),'--seed','42'];
+      const args=[...(row.variant==='brogue'?[]:['--variant',row.variant]),'--seed',row.seed];
       const replay=spawnSync(executable,args,{cwd:temporary,env:{...process.env,BROGUE_COMPARE_SCENE:String(row.fixture_id)},
         input:events.map(event=>event.join(' ')).join('\n')+'\n',encoding:'utf8',timeout:60000,maxBuffer:64*1024*1024});
       assert.equal(replay.status,0,replay.error?.message||replay.stderr||'Native replay did not exit cleanly');

@@ -184,7 +184,7 @@
     },
     {
       "file": "src/platform/browser-platform.c",
-      "sha256": "b276f9025f168c6df2772dd51d5cd2328cc8b2d8b1c1bf747353b502239d724c"
+      "sha256": "6a98bacda2b3f32eaf3f2795887d4227836082400f106c1a9b2f4766dadba606"
     },
     {
       "file": "src/platform/BrowserIO.h",

@@ -177,3 +177,15 @@ player HP/max1000・自然回復停止・鎧raw0、初期TRACKING/leader/followe
 徘徊は最大12restで実index選択・移動・同一after観測内の旧セル→新セル距離減少、睡眠対照は8restの位置/SLEEP/FOV0維持、視認は最大40restのSLEEP→TRACKINGと次の実接近を要求する。restで変わる実stealthRange、全描画観測の他NPC距離>4とplayer/対象HP・NUTRITION以外status初期値維持を確認し、未到達はFAIL。他NPC全てのFOV0は配置時の条件であり、その後は距離・HP/statusで実干渉を排除する。waypointの再計算、scent拡散/方向選択、AI/effect/turn/RNG helperは準備/観測から呼ばない。自然な配置/通常攻略、実臭跡追跡・未形成臭跡対照、alarm騒音、全AI/群れ/変異、実機Safariは未確認。`BROGUE_NATIVE_AI`は完全case IDのCSV。実行は `node brogue-nihon/tests/native-ai.mjs`。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/native-ai/results.json`、`BROGUE_COMPARE_NAME=native-ai`、`BROGUE_COMPARE_DOMAINS=none` で `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。
 
 CHECKの`nativeAIProbe`は未準備・turn0だけで適格NPCの数値ID/index、床候補と他NPC最小距離の件数、3条件の成立可否を純読取する。新suiteのstartup状態も保存し、配置条件の拒否を実AI未到達と区別する。候補計算からworld/RNG/waypoint/scentは変更しない。
+
+### 自然生成地形上の臭跡追跡（CHECK専用）
+
+`node brogue-nihon/tests/native-scent.mjs` の既定はCEの形成/未形成とRapid/Bulletの未形成、PC/タッチの8例。factoryは12例を保持し、残る形成追跡4例は明示IDで診断できるが未到達・未受入である。`BROGUE_NATIVE_SCENT`で対象IDを絞れる。共通の純粋な配置選択が、元の安全床で3〜8歩の単純な4方向経路と自然な遮蔽、対象の元臭跡0、対象/隣接セルの他NPC距離>12、player経路>8と初期他NPC非視認を満たす同じ対象・経路を選ぶ。不成立は状態/RNG不変の拒否。地形・waypoint・臭跡・元NPC情報/時計は保持し、playerと対象の位置・占有・初期TRACKINGだけを準備する。
+
+正例は経路を実移動で最後まで進み、最初の視線喪失を助走とする。その後の、入力前後とも対象が非視認で、同じ入力後の旧セルも非視認、対象がTRACKINGを維持して1セル動き、同じ観測内で新セルの臭跡値が旧セルより大きい場面を要求する。`U=入力前の臭跡時計+3-入力前の対象セル臭跡` が `0..2*入力前stealthRange` に入る認知範囲内の証拠だけをfresh追跡とする。弱い臭跡での97%保持に該当する区間は、旧セル臭跡の入力前後一致で経過値を確定できる場合に別記録し、fresh合格へ使わない。全3variantの通常移動でNPC時計が進む。`D_BULLET_TIME`は無効なdebug分岐である。
+
+負例は同じ経路の終点へplayerを最初から置き、元の未形成臭跡を保持したまま最大3回の実restでTRACKINGからWANDERINGへの遷移を要求する。正例を選択した実行では対象/経路/到達終点/RNGの一致も確認する。対象とplayerの全描画観測HP・特殊status、他NPCとの距離>4を検査する。負例だけ全観測の非視認を要求し、正例は形成区間と遮蔽追跡区間を分ける。認知喪失は特定helper呼出しの証明ではない。CHECK状態で観測した遮蔽動作を公開画面で見えた効果、自然配置、全AI、通常攻略、実機Safariの確認へ昇格しない。新条件の実行結果は保存結果を参照し、未実行を合格にしない。
+
+臭跡fixtureに限り、元生成地形で必要な安全経路を選ぶため42以外の明示seedを受け付ける。他のfixtureは42限定を維持する。ブラウザ証拠のseedと初期状態を一致させ、原作比較も同じuint64 seedで起動する。`BROGUE_SCENT_SEED`は候補診断用の上書きで、実際のseedは各caseに保存される。候補不成立の診断も保持する。
+
+現在の既定受入対象はCEの形成/未形成とRapid/Bulletの未形成、PC/タッチの計8例。Rapid/Bulletの形成追跡4例は、元seed42で安全な遮蔽退路が不成立、seed43で実移動後のfresh遮蔽witness未到達（Bulletの一候補は接触被害guardも失敗）として診断を保存し、既定の成功対象に含めない。明示IDで診断できるが、未到達を成功や原作欠落の証明にしない。CE42・Rapid43・Bullet43の明示生成seedを記録し、正常な原作生成地形での代表条件だけを確認する。全AI/全seedを完了扱いしない。
