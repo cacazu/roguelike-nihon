@@ -152,3 +152,9 @@ Awarenessは開始床だけ既検索にし、実装備後の未検索床への�
 HP100・既知装備・配置・行動時計・webは人工初期条件で、monster info/能力/速度/HP上限と実効果・AIは原作を保持する。WraithはHP30/50、初期tick1から睡眠初撃の猶予を経て次の実restでAIへ届かせる。自然出現・全相互作用・通常攻略での全機能確認とは区別する。対照は明示した初期差を検査し、異なる怪物同士の全状態同値は主張しない。PC/touchはvariantごとに最終の全観測状態/RNGを比較する。セルobserverはterrainFlags/mechFlagsを純読取し、既存の壁/web正負比較では該当セルの原作値を検証してから正規化する。
 
 `BROGUE_MONSTER_ENVIRONMENT` は完全case IDのCSV。実行は `node brogue-nihon/tests/monster-environment.mjs`。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/monster-environment/results.json`、`BROGUE_COMPARE_NAME=monster-environment`、`BROGUE_COMPARE_DOMAINS=none` として `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。未到達はFAILとし、設定だけで個別定義を合格にしない。
+
+`terrain-exposure.mjs` はガス・lichen・回復・bloodwortの10正負条件を3variant/PCtouchの120ケースで検証する。POISON_GASとSTEAMの直接6HP被害（毒状態ではない）、混乱25、麻痺の公開ACK・途中表示・20から0への自動解除、lichenの毒5/濃度1と次restの被害、回復50→56と99→100上限、podへのbumpによる未移動の破裂と次restの回復を確認する。Respirationは有害ガスを防いだ実曝露で未鑑定runicの識別を要求する。火免疫がsteamを防がないこと、Respirationがlichenを防がないことと浮遊の抑止も別対照にする。
+
+敵なし・自然回復停止・HP100/50/99・装備・3×3のガス（麻痺8、他1000）・lichen/podは人工初期条件。状態をhelperで適用せず、実休止・実bump・ACKで効果を発生させる。麻痺はcommand復帰時の0だけで無反応とせず、途中frame・複数の残時間・追加absoluteTurnと照合する。回復雲とpod正条件はdot/illustration/originalの公開表示selectを使い、各画像・全観測state/RNG/待ちserial/消費入力不変を確認する。自然生成・通常攻略・全枝・実機Safariの確認とは区別する。
+
+`BROGUE_TERRAIN_EXPOSURE` は完全IDのCSV。実行は `node brogue-nihon/tests/terrain-exposure.mjs`。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/terrain-exposure/results.json`、`BROGUE_COMPARE_NAME=terrain-exposure`、`BROGUE_COMPARE_DOMAINS=none` として `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。

@@ -842,6 +842,38 @@ static void fixtureMonsterEnvironment(int code) {
     updateEncumbrance();
 }
 
+/* Environmental exposure only; all application/promotion is real input. */
+static void fixtureTerrainExposure(int code) {
+    const int kind = code / 2;
+    const boolean negative = code % 2;
+    fixtureSafeWorld();
+    item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+    armor->flags |= ITEM_EQUIPPED;
+    armor->flags &= ~(ITEM_RUNIC_IDENTIFIED | ITEM_RUNIC_HINTED);
+    armor->enchant1 = 0;
+    armor->enchant2 = A_RESPIRATION;
+    armor->armor = 0;
+    armor->strengthRequired = rogue.strength;
+    if ((negative && (kind <= 3 || kind == 7)) || kind == 8) armor->flags |= ITEM_RUNIC;
+    rogue.armor = armor;
+    fixtureStatus(STATUS_DONNING, 0);
+    if ((kind == 4 || kind == 8) && negative) fixtureStatus(STATUS_LEVITATING, 100);
+    if (kind == 7) fixtureStatus(STATUS_IMMUNE_TO_FIRE, 100);
+    if (kind == 5 || kind == 9) player.currentHP = 50;
+    if (kind == 6) player.currentHP = 99;
+    if (kind == 4 || kind == 8) pmapAt(player.loc)->layers[SURFACE] = LICHEN;
+    else if (kind == 9) pmap[41][14].layers[SURFACE] = BLOODFLOWER_POD;
+    else if (!(negative && (kind == 5 || kind == 6))) {
+        const short gas = kind == 0 ? POISON_GAS : kind == 1 ? CONFUSION_GAS
+            : kind == 2 ? PARALYSIS_GAS : (kind == 3 || kind == 7) ? STEAM : HEALING_CLOUD;
+        for (int x = 39; x <= 41; x++) for (int y = 13; y <= 15; y++) {
+            pmap[x][y].layers[GAS] = gas;
+            pmap[x][y].volume = kind == 2 ? 8 : 1000;
+        }
+    }
+    updateEncumbrance();
+}
+
 static void fixtureRing(short kind, int condition) {
     fixtureSafeWorld();
     item *ring = give(RING, kind, 'a', true);
@@ -1090,6 +1122,9 @@ int brogue_check_fixture(int scene) {
         else if (group == CHECK_MONSTER_ENVIRONMENT) {
             if (kind < 0 || kind >= 20) return -1;
         }
+        else if (group == CHECK_TERRAIN_EXPOSURE) {
+            if (kind < 0 || kind >= 20) return -1;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
@@ -1111,6 +1146,7 @@ int brogue_check_fixture(int scene) {
     else if (category == RING) fixtureRing(kind, condition);
     else if (group == CHECK_MONSTER_ABILITIES) fixtureMonsterAbility(kind);
     else if (group == CHECK_MONSTER_ENVIRONMENT) fixtureMonsterEnvironment(kind);
+    else if (group == CHECK_TERRAIN_EXPOSURE) fixtureTerrainExposure(kind);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
