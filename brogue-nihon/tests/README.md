@@ -158,3 +158,9 @@ HP100・既知装備・配置・行動時計・webは人工初期条件で、mon
 敵なし・自然回復停止・HP100/50/99・装備・3×3のガス（麻痺8、他1000）・lichen/podは人工初期条件。状態をhelperで適用せず、実休止・実bump・ACKで効果を発生させる。麻痺はcommand復帰時の0だけで無反応とせず、途中frame・複数の残時間・追加absoluteTurnと照合する。回復雲とpod正条件はdot/illustration/originalの公開表示selectを使い、各画像・全観測state/RNG/待ちserial/消費入力不変を確認する。自然生成・通常攻略・全枝・実機Safariの確認とは区別する。
 
 `BROGUE_TERRAIN_EXPOSURE` は完全IDのCSV。実行は `node brogue-nihon/tests/terrain-exposure.mjs`。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/terrain-exposure/results.json`、`BROGUE_COMPARE_NAME=terrain-exposure`、`BROGUE_COMPARE_DOMAINS=none` として `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。
+
+`terrain-hazards.mjs` は隠れた毒罠の通常/浮遊/Respiration、火罠の通常/浮遊/火免疫、CHASMの落下/浮遊、深水の品物流失/浮遊という10条件を3variant・PC/touchで60例実行する。実移動で露出・押下後のpressure ACKを確認し、ACK後の原作DF生成と次restの被害/防御を測る。浮遊中も原作の受動探索で罠は露出し得るため、hidden/visibleの二者を許し、ACK・押下・全中間gas/fire・被害がないことを要求する。Respirationは罠を止めず実ガス曝露で未鑑定ルーンが識別され、火免疫もDFの火を止めない。
+
+CHASMは公開Dive確認の取消で全観測状態/RNG不変を確かめ、再承認と落下ACKからnativeの2階へ到達する。時計増分を強制せず、実着地点の深水は被害0、沈水可能な液体は4～5、それ以外は8～10を要求する。observerの`deepest`は最下階上限で、到達階記録ではない。深水/浅水へ確実に着地させる初期状態はこのsuiteに含めず、固定seed42の現在の6例はいずれも通常床なので他の着地分岐は未確認。深水は未装備の既知単品を入水後最大20restで実pack→floorへ流失させ、公開文も確認する。浮遊対照は20rest保持。流失が入水だけで起きた場合はcmd.restを帰属させず、食事効果も確認済み扱いしない。
+
+敵なし・HP100・自然回復停止・鎧raw0・隣の地形/単品/保護状態は人工初期条件であり、罠作動・落下・流失helperや乱数固定は使わない。自然罠配置、既知罠の確認分岐、再作動、致死落下、最下層転送、全装備組合せ、通常攻略全体、実機Safariは未確認。`BROGUE_TERRAIN_HAZARDS`は完全case IDのCSV。実行は `node brogue-nihon/tests/terrain-hazards.mjs`。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/terrain-hazards/results.json`、`BROGUE_COMPARE_NAME=terrain-hazards`、`BROGUE_COMPARE_DOMAINS=none` で `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。

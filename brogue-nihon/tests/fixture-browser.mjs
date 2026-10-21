@@ -158,7 +158,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
             sceneGroups.ARMOR_RUNIC+11,sceneGroups.ARMOR_PLAIN+11,sceneGroups.ARMOR_CONDITION,
             sceneGroups.ARMOR_CONDITION+102,sceneGroups.ARMOR_CONDITION+204,sceneGroups.ARMOR_CONDITION+305,
             sceneGroups.RING_READY+8,sceneGroups.RING_READY+104,sceneGroups.RING_READY+200,
-            sceneGroups.RING_READY+301,sceneGroups.RING_READY+407,sceneGroups.MONSTER_ABILITIES+14,sceneGroups.MONSTER_ABILITIES+100,sceneGroups.MONSTER_ABILITIES+999,sceneGroups.MONSTER_ENVIRONMENT+20,sceneGroups.MONSTER_ENVIRONMENT+100,sceneGroups.MONSTER_ENVIRONMENT+999,sceneGroups.TERRAIN_EXPOSURE+20,sceneGroups.TERRAIN_EXPOSURE+100,sceneGroups.TERRAIN_EXPOSURE+999]){
+            sceneGroups.RING_READY+301,sceneGroups.RING_READY+407,sceneGroups.MONSTER_ABILITIES+14,sceneGroups.MONSTER_ABILITIES+100,sceneGroups.MONSTER_ABILITIES+999,sceneGroups.MONSTER_ENVIRONMENT+20,sceneGroups.MONSTER_ENVIRONMENT+100,sceneGroups.MONSTER_ENVIRONMENT+999,sceneGroups.TERRAIN_EXPOSURE+20,sceneGroups.TERRAIN_EXPOSURE+100,sceneGroups.TERRAIN_EXPOSURE+999,sceneGroups.TERRAIN_HAZARDS+10,sceneGroups.TERRAIN_HAZARDS+100,sceneGroups.TERRAIN_HAZARDS+999]){
             assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),rejected),-1,'Unknown/unsupported kind must reject');
             assert.deepEqual(await d.state(),startup,'Rejected kind changed preparation/RNG');
           }

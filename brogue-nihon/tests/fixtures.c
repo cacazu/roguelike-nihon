@@ -874,6 +874,32 @@ static void fixtureTerrainExposure(int code) {
     updateEncumbrance();
 }
 
+/* Only initial terrain/gear/status preparation; activation, falling and loss
+ * must be reached by subsequent real player input and native RNG. */
+static void fixtureTerrainHazard(int code) {
+    fixtureSafeWorld();
+    item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+    armor->flags |= ITEM_EQUIPPED;
+    armor->flags &= ~(ITEM_RUNIC_IDENTIFIED | ITEM_RUNIC_HINTED);
+    armor->enchant1 = 0;
+    armor->enchant2 = A_RESPIRATION;
+    armor->armor = 0;
+    armor->strengthRequired = rogue.strength;
+    rogue.armor = armor;
+    fixtureStatus(STATUS_DONNING, 0);
+    if (code == 1 || code == 4 || code == 7 || code == 9) fixtureStatus(STATUS_LEVITATING, 100);
+    if (code == 2) armor->flags |= ITEM_RUNIC;
+    if (code == 5) fixtureStatus(STATUS_IMMUNE_TO_FIRE, 100);
+    if (code <= 2) pmap[41][14].layers[DUNGEON] = GAS_TRAP_POISON_HIDDEN;
+    else if (code <= 5) pmap[41][14].layers[DUNGEON] = FLAMETHROWER_HIDDEN;
+    else if (code <= 7) pmap[41][14].layers[LIQUID] = CHASM;
+    else {
+        pmap[41][14].layers[LIQUID] = DEEP_WATER;
+        give(FOOD, RATION, 'b', true)->quantity = 1;
+    }
+    updateEncumbrance();
+}
+
 static void fixtureRing(short kind, int condition) {
     fixtureSafeWorld();
     item *ring = give(RING, kind, 'a', true);
@@ -1125,6 +1151,9 @@ int brogue_check_fixture(int scene) {
         else if (group == CHECK_TERRAIN_EXPOSURE) {
             if (kind < 0 || kind >= 20) return -1;
         }
+        else if (group == CHECK_TERRAIN_HAZARDS) {
+            if (kind < 0 || kind >= 10) return -1;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
@@ -1147,6 +1176,7 @@ int brogue_check_fixture(int scene) {
     else if (group == CHECK_MONSTER_ABILITIES) fixtureMonsterAbility(kind);
     else if (group == CHECK_MONSTER_ENVIRONMENT) fixtureMonsterEnvironment(kind);
     else if (group == CHECK_TERRAIN_EXPOSURE) fixtureTerrainExposure(kind);
+    else if (group == CHECK_TERRAIN_HAZARDS) fixtureTerrainHazard(kind);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
