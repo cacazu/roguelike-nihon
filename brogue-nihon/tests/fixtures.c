@@ -900,6 +900,49 @@ static void fixtureTerrainHazard(int code) {
     updateEncumbrance();
 }
 
+/* Native spellcasters: initial positions/team/health/status only. Spell,
+ * summon, movement, combat and all RNG remain subsequent original behavior. */
+static void fixtureMonsterSpell(int code) {
+    const int kind = code / 2;
+    const boolean negative = code % 2;
+    const short casters[] = {MK_DRAGON, MK_DAR_PRIESTESS, MK_OGRE_SHAMAN, MK_PIXIE, MK_LICH};
+    fixtureSafeWorld();
+    player.info.maxHP = player.currentHP = 1000;
+    item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+    armor->flags |= ITEM_EQUIPPED;
+    armor->enchant1 = armor->armor = 0;
+    armor->strengthRequired = rogue.strength;
+    rogue.armor = armor;
+    fixtureStatus(STATUS_DONNING, 0);
+    if (negative && (kind == 0 || kind == 4)) fixtureStatus(STATUS_IMMUNE_TO_FIRE, 1000);
+    if (negative && kind == 3) fixtureStatus(STATUS_SLOWED, 1000);
+    creature *caster = fixtureTarget(casters[kind], 44, 14);
+    if (kind == 4) {
+        /* Existing, disabled minions limit native summon competition (n=5)
+         * without disabling the ability or changing its original RNG rule. */
+        for (int x = 36; x <= 44; x += 2) {
+            creature *minion = fixtureTarget(MK_FURY, x, 10);
+            minion->leader = caster;
+            minion->bookkeepingFlags |= MB_FOLLOWER;
+            fixtureMonsterStatus(minion, STATUS_PARALYZED, 1000);
+        }
+    }
+    if (kind == 1 || kind == 2) {
+        creature *teammate = fixtureTarget(MK_OGRE, kind == 2 ? 43 : 44, kind == 2 ? 15 : 16);
+        teammate->leader = caster;
+        teammate->bookkeepingFlags |= MB_FOLLOWER;
+        fixtureMonsterStatus(teammate, STATUS_STUCK, 1000);
+        pmapAt(teammate->loc)->layers[SURFACE] = SPIDERWEB;
+        if (kind == 1 && !negative) teammate->currentHP = 1;
+        if (kind == 2 && negative) {
+            fixtureMonsterStatus(teammate, STATUS_HASTED, 1000);
+            teammate->movementSpeed = teammate->info.movementSpeed / 2;
+            teammate->attackSpeed = teammate->info.attackSpeed / 2;
+        }
+    }
+    updateEncumbrance();
+}
+
 static void fixtureRing(short kind, int condition) {
     fixtureSafeWorld();
     item *ring = give(RING, kind, 'a', true);
@@ -1154,6 +1197,9 @@ int brogue_check_fixture(int scene) {
         else if (group == CHECK_TERRAIN_HAZARDS) {
             if (kind < 0 || kind >= 10) return -1;
         }
+        else if (group == CHECK_MONSTER_SPELLS) {
+            if (kind < 0 || kind >= 10) return -1;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
@@ -1177,6 +1223,7 @@ int brogue_check_fixture(int scene) {
     else if (group == CHECK_MONSTER_ENVIRONMENT) fixtureMonsterEnvironment(kind);
     else if (group == CHECK_TERRAIN_EXPOSURE) fixtureTerrainExposure(kind);
     else if (group == CHECK_TERRAIN_HAZARDS) fixtureTerrainHazard(kind);
+    else if (group == CHECK_MONSTER_SPELLS) fixtureMonsterSpell(kind);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

@@ -34,7 +34,8 @@ const adapter=`
     test.cells=Array.from(cells);const result=frame(cells,...metadata);
     if(test.active){
       const s=snapshot(),observation={turn:s.turn,absoluteTurnNumber:s.absoluteTurnNumber,rng:s.rng,x:s.x,y:s.y,hp:s.hp,depth:s.depth,statuses:s.statuses,maxStatuses:s.maxStatuses,playerCell:s.playerCell,spawnCell:s.spawnCell,mapMetrics:s.mapMetrics,
-        gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters};
+        gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
+        messageRows:Array.from({length:3},(_,y)=>Array.from({length:79},(_,i)=>{const at=(y*100+i+21)*10;return Math.max(...test.cells.slice(at+2,at+5))<20?' ':String.fromCodePoint(test.cells[at+1]||32);}).join(''))};
       const signature=JSON.stringify(observation);
       if(signature!==test.lastObservation){
         if(test.observations.length>=2000)throw Error('CHECK observation overflow');
@@ -158,7 +159,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
             sceneGroups.ARMOR_RUNIC+11,sceneGroups.ARMOR_PLAIN+11,sceneGroups.ARMOR_CONDITION,
             sceneGroups.ARMOR_CONDITION+102,sceneGroups.ARMOR_CONDITION+204,sceneGroups.ARMOR_CONDITION+305,
             sceneGroups.RING_READY+8,sceneGroups.RING_READY+104,sceneGroups.RING_READY+200,
-            sceneGroups.RING_READY+301,sceneGroups.RING_READY+407,sceneGroups.MONSTER_ABILITIES+14,sceneGroups.MONSTER_ABILITIES+100,sceneGroups.MONSTER_ABILITIES+999,sceneGroups.MONSTER_ENVIRONMENT+20,sceneGroups.MONSTER_ENVIRONMENT+100,sceneGroups.MONSTER_ENVIRONMENT+999,sceneGroups.TERRAIN_EXPOSURE+20,sceneGroups.TERRAIN_EXPOSURE+100,sceneGroups.TERRAIN_EXPOSURE+999,sceneGroups.TERRAIN_HAZARDS+10,sceneGroups.TERRAIN_HAZARDS+100,sceneGroups.TERRAIN_HAZARDS+999]){
+            sceneGroups.RING_READY+301,sceneGroups.RING_READY+407,sceneGroups.MONSTER_ABILITIES+14,sceneGroups.MONSTER_ABILITIES+100,sceneGroups.MONSTER_ABILITIES+999,sceneGroups.MONSTER_ENVIRONMENT+20,sceneGroups.MONSTER_ENVIRONMENT+100,sceneGroups.MONSTER_ENVIRONMENT+999,sceneGroups.TERRAIN_EXPOSURE+20,sceneGroups.TERRAIN_EXPOSURE+100,sceneGroups.TERRAIN_EXPOSURE+999,sceneGroups.TERRAIN_HAZARDS+10,sceneGroups.TERRAIN_HAZARDS+100,sceneGroups.TERRAIN_HAZARDS+999,sceneGroups.MONSTER_SPELLS+10,sceneGroups.MONSTER_SPELLS+100,sceneGroups.MONSTER_SPELLS+999]){
             assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),rejected),-1,'Unknown/unsupported kind must reject');
             assert.deepEqual(await d.state(),startup,'Rejected kind changed preparation/RNG');
           }
