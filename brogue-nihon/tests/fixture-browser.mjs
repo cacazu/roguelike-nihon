@@ -34,7 +34,7 @@ const adapter=`
     test.cells=Array.from(cells);const result=frame(cells,...metadata);
     if(test.active){
       const s=snapshot(),observation={turn:s.turn,absoluteTurnNumber:s.absoluteTurnNumber,rng:s.rng,x:s.x,y:s.y,hp:s.hp,depth:s.depth,statuses:s.statuses,maxStatuses:s.maxStatuses,playerCell:s.playerCell,spawnCell:s.spawnCell,mapMetrics:s.mapMetrics,
-        nativeAI:s.nativeAI,stealthRange:s.stealthRange,gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
+        nativeAI:s.nativeAI,...(s.portal?{portal:s.portal}:{}),stealthRange:s.stealthRange,gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
         messageRows:Array.from({length:3},(_,y)=>Array.from({length:79},(_,i)=>{const at=(y*100+i+21)*10;return Math.max(...test.cells.slice(at+2,at+5))<20?' ':String.fromCodePoint(test.cells[at+1]||32);}).join(''))};
       const signature=JSON.stringify(observation);
       if(signature!==test.lastObservation){

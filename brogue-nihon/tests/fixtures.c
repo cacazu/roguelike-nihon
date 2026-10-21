@@ -116,7 +116,7 @@ static int featureLeaderIndex(creature *leader) {
     return -1;
 }
 
-/* A depth-one read of the native carried object, only for ENTER scenes.
+/* A depth-one read of the native carried object, for ENTER and PORTAL scenes.
  * enteredSubject is compared by identity, never dereferenced after death. */
 static void featureCarriedMonster(creature *monst) {
     if (!monst) { featureAppend("null"); return; }
@@ -134,6 +134,37 @@ static void featureCarriedMonster(creature *monst) {
     featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d,\"defense\":%d}}",
                   monst->info.damage.lowerBound, monst->info.damage.upperBound,
                   monst->info.accuracy, monst->info.defense);
+}
+
+/* Portal-only live-list evidence; saved identity is compared, not read.
+ * Reuse the bounded native-info reader without triggering visibility or AI. */
+static void featurePortalMember(creature *monst) {
+    if (!monst) { featureAppend("null"); return; }
+    featureAppend("{\"native\":"); featureCarriedMonster(monst);
+    featureAppend(",\"leaderIsPlayer\":%d,\"leaderIndex\":%d,\"machineHome\":%d,"
+                  "\"spawnDepth\":%d,\"DFChance\":%d,\"DFType\":%d,\"nativeBolts\":[",
+                  monst->leader == &player, featureLeaderIndex(monst->leader), monst->machineHome,
+                  monst->spawnDepth, monst->info.DFChance, monst->info.DFType);
+    for (int i = 0; i < 20; i++) featureAppend("%s%d", i ? "," : "", monst->info.bolts[i]);
+    featureAppend("]}");
+}
+static void featurePortalObservation(void) {
+    if (!rogue.gameInProgress || !levels || !monsters || !dormantMonsters) { featureAppend("null"); return; }
+    creature *active = NULL, *asleep = NULL;
+    int activeCount = 0, dormantCount = 0;
+    for (creatureIterator it = iterateCreatures(monsters); hasNextCreature(it);) {
+        creature *monst = nextCreature(&it); activeCount++;
+        if (monst == enteredSubject) active = monst;
+    }
+    for (creatureIterator it = iterateCreatures(dormantMonsters); hasNextCreature(it);) {
+        creature *monst = nextCreature(&it); dormantCount++;
+        if (monst == enteredSubject) asleep = monst;
+    }
+    featureAppend("{\"activeCount\":%d,\"dormantCount\":%d,\"activeSubject\":",activeCount,dormantCount);
+    featurePortalMember(active); featureAppend(",\"dormantSubject\":"); featurePortalMember(asleep);
+    featureAppend(",\"altarCell\":"); featureCell((pos){41,14});
+    featureAppend(",\"portalCell\":"); featureCell((pos){44,14});
+    featureAppend(",\"breakerCell\":"); featureCell((pos){43,12}); featureAppend("}");
 }
 
 /* Bounded pure native-info observation; no safety map/pathfinding/AI call. */
@@ -367,6 +398,9 @@ const char *brogue_check_features(void) {
            discovered, visible, fieldOfView, mapped);
     featureNativeWorld();
     featureAppend(",\"nativeAI\":"); featureNativeAI();
+    if (preparedScene >= CHECK_PORTAL_VALID && preparedScene <= CHECK_PORTAL_BREAKER) {
+        featureAppend(",\"portal\":"); featurePortalObservation();
+    }
     featureAppend(",\"nativeAIProbe\":"); featureNativeAIProbe(); featureAppend("}");
     return featureOverflow ? "{\"error\":\"fixture snapshot overflow\"}" : featureJSON;
 }
@@ -958,6 +992,39 @@ static void fixtureCageKey(int scene) {
     memset(key->keyLoc, 0, sizeof key->keyLoc);
     key->keyLoc[0] = (keyLocationProfile) {{20, 14},
         scene == CHECK_CAGE_WRONG_MACHINE ? 8 : 7, scene != CHECK_CAGE_REUSABLE};
+}
+
+/* Artificial orb/wiring and already-allied dormant native Unicorn only.
+ * Real player entry must activate original key/power/DF/dormancy behavior. */
+static void fixturePortal(int scene) {
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    pmap[41][14].layers[DUNGEON] = ALTAR_KEYHOLE;
+    pmap[44][14].layers[DUNGEON] = PORTAL;
+    pmap[41][14].machineNumber = pmap[44][14].machineNumber = 7;
+    pmap[41][14].flags |= IS_IN_ROOM_MACHINE;
+    pmap[44][14].flags |= IS_IN_ROOM_MACHINE;
+    enteredSubject = fixtureTarget(MK_UNICORN, 44, 14);
+    enteredSubject->creatureState = MONSTER_ALLY;
+    enteredSubject->leader = &player;
+    enteredSubject->bookkeepingFlags |= MB_FOLLOWER | MB_IS_DORMANT;
+    enteredSubject->machineHome = 7;
+    enteredSubject->spawnDepth = rogue.depthLevel;
+    enteredSubject->ticksUntilTurn = 10000;
+    removeCreature(monsters, enteredSubject);
+    prependCreature(dormantMonsters, enteredSubject);
+    pmap[44][14].flags &= ~HAS_MONSTER;
+    pmap[44][14].flags |= HAS_DORMANT_MONSTER;
+    item *orb = give(KEY, KEY_PORTAL, 'a', true);
+    orb->flags |= ITEM_IS_KEY;
+    orb->originDepth = rogue.depthLevel + (scene == CHECK_PORTAL_WRONG_DEPTH ? 1 : 0);
+    memset(orb->keyLoc, 0, sizeof orb->keyLoc);
+    orb->keyLoc[0] = (keyLocationProfile) {{20,14}, scene == CHECK_PORTAL_WRONG_MACHINE ? 8 : 7, true};
+    if (scene == CHECK_PORTAL_BREAKER) {
+        pmap[43][12].layers[DUNGEON] = ELECTRIC_CRYSTAL_OFF;
+        pmap[43][12].machineNumber = 7;
+        pmap[43][12].flags |= IS_IN_ROOM_MACHINE;
+    }
 }
 
 /* Native runic preparation only. Combat and proc RNG are never called here. */
@@ -1737,7 +1804,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_CAGE_WRONG_MACHINE) return -1;
+    } else if (scene < 1 || scene > CHECK_PORTAL_BREAKER) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1783,6 +1850,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_FRUIT_STACK && scene <= CHECK_FRUIT_OVERFLOW) fixtureFruit(scene);
     else if (scene >= CHECK_AGGRAVATE_MYSTIC && scene <= CHECK_AGGRAVATE_OGRE) fixtureMonsterAggravate(scene);
     else if (scene >= CHECK_CAGE_DISPOSABLE && scene <= CHECK_CAGE_WRONG_MACHINE) fixtureCageKey(scene);
+    else if (scene >= CHECK_PORTAL_VALID && scene <= CHECK_PORTAL_BREAKER) fixturePortal(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
