@@ -15,6 +15,7 @@ node tests/consumables.mjs
 node tests/scrolls.mjs
 node tests/bolts.mjs
 node tests/projectiles.mjs
+node tests/knowledge-feats.mjs
 node tests/persistence.mjs
 ```
 
@@ -29,6 +30,8 @@ SDKは `-SdkRoot` または `EMSDK` で指定する。wasm-bindgen-cliがPATHに
 `consumables.mjs`、`scrolls.mjs`、`bolts.mjs` は、CEの薬・チャーム、巻物、Staff／Wandを種類別に扱う。初期条件・公開C画面・実入力・途中／事後状態を保存し、効果、取消、確認、空チャージ、対象への適否、反射を別caseで評価する。`BROGUE_CONSUMABLES`、`BROGUE_SCROLLS`、`BROGUE_BOLTS` にcase IDをカンマ区切りで指定すると絞り込める。`node tests/bolts.mjs --list` は設計とcase一覧だけを出力し、実行証拠を生成しない。fixture番号は `fixture-scenes.h`、実行対象の構築は共通harnessの失敗記録範囲内にあるcase factoryを正本とする。定義・契約・依存関係の読込みに失敗した場合も新しい失敗結果へ更新し、以前の成功を今回の結果として残さない。
 
 `projectiles.mjs` はfixtureのPC／タッチによる投擲・再投擲・照準取消・矢の使い切り、cursor中のShift操作、独立して照準できる3体を使ったTab／Shift+Tabの正逆巡回を検査する。`BROGUE_PROJECTILES`でcaseを絞り込む。fixtureを使用するので通常プレイの証拠とは分け、保存確認を拒否したcaseを保存ファイル作成の成功とは扱わない。
+
+`knowledge-feats.mjs` は既存のCHECK初期状態から、未知の薬の種類呼称と既知の剣の個別銘の置換・空名解除・文字入力取消をPC／タッチで検査する。許可した名称フィールド以外は対象品を含む全観測状態を比較し、未知の正体を公開在庫が漏らさないことも確認する。偉業はPure Mageの装備だけ／実際の可視敵への武器攻撃と、Pure Warriorの照準取消／杖の発射を分け、F画面の初期空白と失敗の赤いマーカーを検査する。初期空白を達成と数えず、他の偉業・終了画面・他variantを合格に広げない。スマホ相当では実タッチで名前と状態欄を表示範囲内へ動かし、スクロールがゲーム入力を送らないことを確認する。`BROGUE_KNOWLEDGE_FEATS` でcaseを絞り込める。
 
 原作との差分比較には、[公式v1.15.1](https://github.com/tmewett/BrogueCE/releases/tag/v1.15.1) の展開ソースとGCCが必要。`BROGUE_ORIGINAL_SOURCE` に原作フォルダーを指定して `node tests/original-compare.mjs` を実行する。コンパイラーは `BROGUE_CC`（省略時 `gcc`）。[固定ソースハッシュ](upstream-1.15.1.json) の全入力を照合し、ブラウザーの実際の消費入力を、原作本体を変更しない専用consoleで再生する。各入力待ちのseed・ターン・実質乱数消費数・位置・HP・階・終了状態を比較する。内部RNG全状態、全アイテム・敵の状態、自動行動への時間依存の割込みまで同一と保証する比較ではない。
 
@@ -70,3 +73,5 @@ node --test tests/artifacts.test.mjs
 ```
 
 既存の日本語辞書・原文export検証は [locales/README.md](../locales/README.md) を参照する。原作比較では比較元の版・sourceと固定seed入力を照合し、専用exportを通常配布へ含めない。共通クレートの検査は [rust-common](../../rust-common/README.md) から実行する。
+
+種類全体を対象にしない追加契約の原作比較は、`BROGUE_FIXTURE_RESULTS` にその合格結果、`BROGUE_COMPARE_NAME` に短い識別名、`BROGUE_COMPARE_DOMAINS=none` を明示する。この設定は全種類網羅を主張しないだけで、入力結果の全case合格、生成物とmanifestの一致、全消費入力待ちの長さと全観測値の一致は省略しない。通常の省略値と種類domain指定は従来どおり全primitiveの独立した効果assertionを必要とする。偉業の内部配列は現在のCHECK観測に含まれないため、Fの状態マーカーはブラウザーの公開セルと画像による証拠であり、native側の内部偉業配列を直接照合したとは記載しない。

@@ -15,7 +15,10 @@ const validComparisonName=comparisonName===''||/^[a-z][a-z0-9-]{0,39}$/.test(com
 const output=path.join(root,'.local/feature-verification',validComparisonName?'fixture-compare'+(comparisonName?'-'+comparisonName:''):'fixture-compare-invalid-name');
 const source=process.env.BROGUE_ORIGINAL_SOURCE;
 const input=process.env.BROGUE_FIXTURE_RESULTS||path.join(root,'.local/feature-verification/consumables/results.json');
-const requestedDomains=(process.env.BROGUE_COMPARE_DOMAINS||'potionKind,charmKind').split(',');
+// `none` explicitly requests trace comparison without claiming complete kind coverage.
+// The default and named kind suites still require every primitive effect target.
+const domainSelection=process.env.BROGUE_COMPARE_DOMAINS||'potionKind,charmKind';
+const requestedDomains=domainSelection==='none'?[]:domainSelection.split(',');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const canonical=bytes=>Buffer.from(bytes.toString('utf8').replaceAll('\r\n','\n'));
 const result={run_id:new Date().toISOString(),result:'fail',checks:[],cases:[],errors:[],excluded_fields:['ready'],
@@ -65,12 +68,13 @@ try{
   for(const filename of ['tests/fixtures.c','tests/fixture-scenes.h','tests/original-platform.c','src/platform/BrowserIO.h'])result.extra_source_sha256[filename]=sha(canonical(await readFile(path.join(root,filename))));
   const inventory=generateDataInventory({gitMetadata:false});
   validateDataSnapshot(inventory);
-  assert.ok(requestedDomains.length&&new Set(requestedDomains).size===requestedDomains.length);
+  assert.ok((requestedDomains.length||domainSelection==='none')&&new Set(requestedDomains).size===requestedDomains.length);
   for(const domain of requestedDomains)assert.ok(['potionKind','charmKind','scrollKind','staffKind','wandKind'].includes(domain),'Unsupported comparison domain: '+domain);
   const required=requestedDomains.flatMap(domain=>inventory.definitions[domain].entries.filter(entry=>entry.classification==='primitive').map(entry=>domain+'.'+entry.symbol));
   const effectTargets=new Set((suite.cases||[]).filter(row=>row.status==='pass'&&row.variant==='brogue').flatMap(row=>(row.targets||[]).filter(target=>target.effect_asserted===true).map(target=>target.domain+'.'+target.symbol)));
   for(const target of required)assert.ok(effectTargets.has(target),'The full requested Brogue effect suite is required: missing '+target);
   result.requested_domains=requestedDomains;
+  result.coverage_requirement=domainSelection==='none'?'No complete-domain claim; all supplied browser cases must pass and match at every input wait.':'Every primitive target in requested_domains must have an independently asserted browser effect.';
   result.required_primitive_targets=required;
   temporary=await mkdtemp(path.join(output,'runtime-'));
   const executable=path.join(output,process.platform==='win32'?'upstream-fixtures.exe':'upstream-fixtures');
