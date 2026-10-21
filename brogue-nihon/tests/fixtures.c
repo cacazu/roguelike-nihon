@@ -94,9 +94,9 @@ static void featureStatuses(const short *statuses) {
 
 static void featureCell(pos loc) {
     featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,"
-           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu,\"rememberedTerrain\":%d,\"machine\":%d}",
+           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu,\"mechFlags\":%lu,\"rememberedTerrain\":%d,\"machine\":%d}",
            loc.x, loc.y, pmapAt(loc)->flags, pmapAt(loc)->layers[DUNGEON], pmapAt(loc)->layers[LIQUID],
-           pmapAt(loc)->layers[SURFACE], pmapAt(loc)->layers[GAS], pmapAt(loc)->volume, terrainFlags(loc),
+           pmapAt(loc)->layers[SURFACE], pmapAt(loc)->layers[GAS], pmapAt(loc)->volume, terrainFlags(loc), terrainMechFlags(loc),
            pmapAt(loc)->rememberedTerrain, pmapAt(loc)->machineNumber);
 }
 
@@ -214,9 +214,7 @@ const char *brogue_check_features(void) {
     count = 0;
     if (rogue.gameInProgress) for (int y = 10; y <= 18; y++) for (int x = 36; x <= 44; x++) {
         if (count++) featureAppend(",");
-        featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,\"surface\":%d,\"gas\":%d,\"volume\":%d,\"rememberedTerrain\":%d,\"machine\":%d}",
-               x, y, pmap[x][y].flags, pmap[x][y].layers[DUNGEON], pmap[x][y].layers[LIQUID],
-               pmap[x][y].layers[SURFACE], pmap[x][y].layers[GAS], pmap[x][y].volume, pmap[x][y].rememberedTerrain, pmap[x][y].machineNumber);
+        featureCell((pos){x, y});
     }
     featureAppend("],\"remoteCells\":[");
     count = 0;
@@ -775,6 +773,75 @@ static void fixtureMonsterAbility(int code) {
 }
 
 /* Unworn known rings and native actors/charge clocks; effects follow real equip. */
+/* Native defensive traits, locomotion and terrain: initial state only. */
+static void fixtureMonsterEnvironment(int code) {
+    const int kind = code / 2;
+    const boolean negative = code % 2;
+    fixtureSafeWorld();
+    creature *actor = NULL;
+    if (kind <= 1) {
+        actor = fixtureFrozenTarget(negative ? MK_OGRE : (kind == 0 ? MK_REVENANT : MK_WARDEN_OF_YENDOR), 41, 14);
+        fixtureMonsterStatus(actor, STATUS_STUCK, 50);
+        pmapAt(actor->loc)->layers[SURFACE] = SPIDERWEB;
+        item *staff = give(STAFF, STAFF_LIGHTNING, 'a', true);
+        staff->charges = staff->enchant1 = 2;
+        staff->enchant2 = 1000;
+        if (kind == 0) {
+            item *weapon = give(WEAPON, SWORD, 'b', true);
+            weapon->flags |= ITEM_EQUIPPED;
+            weapon->enchant1 = 0;
+            weapon->strengthRequired = rogue.strength;
+            rogue.weapon = weapon;
+        }
+    } else if (kind == 2) {
+        actor = fixtureTarget(MK_TROLL, 43, 14);
+        actor->currentHP = 55;
+        actor->ticksUntilTurn = 10000;
+        if (negative) { fixtureMonsterStatus(actor, STATUS_POISONED, 3); actor->poisonAmount = 1; }
+    } else if (kind == 3) {
+        item *weapon = give(WEAPON, SWORD, 'a', true);
+        weapon->flags |= ITEM_EQUIPPED;
+        weapon->enchant1 = 0;
+        weapon->strengthRequired = rogue.strength;
+        rogue.weapon = weapon;
+        actor = fixtureTarget(MK_WRAITH, 41, 14);
+        actor->currentHP = negative ? actor->info.maxHP : 30;
+        actor->creatureState = MONSTER_SLEEPING;
+        actor->ticksUntilTurn = 1;
+    } else if (kind == 4) {
+        actor = fixtureFrozenTarget(negative ? MK_KOBOLD : MK_SPIDER, 43, 14);
+        pmapAt(actor->loc)->layers[SURFACE] = SPIDERWEB;
+    } else if (kind == 5) {
+        for (int x = 39; x <= 44; x++) for (int y = 13; y <= 15; y += 2) pmap[x][y].layers[DUNGEON] = WALL;
+        pmap[42][14].layers[LIQUID] = CHASM;
+        actor = fixtureTarget(negative ? MK_KOBOLD : MK_FURY, 43, 14);
+        actor->ticksUntilTurn = 1;
+    } else if (kind == 6) {
+        pmap[41][14].layers[LIQUID] = SHALLOW_WATER;
+        if (!negative) pmap[40][14].layers[LIQUID] = SHALLOW_WATER;
+        const pos blocked[] = {{40,13},{41,13},{42,13},{42,14},{42,15},{41,15},{40,15}};
+        for (int i = 0; i < 7; i++) pmapAt(blocked[i])->layers[DUNGEON] = WALL;
+        actor = fixtureTarget(MK_EEL, 41, 14);
+        actor->ticksUntilTurn = 1;
+        fixtureMonsterStatus(actor, STATUS_STUCK, 50);
+        pmapAt(actor->loc)->layers[SURFACE] = SPIDERWEB;
+    } else if (kind == 7) {
+        actor = fixtureFrozenTarget(MK_NAGA, 43, 14);
+        if (!negative) pmapAt(actor->loc)->layers[LIQUID] = SHALLOW_WATER;
+    } else if (kind == 8) {
+        fixtureStatus(STATUS_IMMUNE_TO_FIRE, 100);
+        pmap[41][14].layers[DUNGEON] = negative ? WALL : WOODEN_BARRICADE;
+        item *staff = give(STAFF, STAFF_FIRE, 'a', true);
+        staff->charges = staff->enchant1 = 2;
+        staff->enchant2 = 1000;
+    } else if (kind == 9) {
+        fixtureStatus(STATUS_BURNING, 7);
+        if (negative) fixtureStatus(STATUS_LEVITATING, 100);
+        pmap[41][14].layers[LIQUID] = SHALLOW_WATER;
+    }
+    updateEncumbrance();
+}
+
 static void fixtureRing(short kind, int condition) {
     fixtureSafeWorld();
     item *ring = give(RING, kind, 'a', true);
@@ -1020,6 +1087,9 @@ int brogue_check_fixture(int scene) {
         else if (group == CHECK_MONSTER_ABILITIES) {
             if (kind < 0 || kind >= 14) return -1;
         }
+        else if (group == CHECK_MONSTER_ENVIRONMENT) {
+            if (kind < 0 || kind >= 20) return -1;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
@@ -1040,6 +1110,7 @@ int brogue_check_fixture(int scene) {
     else if (category == ARMOR) fixtureArmorRunic(kind, group == CHECK_ARMOR_PLAIN, condition);
     else if (category == RING) fixtureRing(kind, condition);
     else if (group == CHECK_MONSTER_ABILITIES) fixtureMonsterAbility(kind);
+    else if (group == CHECK_MONSTER_ENVIRONMENT) fixtureMonsterEnvironment(kind);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

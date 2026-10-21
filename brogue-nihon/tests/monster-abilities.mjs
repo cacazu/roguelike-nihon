@@ -13,17 +13,18 @@ export function createMonsterAbilityCases({variants=['brogue','rapid_brogue','bu
  const rows=[['acid-weapon','ACID_MOUND','monsterBehaviorFlags','MONST_DEFEND_DEGRADE_WEAPON',1,3,100,100],['toad-hallucinate','TOAD','monsterAbilityFlags','MA_HIT_HALLUCINATE',1,4,100,100],['centipede-weaken','CENTIPEDE','monsterAbilityFlags','MA_CAUSES_WEAKNESS',4,12,100,100],['bat-transference','VAMPIRE_BAT','monsterAbilityFlags','MA_TRANSFERENCE',2,6,50,100],['ogre-stagger','OGRE','monsterAbilityFlags','MA_ATTACKS_STAGGER',9,13,100,200],['goblin-penetrate','GOBLIN','monsterAbilityFlags','MA_ATTACKS_PENETRATE',2,5,100,100],['naga-all-adjacent','NAGA','monsterAbilityFlags','MA_ATTACKS_ALL_ADJACENT',7,11,100,100]];
  const normalizeInitial=(state,kind,negative)=>{
   const s=structuredClone(physical(state));s.fixture=0;
+  const terrain=(c,t,m)=>{assert.equal(c.terrainFlags,t);assert.equal(c.mechFlags,m);c.terrainFlags=c.mechFlags=0;};
   if(kind===0){s.pack[0].flags&=~I('PROTECTED');s.pack[0].protected=0;}
   else if(kind<=3){const a=s.pack[0];a.flags&=~(I('RUNIC')|I('CAN_BE_IDENTIFIED')|I('RUNIC_HINTED'));a.runicKind=-1;a.rechargeTimer=0;a.vorpalEnemy=0;}
   else if(kind===4){
-   const wall=s.cells.find(c=>c.x===39&&c.y===14);assert.equal(wall.dungeon,T(negative?'WALL':'FLOOR'));wall.dungeon=T('FLOOR');
+   const wall=s.cells.find(c=>c.x===39&&c.y===14);assert.equal(wall.dungeon,T(negative?'WALL':'FLOOR'));assert.deepEqual([wall.liquid,wall.surface,wall.gas],[0,0,0]);terrain(wall,negative?V('terrainFlagCatalog','T_OBSTRUCTS_EVERYTHING'):0,negative?V('terrainMechanicalFlagCatalog','TM_STAND_IN_TILE'):0);wall.dungeon=T('FLOOR');
    // Only the wall's derived discovery/visibility bits and three counters differ.
    const vision=F('DISCOVERED')|F('VISIBLE')|F('IN_FIELD_OF_VIEW');for(const c of s.cells)c.flags&=~vision;
    for(const key of ['discovered','visible','fieldOfView'])s.mapMetrics[key]=0;
   }else{
    const ally=s.monsters.find(m=>m.state===V('creatureStates','MONSTER_ALLY'));assert.ok(ally);const x=kind===5?39:41,y=kind===5?14:15,actual=y+Number(negative),other=y+Number(!negative);
    assert.deepEqual([ally.x,ally.y],[x,actual]);ally.y=y;
-   for(const cy of [actual,other]){const c=s.cells.find(c=>c.x===x&&c.y===cy);assert.ok(c);assert.equal(c.surface,cy===actual?T('SPIDERWEB'):0);assert.equal(!!(c.flags&F('HAS_MONSTER')),cy===actual);c.flags&=~F('HAS_MONSTER');c.surface=0;}
+   for(const cy of [actual,other]){const c=s.cells.find(c=>c.x===x&&c.y===cy);assert.ok(c);assert.equal(c.surface,cy===actual?T('SPIDERWEB'):0);assert.deepEqual([c.dungeon,c.liquid,c.gas],[T('FLOOR'),0,0]);terrain(c,cy===actual?V('terrainFlagCatalog','T_ENTANGLES')|V('terrainFlagCatalog','T_IS_FLAMMABLE'):0,cy===actual?V('terrainMechanicalFlagCatalog','TM_STAND_IN_TILE')|V('terrainMechanicalFlagCatalog','TM_VANISHES_UPON_PROMOTION')|V('terrainMechanicalFlagCatalog','TM_VISUALLY_DISTINCT'):0);assert.equal(!!(c.flags&F('HAS_MONSTER')),cy===actual);c.flags&=~F('HAS_MONSTER');c.surface=0;}
   }
   return s;
  };
