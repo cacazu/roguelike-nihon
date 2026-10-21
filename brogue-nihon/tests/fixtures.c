@@ -727,6 +727,22 @@ static void fixtureMonsterFlight(int scene) {
         subject->status[STATUS_MAGICAL_FEAR] = subject->maxStatus[STATUS_MAGICAL_FEAR] = 4;
 }
 
+/* Passive original reflection only. Do not paralyze: a damaging bolt's
+ * moralAttack would clear paralysis and replace the long initial clock. */
+static void fixtureMonsterReflection(int scene) {
+    const short actors[] = {MK_GUARDIAN, MK_WINGED_GUARDIAN, MK_MIRRORED_TOTEM, MK_OGRE, MK_GOLEM};
+    fixtureSafeWorld();
+    item *staff = give(STAFF, STAFF_LIGHTNING, 'a', true);
+    tableForItemCategory(STAFF)[STAFF_LIGHTNING].identified = true;
+    staff->enchant1 = 1;
+    staff->charges = 12; /* Explicit over-capacity fixture, not natural capacity. */
+    staff->enchant2 = 1000; /* >8333 would instead discharge a +1 staff. */
+    creature *subject = fixtureTarget(actors[scene - CHECK_REFLECT_GUARDIAN], 43, 14);
+    subject->ticksUntilTurn = 10000;
+    subject->turnsUntilRegen = 100000;
+    subject->regenPerTurn = 0;
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1504,7 +1520,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_FLIGHT_FEAR_PERMANENT) return -1;
+    } else if (scene < 1 || scene > CHECK_REFLECT_GOLEM) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1539,6 +1555,7 @@ int brogue_check_fixture(int scene) {
     else if (group == CHECK_TERRAIN_HAZARDS) fixtureTerrainHazard(kind);
     else if (group == CHECK_MONSTER_SPELLS) fixtureMonsterSpell(kind);
     else if (scene >= CHECK_FLIGHT_OPEN && scene <= CHECK_FLIGHT_FEAR_PERMANENT) fixtureMonsterFlight(scene);
+    else if (scene >= CHECK_REFLECT_GUARDIAN && scene <= CHECK_REFLECT_GOLEM) fixtureMonsterReflection(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
