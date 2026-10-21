@@ -11,8 +11,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4123,
-          "end_line": 4123,
+          "line": 4136,
+          "end_line": 4136,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -35,8 +35,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4113,
-          "end_line": 4113,
+          "line": 4126,
+          "end_line": 4126,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -59,8 +59,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4107,
-          "end_line": 4107,
+          "line": 4120,
+          "end_line": 4120,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -83,8 +83,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4104,
-          "end_line": 4104,
+          "line": 4117,
+          "end_line": 4117,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -96,432 +96,6 @@
     },
     "io.helptext.control_click_advance_one_space.990cfbf6caa9": {
       "text": "  control-click  ****advance one space",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4108,
-          "end_line": 4108,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.d_list_discovered_items.2c3853351c4d": {
-      "text": "              D  ****list discovered items",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4116,
-          "end_line": 4116,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.disable_enable_color_effects.7a35d025b9fb": {
-      "text": "              \\  ****disable/enable color effects",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4130,
-          "end_line": 4130,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.display_hide_stealth_range.eb12c104b091": {
-      "text": "              ]  ****display/hide stealth range",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4131,
-          "end_line": 4131,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.f2_switch_language.85edc0777c1e": {
-      "text": "             F2  ****Switch language",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4126,
-          "end_line": 4126,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.g_toggle_graphical_tiles_when_available.5d816b7bf86d": {
-      "text": "              G  ****toggle graphical tiles (when available)",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4125,
-          "end_line": 4125,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.hjklyubn_arrow_keys_or_numpad_move_or_attack_con.e783617e1e9a": {
-      "text": "hjklyubn, arrow keys, or numpad  ****move or attack (control or shift to run)",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4111,
-          "end_line": 4111,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.i_right_click_view_inventory.c408e6e02e17": {
-      "text": " i, right-click  ****view inventory",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4115,
-          "end_line": 4115,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.m_display_old_messages.148e615b7a3a": {
-      "text": "              M  ****display old messages",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4124,
-          "end_line": 4124,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.mouse_move_cursor_including_to_examine_monsters_.34745e4b9725": {
-      "text": "          mouse  ****move cursor (including to examine monsters and terrain)",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4106,
-          "end_line": 4106,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.press_space_or_click_to_continue.b8cdeef46cb1": {
-      "text": "        -- press space or click to continue --",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4134,
-          "end_line": 4134,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ]
-    },
-    "io.helptext.q_quit_and_abandon_game.c58083e43b75": {
-      "text": "              Q  ****quit and abandon game",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4128,
-          "end_line": 4128,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.return_enable_keyboard_cursor_control.81caea40038c": {
-      "text": "       <return>  ****enable keyboard cursor control",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4109,
-          "end_line": 4109,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.s_save_and_exit.1c6e5a17fbee": {
-      "text": "              S  ****save and exit",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4127,
-          "end_line": 4127,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.s_search_for_secrets_control_s_long_search.9f34d63ed513": {
-      "text": "              s  ****search for secrets (control-s: long search)",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4120,
-          "end_line": 4120,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.space_esc_clear_message_or_cancel_command.3709385507e5": {
-      "text": "    <space/esc>  ****clear message or cancel command",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4132,
-          "end_line": 4132,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.space_esc_disable_keyboard_cursor_control.f972bcdfd376": {
-      "text": "    <space/esc>  ****disable keyboard cursor control",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4110,
-          "end_line": 4110,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.t_re_throw_last_item_at_last_monster.e6eda9305dc4": {
-      "text": "              T  ****re-throw last item at last monster",
-      "translatable": true,
-      "kind": "help_text",
-      "sources": [
-        {
-          "file": "src/brogue/IO.c",
-          "line": 4114,
-          "end_line": 4114,
-          "symbol": "helpText",
-          "function": "printHelpScreen",
-          "scope": "initializer",
-          "call": null,
-          "argument_index": null,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [],
-        "brogue_tokens": [
-          "****"
-        ]
-      }
-    },
-    "io.helptext.travel_to_stairs.7b7a66e2360e": {
-      "text": "           <, >  ****travel to stairs",
       "translatable": true,
       "kind": "help_text",
       "sources": [
@@ -544,15 +118,15 @@
         ]
       }
     },
-    "io.helptext.x_auto_explore_control_x_fast_forward.c0335533a615": {
-      "text": "              x  ****auto-explore (control-x: fast forward)",
+    "io.helptext.d_list_discovered_items.2c3853351c4d": {
+      "text": "              D  ****list discovered items",
       "translatable": true,
       "kind": "help_text",
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4122,
-          "end_line": 4122,
+          "line": 4129,
+          "end_line": 4129,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -568,8 +142,176 @@
         ]
       }
     },
-    "io.helptext.z_rest_for_100_turns_or_until_something_happens.d60aade74b91": {
-      "text": "              Z  ****rest for 100 turns or until something happens",
+    "io.helptext.disable_enable_color_effects.7a35d025b9fb": {
+      "text": "              \\  ****disable/enable color effects",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4143,
+          "end_line": 4143,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.display_hide_stealth_range.eb12c104b091": {
+      "text": "              ]  ****display/hide stealth range",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4144,
+          "end_line": 4144,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.f2_switch_language.85edc0777c1e": {
+      "text": "             F2  ****Switch language",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4139,
+          "end_line": 4139,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.g_toggle_graphical_tiles_when_available.5d816b7bf86d": {
+      "text": "              G  ****toggle graphical tiles (when available)",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4138,
+          "end_line": 4138,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.hjklyubn_arrow_keys_or_numpad_move_or_attack_con.e783617e1e9a": {
+      "text": "hjklyubn, arrow keys, or numpad  ****move or attack (control or shift to run)",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4124,
+          "end_line": 4124,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.i_right_click_view_inventory.c408e6e02e17": {
+      "text": " i, right-click  ****view inventory",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4128,
+          "end_line": 4128,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.m_display_old_messages.148e615b7a3a": {
+      "text": "              M  ****display old messages",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4137,
+          "end_line": 4137,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.mouse_move_cursor_including_to_examine_monsters_.34745e4b9725": {
+      "text": "          mouse  ****move cursor (including to examine monsters and terrain)",
       "translatable": true,
       "kind": "help_text",
       "sources": [
@@ -592,6 +334,264 @@
         ]
       }
     },
+    "io.helptext.press_space_or_click_to_continue.b8cdeef46cb1": {
+      "text": "        -- press space or click to continue --",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4147,
+          "end_line": 4147,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ]
+    },
+    "io.helptext.q_quit_and_abandon_game.c58083e43b75": {
+      "text": "              Q  ****quit and abandon game",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4141,
+          "end_line": 4141,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.return_enable_keyboard_cursor_control.81caea40038c": {
+      "text": "       <return>  ****enable keyboard cursor control",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4122,
+          "end_line": 4122,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.s_save_and_exit.1c6e5a17fbee": {
+      "text": "              S  ****save and exit",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4140,
+          "end_line": 4140,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.s_search_for_secrets_control_s_long_search.9f34d63ed513": {
+      "text": "              s  ****search for secrets (control-s: long search)",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4133,
+          "end_line": 4133,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.space_esc_clear_message_or_cancel_command.3709385507e5": {
+      "text": "    <space/esc>  ****clear message or cancel command",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4145,
+          "end_line": 4145,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.space_esc_disable_keyboard_cursor_control.f972bcdfd376": {
+      "text": "    <space/esc>  ****disable keyboard cursor control",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4123,
+          "end_line": 4123,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.t_re_throw_last_item_at_last_monster.e6eda9305dc4": {
+      "text": "              T  ****re-throw last item at last monster",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4127,
+          "end_line": 4127,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.travel_to_stairs.7b7a66e2360e": {
+      "text": "           <, >  ****travel to stairs",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4134,
+          "end_line": 4134,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.x_auto_explore_control_x_fast_forward.c0335533a615": {
+      "text": "              x  ****auto-explore (control-x: fast forward)",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4135,
+          "end_line": 4135,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
+    "io.helptext.z_rest_for_100_turns_or_until_something_happens.d60aade74b91": {
+      "text": "              Z  ****rest for 100 turns or until something happens",
+      "translatable": true,
+      "kind": "help_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 4132,
+          "end_line": 4132,
+          "symbol": "helpText",
+          "function": "printHelpScreen",
+          "scope": "initializer",
+          "call": null,
+          "argument_index": null,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [],
+        "brogue_tokens": [
+          "****"
+        ]
+      }
+    },
     "io.helptext.z_rest_once.017aecdd76de": {
       "text": "              z  ****rest once",
       "translatable": true,
@@ -599,8 +599,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4118,
-          "end_line": 4118,
+          "line": 4131,
+          "end_line": 4131,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",

@@ -25,6 +25,7 @@
 #include <time.h>
 
 #include "Rogue.h"
+#include "BrowserIO.h"
 #include "GlobalsBase.h"
 #include "Globals.h"
 
@@ -361,7 +362,6 @@ static short actionMenu(short x, boolean playingBack) {
         buttons[buttonCount].flags &= ~B_ENABLED;
         buttonCount++;
 
-        if (!serverMode) {
             if (playingBack) {
                  if (KEYBOARD_LABELS) {
                     sprintf(buttons[buttonCount].text, "  %sO: %sOpen saved game  ",        yellowColorEscape, whiteColorEscape);
@@ -386,7 +386,6 @@ static short actionMenu(short x, boolean playingBack) {
                 buttons[buttonCount].hotkey[0] = SAVE_GAME_KEY;
                 buttonCount++;
             }
-        }
         if (KEYBOARD_LABELS) {
             sprintf(buttons[buttonCount].text, "  %sQ: %sQuit %s  ",    yellowColorEscape, whiteColorEscape, (playingBack ? "to title screen" : "and abandon game"));
         } else {
@@ -2646,7 +2645,7 @@ void executeKeystroke(signed long keystroke, boolean controlKey, boolean shiftKe
             }
             break;
         case SAVE_GAME_KEY:
-            if (rogue.playbackMode || serverMode) {
+            if (rogue.playbackMode) {
                 return;
             }
             if (confirm("Save this game and exit?", false)) {
@@ -2785,6 +2784,9 @@ boolean getInputTextString(char *inputText,
 
     maxLength = min(maxLength, COLS - x);
 
+    BrowserWait previousWait = browserWaitBegin(BROWSER_TEXT, maxLength - promptSuffixLen, true);
+    for (int key = textEntryBounds[textEntryType][0]; key <= textEntryBounds[textEntryType][1]; key++) browserWaitKey(key);
+
 
     if (inputText != defaultEntry) {
         strcpy(inputText, defaultEntry);
@@ -2853,6 +2855,8 @@ boolean getInputTextString(char *inputText,
     }
 
     inputText[charNum] = '\0';
+
+    browserWaitRestore(previousWait);
 
     if (keystroke == ESCAPE_KEY) {
         return false;
@@ -2940,6 +2944,9 @@ void waitForAcknowledgment() {
         return;
     }
 
+    BrowserWait previousWait = browserWaitBegin(BROWSER_ACK, 0, true);
+    browserWaitKey(ACKNOWLEDGE_KEY);
+    browserWaitKey(ESCAPE_KEY);
     do {
         nextBrogueEvent(&theEvent, false, false, false);
         if (theEvent.eventType == KEYSTROKE && theEvent.param1 != ACKNOWLEDGE_KEY && theEvent.param1 != ESCAPE_KEY) {
@@ -2947,13 +2954,17 @@ void waitForAcknowledgment() {
         }
     } while (!(theEvent.eventType == KEYSTROKE && (theEvent.param1 == ACKNOWLEDGE_KEY || theEvent.param1 == ESCAPE_KEY)
                || theEvent.eventType == MOUSE_UP));
+    browserWaitRestore(previousWait);
 }
 
 void waitForKeystrokeOrMouseClick() {
     rogueEvent theEvent;
+    BrowserWait previousWait = browserWaitBegin(BROWSER_ACK, 0, true);
+    browserWaitKey(ACKNOWLEDGE_KEY);
     do {
         nextBrogueEvent(&theEvent, false, false, false);
     } while (theEvent.eventType != KEYSTROKE && theEvent.eventType != MOUSE_UP);
+    browserWaitRestore(previousWait);
 }
 
 boolean confirm(char *prompt, boolean alsoDuringPlayback) {
@@ -2986,7 +2997,9 @@ boolean confirm(char *prompt, boolean alsoDuringPlayback) {
     buttons[1].flags |= (B_WIDE_CLICK_AREA | B_KEYPRESS_HIGHLIGHT);
 
     const SavedDisplayBuffer rbuf = saveDisplayBuffer();
+    BrowserWait previousWait = browserWaitBegin(BROWSER_CONFIRM, 0, true);
     retVal = printTextBox(prompt, COLS/3, ROWS/3, COLS/3, &white, &interfaceBoxColor, buttons, 2);
+    browserWaitRestore(previousWait);
     restoreDisplayBuffer(&rbuf);
 
     if (retVal == -1 || retVal == 1) { // If they canceled or pressed no.

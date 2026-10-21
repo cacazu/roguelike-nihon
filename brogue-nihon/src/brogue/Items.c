@@ -23,6 +23,7 @@
 
 
 #include "Rogue.h"
+#include "BrowserIO.h"
 #include "GlobalsBase.h"
 #include "Globals.h"
 
@@ -3021,6 +3022,7 @@ char displayInventory(unsigned short categoryMask,
         restoreDisplayBuffer(&rbuf);   // Remove the inventory display while the buttons are active,
                                             // since they look the same and we don't want their opacities to stack.
 
+        BrowserWait previousWait = browserWaitBegin(BROWSER_ITEM, 0, true);
         highlightItemLine = buttonInputLoop(buttons,
                                             itemCount + extraLineCount + 2, // the 2 is for up/down hotkeys
                                             COLS - maxLength,
@@ -3028,6 +3030,7 @@ char displayInventory(unsigned short categoryMask,
                                             maxLength,
                                             itemNumber + extraLineCount,
                                             &theEvent);
+        browserWaitRestore(previousWait);
         if (highlightItemLine == itemNumber + extraLineCount + 0) {
             // Up key
             highlightItemLine = itemNumber - 1;
@@ -5644,6 +5647,10 @@ boolean chooseTarget(pos *returnLoc,
         return true;
     }
 
+    BrowserWait previousWait = browserWaitBegin(BROWSER_TARGET, 0, true);
+    const int targetKeys[] = {UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY, UPLEFT_KEY, UPRIGHT_KEY,
+                             DOWNLEFT_KEY, DOWNRIGHT_KEY, RETURN_KEY, TAB_KEY, ESCAPE_KEY};
+    for (int key = 0; key < (int)(sizeof targetKeys / sizeof *targetKeys); key++) browserWaitKey(targetKeys[key]);
     oldRNG = rogue.RNG;
     rogue.RNG = RNG_COSMETIC;
 
@@ -5687,6 +5694,7 @@ boolean chooseTarget(pos *returnLoc,
             confirmMessages();
             rogue.cursorLoc = INVALID_POS;
             restoreRNG;
+            browserWaitRestore(previousWait);
             return false;
         }
 
@@ -5749,6 +5757,7 @@ boolean chooseTarget(pos *returnLoc,
         confirmMessages();
         restoreRNG;
         rogue.cursorLoc = INVALID_POS;
+        browserWaitRestore(previousWait);
         return false;
     }
 
@@ -5760,6 +5769,7 @@ boolean chooseTarget(pos *returnLoc,
     *returnLoc = targetLoc;
     restoreRNG;
     rogue.cursorLoc = INVALID_POS;
+    browserWaitRestore(previousWait);
     return true;
 }
 

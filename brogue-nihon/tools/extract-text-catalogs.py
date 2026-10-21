@@ -224,7 +224,9 @@ def classify(path, symbol, scope_kind, call, argument, directive, text, statemen
         if "blueprint" in scope:
             return "diagnostics", "generation_label"
         return "content", "game_data_text"
-    if name in ("term.c", "curses-platform.c", "web-platform.c"):
+    if name == "browser-platform.c":
+        return "diagnostics", "browser_verification_protocol"
+    if name in ("term.c", "curses-platform.c"):
         if owner in ("ensure_size", "curses_init") and (call in ("mvprintw", "printw") or "terminal" in lower):
             return "errors", "display_text"
         return "internal", "platform_value"

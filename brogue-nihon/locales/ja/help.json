@@ -13,8 +13,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4123,
-          "end_line": 4123,
+          "line": 4136,
+          "end_line": 4136,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -33,8 +33,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4113,
-          "end_line": 4113,
+          "line": 4126,
+          "end_line": 4126,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -53,8 +53,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4107,
-          "end_line": 4107,
+          "line": 4120,
+          "end_line": 4120,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -73,8 +73,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4104,
-          "end_line": 4104,
+          "line": 4117,
+          "end_line": 4117,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -93,8 +93,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4108,
-          "end_line": 4108,
+          "line": 4121,
+          "end_line": 4121,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -113,8 +113,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4116,
-          "end_line": 4116,
+          "line": 4129,
+          "end_line": 4129,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -133,8 +133,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4130,
-          "end_line": 4130,
+          "line": 4143,
+          "end_line": 4143,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -153,8 +153,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4131,
-          "end_line": 4131,
+          "line": 4144,
+          "end_line": 4144,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -173,8 +173,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4126,
-          "end_line": 4126,
+          "line": 4139,
+          "end_line": 4139,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -193,8 +193,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4125,
-          "end_line": 4125,
+          "line": 4138,
+          "end_line": 4138,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -213,8 +213,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4111,
-          "end_line": 4111,
+          "line": 4124,
+          "end_line": 4124,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -233,8 +233,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4115,
-          "end_line": 4115,
+          "line": 4128,
+          "end_line": 4128,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -253,8 +253,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4124,
-          "end_line": 4124,
+          "line": 4137,
+          "end_line": 4137,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -273,8 +273,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4106,
-          "end_line": 4106,
+          "line": 4119,
+          "end_line": 4119,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -293,8 +293,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4134,
-          "end_line": 4134,
+          "line": 4147,
+          "end_line": 4147,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -313,8 +313,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4128,
-          "end_line": 4128,
+          "line": 4141,
+          "end_line": 4141,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -333,8 +333,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4109,
-          "end_line": 4109,
+          "line": 4122,
+          "end_line": 4122,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -353,8 +353,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4127,
-          "end_line": 4127,
+          "line": 4140,
+          "end_line": 4140,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -373,8 +373,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4120,
-          "end_line": 4120,
+          "line": 4133,
+          "end_line": 4133,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -393,8 +393,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4132,
-          "end_line": 4132,
+          "line": 4145,
+          "end_line": 4145,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -413,8 +413,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4110,
-          "end_line": 4110,
+          "line": 4123,
+          "end_line": 4123,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -433,8 +433,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4114,
-          "end_line": 4114,
+          "line": 4127,
+          "end_line": 4127,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -453,8 +453,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4121,
-          "end_line": 4121,
+          "line": 4134,
+          "end_line": 4134,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -473,8 +473,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4122,
-          "end_line": 4122,
+          "line": 4135,
+          "end_line": 4135,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -493,8 +493,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4119,
-          "end_line": 4119,
+          "line": 4132,
+          "end_line": 4132,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",
@@ -513,8 +513,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4118,
-          "end_line": 4118,
+          "line": 4131,
+          "end_line": 4131,
           "symbol": "helpText",
           "function": "printHelpScreen",
           "scope": "initializer",

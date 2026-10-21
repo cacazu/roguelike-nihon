@@ -5,12 +5,10 @@ import {spawn, execFileSync} from "node:child_process";
 import {once} from "node:events";
 import {cp, mkdir, mkdtemp, writeFile} from "node:fs/promises";
 import path from "node:path";
-import os from "node:os";
 import {fileURLToPath} from "node:url";
 import {createPreviewServer} from "../../../tools/server.mjs";
 import {artifactDirectory} from "../../tools/temporary-artifacts.mjs";
 import {prepareBrowserRuntime} from "./browser-runtime.mjs";
-import {installBrowserTestAdapter} from "./test-adapter.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const previewServer = fileURLToPath(new URL("../../../tools/server.mjs", import.meta.url));
@@ -37,7 +35,7 @@ function launch(args) {
 async function ready(result) {
   const deadline = Date.now() + 15000;
   while (Date.now() < deadline) {
-    const match = result.stdout.match(/Rogue preview: (https?:\/\/127\.0\.0\.1:\d+\/)/);
+    const match = result.stdout.match(/Game preview: (https?:\/\/127\.0\.0\.1:\d+\/)/);
     if (match) return match[1];
     if (result.child.exitCode !== null) throw Error("Startup failed: " + result.stderr + result.stdout);
     await new Promise(resolve => setTimeout(resolve, 25));
@@ -62,16 +60,60 @@ async function listen(server) {
 async function check(label, run) {await run(); evidence.checks.push(label); console.log("PASS " + label);}
 const launcher = port => [previewServer, "--root", root, String(port)];
 async function click(page, id, touch = false) {
-  await page.waitForFunction(id => __rogueBrowserTest.canvas?.controls.some(control => control.id === id && !control.disabled), id);
-  const rect = await page.evaluate(id => __rogueBrowserTest.canvas.controls.find(control => control.id === id).rect, id);
-  const box=await page.locator('#rogue-canvas').boundingBox();
-  if (touch) await page.touchscreen.tap(box.x+rect.x+rect.w/2,box.y+rect.y+rect.h/2);
-  else await page.mouse.click(box.x+rect.x+rect.w/2,box.y+rect.y+rect.h/2);
+  const control = page.locator(`[data-control="${id}"]:not([disabled])`);
+  await control.waitFor();
+  if (touch) await control.tap(); else await control.click();
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+function observeProduction() {
+  const NativeWorker = window.Worker;
+  const observed = window.__startupObserved = {workers: 0, frame: null, trace: null, requests: 0};
+  window.Worker = class extends NativeWorker {
+    constructor(...args) {
+      super(...args);
+      const generation = ++observed.workers;
+      observed.frame = observed.trace = null; observed.requests = 0;
+      this.addEventListener("message", ({data}) => {
+        if (generation !== observed.workers) return;
+        if (data.type === "frame") observed.frame = data;
+        else if (data.type === "trace") observed.trace = data;
+        else if (data.type === "input-request") observed.requests++;
+      });
+    }
+  };
+}
+const idle = page => page.waitForFunction(() => __startupObserved.trace && __startupObserved.requests > 0 &&
+  __startupObserved.frame?.ui.input.kind === "command" && !__startupObserved.frame.ui.window);
+const state = page => page.evaluate(() => ({words: __startupObserved.trace.words,
+  player: __startupObserved.frame.player, stats: __startupObserved.frame.stats}));
+async function stored(page) {
+  return page.evaluate(() => new Promise((resolve, reject) => {
+    const request = indexedDB.open("original-rogue-web", 1); request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result, transaction = db.transaction("saves", "readonly"), read = transaction.objectStore("saves").get("manual");
+      transaction.oncomplete = () => {db.close(); resolve(read.result ? Array.from(new Uint8Array(read.result)) : null);};
+      transaction.onerror = () => {db.close(); reject(transaction.error);};
+    };
+  }));
+}
+async function saveAtTop(page, touch) {
+  await click(page, "settings-toggle", touch);
+  for (const id of ["save", "download-save", "import-save"])
+    assert.equal(await page.locator(`[data-control="${id}"]`).count(), 0);
+  await click(page, "settings-top", touch);
+  await page.locator('[data-control="load"]:not([disabled])').waitFor();
+  const bytes = await stored(page); assert.ok(bytes?.length > 0); return bytes;
+}
+async function waitTurn(page, touch) {
+  const turn = (await state(page)).words[13];
+  if (touch) await click(page, "touch-.", true); else await page.keyboard.press(".");
+  await page.waitForFunction(turn => __startupObserved.trace?.words[13] === turn + 1, turn);
+  await idle(page);
 }
 
 try {
   const first = launch([previewServer, "--root", root, "0"]);
+  let active = first;
   const base = await ready(first), port = Number(new URL(base).port);
   await check("fresh Node launcher serves the real game with isolation headers", async () => {
     const response = await fetch(base);
@@ -83,7 +125,7 @@ try {
     const second = await completed(launch(launcher(port)));
     assert.equal(second.code, 0, second.stderr);
     assert.match(second.stdout, /既に起動/);
-    assert.ok(second.stdout.includes("Rogue preview: " + base));
+    assert.ok(second.stdout.includes("Game preview: " + base));
     assert.equal(first.child.exitCode, null);
   });
   const foreign = http.createServer((_, response) => response.end("another application"));
@@ -113,24 +155,17 @@ try {
     assert.equal(result.code, 1);
     assert.match(result.stderr, /別のサーバーが使用/);
   });
-  const legacy = createPreviewServer();
-  legacy.on("request", (_, response) => response.removeHeader("X-Rogue-Preview"));
-  const legacyPort = await listen(legacy);
-  await check("an already running older server is verified from matching production files", async () => {
-    const result = await completed(launch(launcher(legacyPort)));
-    assert.equal(result.code, 0, result.stderr);
-    assert.match(result.stdout, /既に起動/);
-  });
-  await cp(path.join(root, "web/worker.js"), path.join(otherRoot, "web/worker.js"));
-  await mkdir(path.join(otherRoot, "build"));
-  await writeFile(path.join(otherRoot, "build/build-manifest.json"), "different build");
-  const mismatch = createPreviewServer({root: otherRoot});
-  mismatch.on("request", (_, response) => response.removeHeader("X-Rogue-Preview"));
-  const mismatchPort = await listen(mismatch);
-  await check("legacy detection rejects different build contents", async () => {
-    const result = await completed(launch(launcher(mismatchPort)));
+  const unidentified = createPreviewServer({root});
+  unidentified.on("request", (_, response) => response.removeHeader("X-Rogue-Preview"));
+  const unidentifiedPort = await listen(unidentified);
+  await check("an isolated server without workspace identity is rejected without stopping its owner", async () => {
+    const result = await completed(launch(launcher(unidentifiedPort)));
     assert.equal(result.code, 1);
     assert.match(result.stderr, /別のサーバーが使用/);
+    const response = await fetch(`http://127.0.0.1:${unidentifiedPort}/`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cross-origin-embedder-policy"), "require-corp");
+    assert.equal(response.headers.get("x-rogue-preview"), null);
   });
   runtime = await prepareBrowserRuntime(root);
   browser = await chromium.launch({executablePath: browserExecutable(),
@@ -159,42 +194,54 @@ try {
   for (const touch of [false, true]) {
     const label = touch ? "mobile" : "PC";
     const context = await browser.newContext({viewport: touch ? {width: 390, height: 844} : {width: 1240, height: 900},
-      isMobile: touch, hasTouch: touch, deviceScaleFactor: touch ? 2 : 1, acceptDownloads: true});
+      isMobile: touch, hasTouch: touch, deviceScaleFactor: touch ? 2 : 1});
     try {
+      await context.addInitScript(observeProduction);
       const page = await context.newPage();
-      await installBrowserTestAdapter(page);
       page.on("pageerror", error => evidence.errors.push(error.message));
       await page.goto(base + "?trace=1&lang=ja&view=pixels");
       await check(label + " reused origin starts the game and advances a turn", async () => {
+        await page.locator('[data-control="new-game"]:not([disabled])').waitFor();
         for (const [id, value] of [["name", "起動確認勇者"], ["seed", "17"]]) {
-          await click(page, id, touch); await page.keyboard.press("Control+a"); await page.keyboard.insertText(value);
+          await page.locator("#" + id).fill(value);
         }
         await click(page, "new-game", touch);
-        await page.waitForFunction(() => __rogueBrowserTest.running && __rogueBrowserTest.trace && __rogueBrowserTest.queuePending === 0);
-        const turn = await page.evaluate(() => __rogueBrowserTest.trace.words[13]);
-        await page.keyboard.press(".");
-        await page.waitForFunction(turn => __rogueBrowserTest.trace.words[13] === turn + 1, turn);
+        await idle(page); await waitTurn(page, touch);
+        assert.equal(await page.evaluate(() => "__rogueBrowserTest" in window), false);
         const image = label + "-game.png";
         await page.screenshot({path: path.join(output, image)}); evidence.screenshots.push(image);
       });
       await check(label + " repeated launcher preserves saved data and resumed gameplay", async () => {
-        await click(page, "settings-toggle", touch); await click(page, "save", touch);
-        await page.waitForFunction(() => __rogueBrowserTest.savedLength > 0 && !__rogueBrowserTest.savePending);
+        const before = await state(page), bytes = await saveAtTop(page, touch);
         const result = await completed(launch(launcher(port)));
         assert.equal(result.code, 0, result.stderr);
         assert.ok(result.stdout.includes(base));
-        await page.reload(); await click(page, "load", touch);
-        await page.waitForFunction(() => __rogueBrowserTest.frame && __rogueBrowserTest.trace && __rogueBrowserTest.queuePending === 0);
-        const turn = await page.evaluate(() => __rogueBrowserTest.trace.words[13]);
-        await page.keyboard.press(".");
-        await page.waitForFunction(turn => __rogueBrowserTest.trace.words[13] === turn + 1, turn);
+        assert.equal(active.child.exitCode, null);
+        await page.reload(); await page.locator('[data-control="load"]:not([disabled])').waitFor();
+        assert.deepEqual(await stored(page), bytes);
+        await click(page, "load", touch); await idle(page);
+        assert.deepEqual(await state(page), before); assert.equal(await stored(page), null);
+        await waitTurn(page, touch);
+      });
+      await check(label + " restarting the server keeps the origin, autosave bytes and next game turn", async () => {
+        const before = await state(page), bytes = await saveAtTop(page, touch);
+        active.child.kill(); await active.closed;
+        active = launch(launcher(port)); assert.equal(await ready(active), base);
+        await page.reload(); await page.locator('[data-control="load"]:not([disabled])').waitFor();
+        assert.deepEqual(await stored(page), bytes);
+        await click(page, "load", touch); await idle(page);
+        assert.deepEqual(await state(page), before); assert.equal(await stored(page), null);
+        await waitTurn(page, touch);
       });
     } finally {await context.close();}
   }
   assert.deepEqual(evidence.errors, []);
+  evidence.result = "pass";
   evidence.finished_at = new Date().toISOString();
-  await writeFile(path.join(output, "evidence.json"), JSON.stringify(evidence, null, 2));
+} catch (error) {
+  evidence.result = "fail"; evidence.failure = error.stack; throw error;
 } finally {
+  await writeFile(path.join(output, "evidence.json"), JSON.stringify(evidence, null, 2));
   await browser?.close(); await runtime?.dispose();
   for (const child of children) child.kill();
   for (const server of servers) {server.closeAllConnections(); await new Promise(resolve => server.close(resolve));}

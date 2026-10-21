@@ -1182,16 +1182,11 @@ void gameOver(char *killedBy, boolean useCustomPhrasing) {
         displayMoreSign();
     }
 
-    if (serverMode) {
-        blackOutScreen();
-        saveRecordingNoPrompt(recordingFilename);
-    } else {
-        if (!rogue.playbackMode && saveHighScore(theEntry)) {
-            printHighScores(true);
-        }
-        blackOutScreen();
-        saveRecording(recordingFilename);
+    if (!rogue.playbackMode && saveHighScore(theEntry)) {
+        printHighScores(true);
     }
+    blackOutScreen();
+    saveRecording(recordingFilename);
 
     if (rogue.playbackMode && nonInteractivePlayback) {
         printf("Recording: %s ended after %li turns (game over).\n", rogue.currentGamePath, rogue.playerTurnNumber);
@@ -1351,13 +1346,9 @@ void victory(boolean superVictory) {
 
     displayMoreSign();
 
-    if (serverMode) {
-        saveRecordingNoPrompt(recordingFilename);
-    } else {
-        blackOutScreen();
-        saveRecording(recordingFilename);
-        printHighScores(qualified);
-    }
+    blackOutScreen();
+    saveRecording(recordingFilename);
+    printHighScores(qualified);
 
     if (rogue.playbackMode && nonInteractivePlayback) {
         printf("Recording: %s ended after %li turns (victory).\n", rogue.currentGamePath, rogue.playerTurnNumber);

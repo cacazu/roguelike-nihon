@@ -11,8 +11,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 64,
-          "end_line": 64,
+          "line": 60,
+          "end_line": 60,
           "symbol": "badArgument",
           "function": "badArgument",
           "scope": "function",
@@ -29,8 +29,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 248,
-          "end_line": 248,
+          "line": 244,
+          "end_line": 244,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -47,8 +47,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 234,
-          "end_line": 234,
+          "line": 230,
+          "end_line": 230,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -65,8 +65,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 230,
-          "end_line": 230,
+          "line": 226,
+          "end_line": 226,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -83,8 +83,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 142,
-          "end_line": 142,
+          "line": 138,
+          "end_line": 138,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -101,8 +101,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 368,
-          "end_line": 368,
+          "line": 356,
+          "end_line": 356,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -112,8 +112,8 @@
         },
         {
           "file": "src/platform/main.c",
-          "line": 373,
-          "end_line": 373,
+          "line": 366,
+          "end_line": 366,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -130,8 +130,26 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 120,
-          "end_line": 120,
+          "line": 116,
+          "end_line": 116,
+          "symbol": "main",
+          "function": "main",
+          "scope": "function",
+          "call": "fprintf",
+          "argument_index": 1,
+          "literal_count": 1
+        }
+      ]
+    },
+    "main.main.screen_verification_requires_the_sdl_backend.c0119973e580": {
+      "text": "Screen verification requires the SDL backend.\n",
+      "translatable": true,
+      "kind": "console_text",
+      "sources": [
+        {
+          "file": "src/platform/main.c",
+          "line": 361,
+          "end_line": 361,
           "symbol": "main",
           "function": "main",
           "scope": "function",
@@ -148,32 +166,14 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 21,
-          "end_line": 30,
+          "line": 20,
+          "end_line": 29,
           "symbol": "printCommandlineHelp",
           "function": "printCommandlineHelp",
           "scope": "function",
           "call": "printf",
           "argument_index": 1,
           "literal_count": 10
-        }
-      ]
-    },
-    "main.printcommandlinehelp.server_mode_run_the_game_in_web_brogue_server_mo.2fdf406ea5a5": {
-      "text": "--server-mode              run the game in web-brogue server mode\n",
-      "translatable": true,
-      "kind": "console_text",
-      "sources": [
-        {
-          "file": "src/platform/main.c",
-          "line": 32,
-          "end_line": 32,
-          "symbol": "printCommandlineHelp",
-          "function": "printCommandlineHelp",
-          "scope": "function",
-          "call": "printf",
-          "argument_index": 1,
-          "literal_count": 1
         }
       ]
     },
@@ -184,8 +184,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 35,
-          "end_line": 39,
+          "line": 31,
+          "end_line": 35,
           "symbol": "printCommandlineHelp",
           "function": "printCommandlineHelp",
           "scope": "function",
@@ -202,8 +202,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 42,
-          "end_line": 42,
+          "line": 38,
+          "end_line": 38,
           "symbol": "printCommandlineHelp",
           "function": "printCommandlineHelp",
           "scope": "function",
@@ -220,8 +220,8 @@
       "sources": [
         {
           "file": "src/platform/main.c",
-          "line": 44,
-          "end_line": 53,
+          "line": 40,
+          "end_line": 49,
           "symbol": "printCommandlineHelp",
           "function": "printCommandlineHelp",
           "scope": "function",

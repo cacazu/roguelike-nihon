@@ -11,8 +11,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7646,
-          "end_line": 7646,
+          "line": 7656,
+          "end_line": 7656,
           "symbol": "itemAtLoc",
           "function": "itemAtLoc",
           "scope": "function",
@@ -29,8 +29,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 395,
-          "end_line": 395,
+          "line": 396,
+          "end_line": 396,
           "symbol": "makeItemInto",
           "function": "makeItemInto",
           "scope": "function",
@@ -47,8 +47,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 848,
-          "end_line": 848,
+          "line": 849,
+          "end_line": 849,
           "symbol": "pickUpItemAt",
           "function": "pickUpItemAt",
           "scope": "function",
@@ -65,8 +65,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 887,
-          "end_line": 887,
+          "line": 906,
+          "end_line": 906,
           "symbol": "dialogChooseFile",
           "function": "dialogChooseFile",
           "scope": "function",
@@ -191,8 +191,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1428,
-          "end_line": 1428,
+          "line": 1420,
+          "end_line": 1420,
           "symbol": "selectFile",
           "function": "selectFile",
           "scope": "function",

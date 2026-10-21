@@ -77,14 +77,7 @@ async function isSamePreview(url, root, tls) {
     const response = await readPreviewResponse(url, "HEAD", tls);
     if (response.status !== 200 || response.headers["cross-origin-opener-policy"] !== "same-origin" ||
         response.headers["cross-origin-embedder-policy"] !== "require-corp") return false;
-    if (response.headers["x-rogue-preview"]) return response.headers["x-rogue-preview"] === previewIdentity(root);
-    // Servers started before the identity header was added can still serve the
-    // updated files. Verify the browser entry point, Worker and build together.
-    const matches = await Promise.all(["web/index.html", "web/worker.js", "build/build-manifest.json"].map(async file => {
-      const [local, remote] = await Promise.all([readFile(path.join(root, file)), readPreviewResponse(new URL(file, url), "GET", tls)]);
-      return remote.status === 200 && local.equals(remote.body);
-    }));
-    return matches.every(Boolean);
+    return response.headers["x-rogue-preview"] === previewIdentity(root);
   } catch { return false; }
 }
 
@@ -124,8 +117,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const tls = certificate ? { cert: await readFile(certificate), key: await readFile(privateKey) } : undefined;
   try {
     const { server, url, reused } = await startPreviewServer({ root, port, host, tls });
-    if (reused) console.log("Rogueは既に起動しています。このURLをブラウザーで開いてください。");
-    console.log("Rogue preview: " + url);
+    if (reused) console.log("プレビューは既に起動しています。このURLをブラウザーで開いてください。");
+    console.log("Game preview: " + url);
     if (server) {
       server.on("error", error => { console.error(error.message); process.exitCode = 1; });
       for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => server.close());

@@ -44,11 +44,6 @@ cppflags += -DBROGUE_SDL
 libs += $(shell $(SDL_CONFIG) --libs) -lSDL2_image -lSDL2_ttf
 endif
 
-ifeq ($(WEBBROGUE),YES)
-sources += $(addprefix src/platform/,web-platform.c)
-cppflags += -DBROGUE_WEB
-endif
-
 ifeq ($(RAPIDBROGUE),YES)
 cppflags += -DRAPID_BROGUE
 endif
