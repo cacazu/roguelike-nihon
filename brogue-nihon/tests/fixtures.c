@@ -32,6 +32,9 @@ static char featureJSON[65536];
 static size_t featureLength;
 static boolean featureOverflow;
 
+#if defined(__GNUC__) || defined(__clang__)
+static void featureAppend(const char *format, ...) __attribute__((format(printf, 1, 2)));
+#endif
 static void featureAppend(const char *format, ...) {
     if (featureOverflow) return;
     va_list args;
@@ -65,9 +68,17 @@ static void featureItem(item *it) {
            table ? table[it->kind].called : 0);
     featureString(table ? table[it->kind].callTitle : "");
     featureAppend(",\"cursed\":%d,\"strengthRequired\":%d,\"timesEnchanted\":%d,"
-           "\"maxChargesKnown\":%d,\"lastUsed\":[%lu,%lu,%lu]}",
+           "\"maxChargesKnown\":%d,\"lastUsed\":[%lu,%lu,%lu]",
            !!(it->flags & ITEM_CURSED), it->strengthRequired, it->timesEnchanted,
            !!(it->flags & ITEM_MAX_CHARGES_KNOWN), it->lastUsed[0], it->lastUsed[1], it->lastUsed[2]);
+    featureAppend(",\"runicKind\":%d,\"vorpalEnemy\":%d,\"originDepth\":%d,\"keyLoc\":[",
+           it->flags & ITEM_RUNIC ? it->enchant2 : -1, it->vorpalEnemy, it->originDepth);
+    if (it->flags & ITEM_IS_KEY) for (int i = 0; i < KEY_ID_MAXIMUM; i++) {
+        featureAppend("%s{\"x\":%d,\"y\":%d,\"machine\":%d,\"disposable\":%d}",
+               i ? "," : "", it->keyLoc[i].loc.x, it->keyLoc[i].loc.y, it->keyLoc[i].machine,
+               it->keyLoc[i].disposableHere);
+    }
+    featureAppend("]}");
 }
 
 static void featureStatuses(const short *statuses) {
@@ -78,10 +89,10 @@ static void featureStatuses(const short *statuses) {
 
 static void featureCell(pos loc) {
     featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,"
-           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu,\"rememberedTerrain\":%d}",
+           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu,\"rememberedTerrain\":%d,\"machine\":%d}",
            loc.x, loc.y, pmapAt(loc)->flags, pmapAt(loc)->layers[DUNGEON], pmapAt(loc)->layers[LIQUID],
            pmapAt(loc)->layers[SURFACE], pmapAt(loc)->layers[GAS], pmapAt(loc)->volume, terrainFlags(loc),
-           pmapAt(loc)->rememberedTerrain);
+           pmapAt(loc)->rememberedTerrain, pmapAt(loc)->machineNumber);
 }
 
 const char *brogue_check_features(void) {
@@ -119,6 +130,8 @@ const char *brogue_check_features(void) {
            player.status[STATUS_SEARCHING], rogue.automationActive, rogue.autoPlayingLevel, rogue.disturbed,
            rogue.trueColorMode, rogue.displayStealthRangeMode, rogue.cursorMode, rogue.cursorLoc.x, rogue.cursorLoc.y,
            rogue.minersLight.lightRadius.lowerBound, rogue.minersLight.lightRadius.upperBound);
+    featureAppend("\"inWater\":%d,\"playerCombat\":{\"defense\":%d,\"damageMin\":%d,\"damageMax\":%d},",
+           rogue.inWater, player.info.defense, player.info.damage.lowerBound, player.info.damage.upperBound);
     featureAppend("\"status\":{\"nutrition\":%d,\"burning\":%d,\"poisoned\":%d,\"slowed\":%d,"
            "\"hasted\":%d,\"invisible\":%d,\"levitating\":%d,\"telepathic\":%d,\"fireImmune\":%d},\"pack\":[",
            player.status[STATUS_NUTRITION], player.status[STATUS_BURNING], player.status[STATUS_POISONED],
@@ -160,9 +173,9 @@ const char *brogue_check_features(void) {
     count = 0;
     if (rogue.gameInProgress) for (int y = 10; y <= 18; y++) for (int x = 36; x <= 44; x++) {
         if (count++) featureAppend(",");
-        featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,\"surface\":%d,\"gas\":%d,\"volume\":%d,\"rememberedTerrain\":%d}",
+        featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,\"surface\":%d,\"gas\":%d,\"volume\":%d,\"rememberedTerrain\":%d,\"machine\":%d}",
                x, y, pmap[x][y].flags, pmap[x][y].layers[DUNGEON], pmap[x][y].layers[LIQUID],
-               pmap[x][y].layers[SURFACE], pmap[x][y].layers[GAS], pmap[x][y].volume, pmap[x][y].rememberedTerrain);
+               pmap[x][y].layers[SURFACE], pmap[x][y].layers[GAS], pmap[x][y].volume, pmap[x][y].rememberedTerrain, pmap[x][y].machineNumber);
     }
     featureAppend("],\"remoteCells\":[");
     count = 0;
@@ -583,6 +596,73 @@ static void fixtureBolt(unsigned short category, short kind, int condition) {
     updateEncumbrance();
 }
 
+/* Initial conditions only. Original combat, AI, machine and vision routines
+ * remain reachable exclusively through subsequent real player events. */
+static void fixtureContracts(int scene) {
+    fixtureBoltStairs();
+    player.info.maxHP = player.currentHP = 100;
+    player.turnsUntilRegen = 100000;
+    player.regenPerTurn = 0;
+    if (scene == CHECK_SLAYING_MATCH || scene == CHECK_SLAYING_OTHER) {
+        item *weapon = give(WEAPON, DAGGER, 'a', true);
+        weapon->flags |= ITEM_RUNIC | ITEM_EQUIPPED;
+        weapon->flags &= ~(ITEM_RUNIC_IDENTIFIED | ITEM_RUNIC_HINTED);
+        weapon->enchant2 = W_SLAYING;
+        weapon->vorpalEnemy = scene == CHECK_SLAYING_MATCH ? 4 : 2;
+        rogue.weapon = weapon;
+        creature *target = fixtureFrozenTarget(MK_OGRE, 41, 14);
+        target->info.maxHP = target->currentHP = 100;
+        /* Artificial shared hit guarantee isolates the slaying effect. */
+        target->status[STATUS_STUCK] = target->maxStatus[STATUS_STUCK] = 50;
+    } else if (scene == CHECK_VULNERABILITY || scene == CHECK_PLAIN_ARMOR_CONTROL) {
+        item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+        armor->flags |= ITEM_EQUIPPED;
+        if (scene == CHECK_VULNERABILITY) { armor->flags |= ITEM_RUNIC; armor->enchant2 = A_VULNERABILITY; }
+        rogue.armor = armor;
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+        fixtureStatus(STATUS_STUCK, 50);
+        fixtureTarget(MK_KOBOLD, 41, 14)->ticksUntilTurn = 0;
+    } else if (scene == CHECK_SPIDER_OPEN || scene == CHECK_SPIDER_BLOCKED) {
+        if (scene == CHECK_SPIDER_BLOCKED) for (int y = 10; y <= 18; y++) pmap[42][y].layers[DUNGEON] = WALL;
+        fixtureTarget(MK_SPIDER, 44, 14)->ticksUntilTurn = 0;
+    } else if (scene == CHECK_CAPTIVE) {
+        creature *target = fixtureTarget(MK_OGRE, 41, 14);
+        target->bookkeepingFlags |= MB_CAPTIVE | MB_SEIZED;
+        target->bookkeepingFlags &= ~MB_FOLLOWER;
+        target->leader = NULL;
+        target->ticksUntilTurn = 0;
+    } else if (scene == CHECK_LEVER || scene == CHECK_LEVER_BREAKER) {
+        pmap[41][14].layers[DUNGEON] = WALL_LEVER;
+        pmap[43][14].layers[DUNGEON] = PORTCULLIS_CLOSED;
+        pmap[43][16].layers[DUNGEON] = PORTCULLIS_CLOSED;
+        for (int i = 0; i < 3; i++) { int x = i ? 43 : 41, y = i == 2 ? 16 : 14;
+            pmap[x][y].machineNumber = i == 2 ? 8 : 7; pmap[x][y].flags |= IS_IN_ROOM_MACHINE;
+        }
+        if (scene == CHECK_LEVER_BREAKER) { pmap[43][12].layers[DUNGEON] = ELECTRIC_CRYSTAL_OFF;
+            pmap[43][12].machineNumber = 7; pmap[43][12].flags |= IS_IN_ROOM_MACHINE;
+        }
+    } else if (scene >= CHECK_KEY_DISPOSABLE && scene <= CHECK_KEY_WRONG_LOCK) {
+        pmap[41][14].layers[DUNGEON] = LOCKED_DOOR;
+        pmap[41][14].machineNumber = 7;
+        pmap[41][14].flags |= IS_IN_ROOM_MACHINE;
+        item *key = give(KEY, KEY_DOOR, 'a', true);
+        key->flags |= ITEM_IS_KEY;
+        key->originDepth = rogue.depthLevel + (scene == CHECK_KEY_WRONG_DEPTH ? 1 : 0);
+        memset(key->keyLoc, 0, sizeof key->keyLoc);
+        key->keyLoc[0] = (keyLocationProfile) {{20, 14}, scene == CHECK_KEY_WRONG_LOCK ? 8 : 7,
+                                            scene != CHECK_KEY_REUSABLE};
+    } else if (scene == CHECK_WATER || scene == CHECK_WATER_LEVITATING) {
+        pmap[41][14].layers[LIQUID] = DEEP_WATER;
+        if (scene == CHECK_WATER_LEVITATING) fixtureStatus(STATUS_LEVITATING, 100);
+    } else if (scene == CHECK_VISIBILITY_MEMORY) {
+        for (int y = 12; y <= 16; y++) pmap[41][y].layers[DUNGEON] = WALL;
+        pmap[42][14].layers[SURFACE] = CARPET;
+        /* Completely sealed, still undiscovered control beyond the local room. */
+        pmap[22][14].layers[DUNGEON] = FLOOR;
+    }
+    updateEncumbrance();
+}
+
 int brogue_check_fixture(int scene) {
     if (preparedScene || !gameConst || brogue_check_wait_kind() != BROWSER_COMMAND
         || rogue.seed != 42 || rogue.playerTurnNumber != 0 || rogue.playbackMode || rogue.cursorMode
@@ -606,13 +686,14 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0)) return -1;
-    } else if (scene < 1 || scene > CHECK_TARGET_CYCLE) return -1;
+    } else if (scene < 1 || scene > CHECK_VISIBILITY_MEMORY) return -1;
     fixtureRoom();
     preparedScene = scene;
     if (category == POTION || category == CHARM) fixtureConsumable(category, kind, group == CHECK_POTION_KNOWN || category == CHARM, group == CHECK_CHARM_COOLDOWN);
     else if (category == SCROLL) fixtureScroll(kind, group == CHECK_SCROLL_KNOWN);
     else if (category == STAFF || category == WAND) fixtureBolt(category, kind, condition);
     else if (scene <= 8) fixtureInventory();
+    else if (scene >= CHECK_SLAYING_MATCH) fixtureContracts(scene);
     switch (scene) {
         case CHECK_TARGET_CYCLE:
             /* Three independently targetable enemies distinguish forward and

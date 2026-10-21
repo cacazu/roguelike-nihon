@@ -55,7 +55,18 @@ export class FixturePage {
   async assertSceneFrame(){const s=await this.state();if(s.inProgress){const player=await this.publicCell(s.x+21,s.y+3);assert.equal(player[1],64,'Public player glyph is missing at the actual C location');if(s.depth===this.origin.depth){const old=await this.publicCell(this.origin.x+21,this.origin.y+3);assert.equal(old[1],32,'Old pre-fixture player/map was restored');}return {player,old:await this.publicCell(this.origin.x+21,this.origin.y+3)};}}
   async wait(){return this.page.evaluate(()=>({serial:__brogueFixture.serial,waiting:__brogueFixture.waiting,kind:document.querySelector('#game').dataset.waitKind,descriptor:__brogueFixture.descriptor}));}
   async record(action){this.entry.steps.push({action,wait:await this.wait(),state:await this.state()});}
-  async screenshot(name){const filename=this.prefix+name+'.png';await this.page.screenshot({path:path.join(this.entry.directory,filename),fullPage:true});this.entry.screenshots.push(filename);}
+  async screenshot(name){
+    if(this.entry.input_path==='touch'&&(await this.wait()).kind==='command'){
+      const before=await this.state(),wait=await this.wait(),count=(await this.trace()).native_trace.length;
+      await this.page.locator('#center-player').tap();
+      assert.deepEqual(await this.state(),before,'Centering the public viewport must not change game state');
+      assert.equal((await this.wait()).serial,wait.serial);assert.equal((await this.trace()).native_trace.length,count);
+      const geometry=await this.page.evaluate(({x,y})=>{const c=document.querySelector('#game').getBoundingClientRect(),v=document.querySelector('#viewport').getBoundingClientRect();return {x:c.x+(x+21+.5)*c.width/100,y:c.y+(y+3+.5)*c.height/34,viewport:{x:v.x,y:v.y,w:v.width,h:v.height}};},before),v=geometry.viewport;
+      assert.ok(geometry.x>v.x&&geometry.x<v.x+v.w&&geometry.y>v.y&&geometry.y<v.y+v.h,'Prepared player must be inside the actual touch viewport');
+      this.entry.map_viewports??=[];this.entry.map_viewports.push({name,geometry});
+    }
+    const filename=this.prefix+name+'.png';await this.page.screenshot({path:path.join(this.entry.directory,filename),fullPage:true});this.entry.screenshots.push(filename);
+  }
   async input(key){
     const before=await this.wait();assert.equal(before.waiting,true,'Original C is not awaiting an event');
     if(this.entry.input_path==='touch'){
@@ -130,7 +141,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
           await page.waitForFunction(()=>globalThis.__brogueFixture?.waiting&&document.querySelector('#game').dataset.waitKind==='command',null,{timeout:60000});
           const d=new FixturePage(page,entry,prefix),startup=await d.state(),wait=await d.wait();
           assert.equal(await page.evaluate(()=>__brogueFixture.prestartFeaturesError),'CHECK game has not started');assert.equal(await page.evaluate(()=>__brogueFixture.prestartReject),-1);assert.equal(startup.fixture,0);assert.equal(startup.seed,'42');assert.equal(startup.turn,0);assert.equal(startup.ready,1);assert.equal(wait.serial,1);
-          for(const rejected of[-1,99999,
+          for(const rejected of[-1,99999,Math.max(...Object.values(sceneGroups).filter(id=>id<1000))+1,
             sceneGroups.POTION_UNKNOWN+startup.kindCounts.potion,sceneGroups.CHARM_READY+startup.kindCounts.charm,
             sceneGroups.SCROLL_UNKNOWN+startup.kindCounts.scroll,sceneGroups.SCROLL_KNOWN+startup.kindCounts.scroll,
             sceneGroups.STAFF_READY+startup.kindCounts.staff,sceneGroups.WAND_READY+startup.kindCounts.wand,
@@ -148,9 +159,10 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
           await d.record('CHECK prepare '+scene);await d.screenshot('initial');return d;
         };
         driver=await makePage(test.fixture_id);entry.initial_state=await driver.state();
-        await test.execute(driver,{control:async callback=>{
-          const control=await makePage(test.fixture_id,'control-');const initial_state=await control.state();
-          try{const value=await callback(control);entry.control_runs??=[];entry.control_runs.push({fixture_id:test.fixture_id,initial_state,...await control.trace(),final_state:await control.state()});return value;}finally{await control.page.close();}
+        await test.execute(driver,{control:async (callback,fixture_id=test.fixture_id)=>{
+          assert.ok(Number.isSafeInteger(fixture_id)&&fixture_id>0);
+          const control=await makePage(fixture_id,'control-');const initial_state=await control.state();
+          try{const value=await callback(control);entry.control_runs??=[];entry.control_runs.push({fixture_id,initial_state,...await control.trace(),final_state:await control.state()});return value;}finally{await control.page.close();}
         }});
         await driver.settle();assert.equal((await driver.wait()).kind,'command');entry.final_state=await driver.state();entry.public_final_frame=await driver.assertSceneFrame();
         Object.assign(entry,await driver.trace());assert.ok(entry.native_trace.length>0);assert.deepEqual(entry.native_trace[0].before,entry.initial_state,'First consumed event must start at the injected initial state');

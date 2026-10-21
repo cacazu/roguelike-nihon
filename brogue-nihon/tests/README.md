@@ -16,6 +16,7 @@ node tests/scrolls.mjs
 node tests/bolts.mjs
 node tests/projectiles.mjs
 node tests/knowledge-feats.mjs
+node tests/world-contracts.mjs
 node tests/persistence.mjs
 ```
 
@@ -75,3 +76,11 @@ node --test tests/artifacts.test.mjs
 既存の日本語辞書・原文export検証は [locales/README.md](../locales/README.md) を参照する。原作比較では比較元の版・sourceと固定seed入力を照合し、専用exportを通常配布へ含めない。共通クレートの検査は [rust-common](../../rust-common/README.md) から実行する。
 
 種類全体を対象にしない追加契約の原作比較は、`BROGUE_FIXTURE_RESULTS` にその合格結果、`BROGUE_COMPARE_NAME` に短い識別名、`BROGUE_COMPARE_DOMAINS=none` を明示する。この設定は全種類網羅を主張しないだけで、入力結果の全case合格、生成物とmanifestの一致、全消費入力待ちの長さと全観測値の一致は省略しない。通常の省略値と種類domain指定は従来どおり全primitiveの独立した効果assertionを必要とする。偉業の内部配列は現在のCHECK観測に含まれないため、Fの状態マーカーはブラウザーの公開セルと画像による証拠であり、native側の内部偉業配列を直接照合したとは記載しない。
+
+`world-contracts.mjs` は、CHECKの準備だけを `fixtures.c` に置き、以降はPCキー／公開されたタッチ候補から原作を操作する。Slayingの一致／別種、Vulnerabilityと通常鎧の同じ待機中の実AI被害、Spiderの開通／壁遮断、捕虜のNo／Yes／実追随、レバーの機構別連動／遮断器、鍵のmachine一致と使い捨て／再利用／深度違い／別機構、水中と浮遊時の光半径、迂回での地形発見と視界外の記憶を検査する。`BROGUE_WORLD_CONTRACTS` でcaseを絞り込める。別初期条件の対照はharnessの `control(callback, fixture_id)` で独立ページを開き、準備状態・消費入力・最終状態を保存する。省略時は主caseと同じ初期条件を使う。
+
+人工的なHP100・回復停止・STUCKによる必中・元のAI情報・階段退避を事前条件として記録する。Slayingの必中特性、他のルーン、全AI能力・自然な群れ／変異、機構blueprint生成、鍵の座標一致による成功、未訪問階の生成は今回の代表分岐とは別に残す。Vulnerabilityは同じ待機中の総近接被害の対照であり、敵が1回だけ攻撃したとは仮定しない。CHECK観測にはrunic／鍵の照合情報、機構番号、水中と戦闘数値を追加し、鍵配列は終端後も含む固定上限を確認する。これらの読取export・準備sceneはproductionにはリンクしない。
+
+CHECKを拡張した後の比較は新しいmanifestと生成物で再実行する。旧版の全回帰は `.local/phase-evidence/` の版別証拠として維持し、新版の合格へ自動で移さない。検証表のcurrentとhistoricalはこの版の一致を区別して読む。
+
+共通fixture harnessのタッチ地図撮影は、command待ちで既存の＠ボタンを実タップし、プレイヤーをviewport内へ戻す。全観測状態・入力serial・消費入力記録が変わらないことと画面内座標を保存する。modal画面はこの再配置を適用せず、各検査の表示範囲を確認する。
