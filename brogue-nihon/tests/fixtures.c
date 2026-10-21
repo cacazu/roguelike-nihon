@@ -95,6 +95,16 @@ static void featureCell(pos loc) {
            pmapAt(loc)->rememberedTerrain, pmapAt(loc)->machineNumber);
 }
 
+static int featureLeaderIndex(creature *leader) {
+    if (!leader) return -1;
+    if (leader == &player) return -2;
+    int index = 0;
+    for (creatureIterator iter = iterateCreatures(monsters); hasNextCreature(iter); index++) {
+        if (nextCreature(&iter) == leader) return index;
+    }
+    return -1;
+}
+
 const char *brogue_check_features(void) {
     if (!gameConst) return "{\"error\":\"CHECK game has not started\"}";
     featureLength = 0;
@@ -130,6 +140,22 @@ const char *brogue_check_features(void) {
            player.status[STATUS_SEARCHING], rogue.automationActive, rogue.autoPlayingLevel, rogue.disturbed,
            rogue.trueColorMode, rogue.displayStealthRangeMode, rogue.cursorMode, rogue.cursorLoc.x, rogue.cursorLoc.y,
            rogue.minersLight.lightRadius.lowerBound, rogue.minersLight.lightRadius.upperBound);
+    featureAppend("\"levels\":[");
+    /* Only native topology has meaningful visited/awaySince metadata. Some older
+     * terminal fixtures deliberately change depth without travelling there. */
+    if (rogue.gameInProgress && levels && (!preparedScene || preparedScene == CHECK_NATIVE_LEVELS)) {
+        for (int i = 0; i < 2 && i < gameConst->deepestLevel; i++) {
+            levelData *level = &levels[i];
+            featureAppend("%s{\"depth\":%d,\"visited\":%d,\"seed\":\"%llu\",\"upX\":%d,\"upY\":%d,\"downX\":%d,\"downY\":%d,\"awaySince\":",
+                   i ? "," : "", i + 1, level->visited, (unsigned long long) level->levelSeed,
+                   level->upStairsLoc.x, level->upStairsLoc.y, level->downStairsLoc.x, level->downStairsLoc.y);
+            /* awaySince is first initialized on exit, never on first entry. */
+            if (level->visited && i + 1 != rogue.depthLevel) featureAppend("%lu", level->awaySince);
+            else featureAppend("null");
+            featureAppend("}");
+        }
+    }
+    featureAppend("],");
     featureAppend("\"inWater\":%d,\"playerCombat\":{\"defense\":%d,\"damageMin\":%d,\"damageMax\":%d},",
            rogue.inWater, player.info.defense, player.info.damage.lowerBound, player.info.damage.upperBound);
     featureAppend("\"status\":{\"nutrition\":%d,\"burning\":%d,\"poisoned\":%d,\"slowed\":%d,"
@@ -166,8 +192,11 @@ const char *brogue_check_features(void) {
         featureAppend(",\"maxStatuses\":");
         featureStatuses(monst->maxStatus);
         featureAppend(",\"poisonAmount\":%d,\"movementSpeed\":%d,\"attackSpeed\":%d,"
-               "\"newPowerCount\":%d,\"totalPowerCount\":%d}", monst->poisonAmount,
-               monst->movementSpeed, monst->attackSpeed, monst->newPowerCount, monst->totalPowerCount);
+               "\"newPowerCount\":%d,\"totalPowerCount\":%d,\"mode\":%d,\"mutationIndex\":%d,\"leaderIndex\":%d,\"carriedItem\":", monst->poisonAmount,
+               monst->movementSpeed, monst->attackSpeed, monst->newPowerCount, monst->totalPowerCount,
+               monst->creatureMode, monst->mutationIndex, featureLeaderIndex(monst->leader));
+        if (monst->carriedItem) featureItem(monst->carriedItem); else featureAppend("null");
+        featureAppend("}");
     }
     featureAppend("],\"cells\":[");
     count = 0;
@@ -598,11 +627,15 @@ static void fixtureBolt(unsigned short category, short kind, int condition) {
 
 /* Initial conditions only. Original combat, AI, machine and vision routines
  * remain reachable exclusively through subsequent real player events. */
-static void fixtureContracts(int scene) {
+static void fixtureSafeWorld(void) {
     fixtureBoltStairs();
     player.info.maxHP = player.currentHP = 100;
     player.turnsUntilRegen = 100000;
     player.regenPerTurn = 0;
+}
+
+static void fixtureContracts(int scene) {
+    fixtureSafeWorld();
     if (scene == CHECK_SLAYING_MATCH || scene == CHECK_SLAYING_OTHER) {
         item *weapon = give(WEAPON, DAGGER, 'a', true);
         weapon->flags |= ITEM_RUNIC | ITEM_EQUIPPED;
@@ -664,6 +697,91 @@ static void fixtureContracts(int scene) {
     updateEncumbrance();
 }
 
+static void fixtureEquippedDagger(void) {
+    item *weapon = give(WEAPON, DAGGER, 'a', true);
+    weapon->flags |= ITEM_EQUIPPED;
+    rogue.weapon = weapon;
+}
+
+static void fixtureAdvanced(int scene) {
+    fixtureSafeWorld();
+    if (scene == CHECK_KEY_COORDINATE) {
+        pmap[41][14].layers[DUNGEON] = LOCKED_DOOR;
+        pmap[41][14].machineNumber = 7;
+        pmap[41][14].flags |= IS_IN_ROOM_MACHINE;
+        item *key = give(KEY, KEY_DOOR, 'a', true);
+        key->flags |= ITEM_IS_KEY;
+        key->originDepth = rogue.depthLevel;
+        memset(key->keyLoc, 0, sizeof key->keyLoc);
+        key->keyLoc[0] = (keyLocationProfile) {{41, 14}, 8, true};
+    } else if (scene == CHECK_FEAT_GOLD) {
+        fixtureFloorItem(GOLD, 0, 41, 14)->quantity = 1;
+    } else if (scene == CHECK_FEAT_SPECIALIST_READY || scene == CHECK_FEAT_SPECIALIST_BELOW) {
+        give(SCROLL, SCROLL_ENCHANTING, 'a', true)->quantity = 2;
+        give(WEAPON, DAGGER, 'b', true)->enchant1 = scene == CHECK_FEAT_SPECIALIST_READY ? 15 : 14;
+    } else if (scene == CHECK_JELLY_OPEN || scene == CHECK_JELLY_BLOCKED) {
+        fixtureEquippedDagger();
+        creature *target = fixtureFrozenTarget(MK_PINK_JELLY, 41, 14);
+        target->status[STATUS_STUCK] = target->maxStatus[STATUS_STUCK] = 50;
+        pmap[41][14].layers[SURFACE] = SPIDERWEB;
+        if (scene == CHECK_JELLY_BLOCKED) {
+            const pos blocked[] = {{39,14},{40,13},{40,15},{42,14},{41,13},{41,15}};
+            for (int i = 0; i < 6; i++) pmapAt(blocked[i])->layers[DUNGEON] = WALL;
+        }
+    } else if (scene == CHECK_SPIDER_MELEE || scene == CHECK_SPIDER_DELAYED) {
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+        fixtureStatus(STATUS_STUCK, 50);
+        fixtureTarget(MK_SPIDER, 41, 14)->ticksUntilTurn = scene == CHECK_SPIDER_MELEE ? 1 : 201;
+    } else if (scene == CHECK_ACID_ARMOR || scene == CHECK_ACID_PROTECTED) {
+        item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+        armor->flags |= ITEM_EQUIPPED;
+        if (scene == CHECK_ACID_PROTECTED) armor->flags |= ITEM_PROTECTED;
+        rogue.armor = armor;
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+        fixtureStatus(STATUS_STUCK, 50);
+        fixtureTarget(MK_ACID_MOUND, 41, 14)->ticksUntilTurn = 1;
+    } else if (scene == CHECK_MONKEY_ITEM || scene == CHECK_MONKEY_EMPTY) {
+        fixtureEquippedDagger();
+        if (scene == CHECK_MONKEY_ITEM) give(WEAPON, DART, 'b', true)->quantity = 5;
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+        fixtureStatus(STATUS_STUCK, 50);
+        fixtureTarget(MK_MONKEY, 41, 14)->ticksUntilTurn = 1;
+    } else if (scene == CHECK_BOG_SEIZE || scene == CHECK_BOG_LEVITATING) {
+        pmap[40][14].layers[LIQUID] = pmap[41][14].layers[LIQUID] = DEEP_WATER;
+        const pos blocked[] = {{40,13},{41,13},{42,13},{42,14},{42,15},{41,15},{40,15}};
+        for (int i = 0; i < 7; i++) pmapAt(blocked[i])->layers[DUNGEON] = WALL;
+        if (scene == CHECK_BOG_LEVITATING) fixtureStatus(STATUS_LEVITATING, 100);
+        fixtureTarget(MK_BOG_MONSTER, 41, 14)->ticksUntilTurn = 1;
+    } else if (scene == CHECK_CONJURER || scene == CHECK_CONJURER_PARALYZED) {
+        creature *target = fixtureTarget(MK_GOBLIN_CONJURER, 44, 14);
+        target->ticksUntilTurn = 1;
+        if (scene == CHECK_CONJURER_PARALYZED) target->status[STATUS_PARALYZED] = target->maxStatus[STATUS_PARALYZED] = 50;
+    }
+    updateEncumbrance();
+}
+
+/* Preflight leaves every state/RNG field untouched on rejection. The world,
+ * items, monsters and level metadata are the original generated ones. */
+static boolean fixtureNativeStart(pos *destination) {
+    if (!levels || rogue.depthLevel != 1 || levels[1].visited
+        || !isPosInMap(rogue.downLoc) || !isPosInMap(rogue.upLoc)
+        || pmapAt(rogue.downLoc)->layers[DUNGEON] != DOWN_STAIRS
+        || pmapAt(rogue.upLoc)->layers[DUNGEON] != DUNGEON_EXIT
+        || !(pmapAt(rogue.downLoc)->flags & HAS_STAIRS)
+        || !posEq(levels[0].downStairsLoc, rogue.downLoc)
+        || !posEq(levels[0].upStairsLoc, rogue.upLoc)) return false;
+    for (int dir = 0; dir < 4; dir++) {
+        pos loc = {rogue.downLoc.x + nbDirs[dir][0], rogue.downLoc.y + nbDirs[dir][1]};
+        if (isPosInMap(loc)
+            && !(terrainFlags(loc) & T_PATHING_BLOCKER)
+            && !(pmapAt(loc)->flags & (HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE))) {
+            *destination = loc;
+            return true;
+        }
+    }
+    return false;
+}
+
 int brogue_check_fixture(int scene) {
     if (preparedScene || !gameConst || brogue_check_wait_kind() != BROWSER_COMMAND
         || rogue.seed != 42 || rogue.playerTurnNumber != 0 || rogue.playbackMode || rogue.cursorMode
@@ -687,14 +805,21 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0)) return -1;
-    } else if (scene < 1 || scene > CHECK_VISIBILITY_MEMORY) return -1;
-    fixtureRoom();
+    } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
+    if (scene == CHECK_NATIVE_LEVELS) {
+        pos destination;
+        if (!fixtureNativeStart(&destination)) return -1;
+        pmapAt(player.loc)->flags &= ~HAS_PLAYER;
+        player.loc = destination;
+        pmapAt(player.loc)->flags |= HAS_PLAYER;
+    } else fixtureRoom();
     preparedScene = scene;
     if (category == POTION || category == CHARM) fixtureConsumable(category, kind, group == CHECK_POTION_KNOWN || category == CHARM, group == CHECK_CHARM_COOLDOWN);
     else if (category == SCROLL) fixtureScroll(kind, group == CHECK_SCROLL_KNOWN);
     else if (category == STAFF || category == WAND) fixtureBolt(category, kind, condition);
     else if (scene <= 8) fixtureInventory();
-    else if (scene >= CHECK_SLAYING_MATCH) fixtureContracts(scene);
+    else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
+    else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
     switch (scene) {
         case CHECK_TARGET_CYCLE:
             /* Three independently targetable enemies distinguish forward and

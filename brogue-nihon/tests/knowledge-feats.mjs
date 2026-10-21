@@ -1,5 +1,7 @@
 // Real naming and feat transitions through the public UI; preparation uses existing CHECK scenes.
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {runFixtureSuite} from './fixture-browser.mjs';
 const observed=({ready,...state})=>state;
 const item=(s,letter)=>{const it=s.pack.find(it=>it.letter===letter.charCodeAt(0));assert.ok(it,'Missing '+letter);return it;};
@@ -29,9 +31,10 @@ async function menu(d){
   throw Error('Native menu remains outside viewport');
 }
 // Move the actual touch viewport until the tested native names/status cells fit.
-async function revealFeatStatus(d){
+async function revealFeatStatus(d,expected){
+  const indices=Object.keys(expected).map(Number),top=1+Math.min(...indices),bottom=3+Math.max(...indices);
   for(let attempt=0;attempt<14;attempt++){
-    const g=await d.page.evaluate(()=>{const c=document.querySelector('#game').getBoundingClientRect(),v=document.querySelector('#viewport').getBoundingClientRect();return {left:c.x+21*c.width/100,right:c.x+40*c.width/100,top:c.y+c.height/34,bottom:c.y+4*c.height/34,v:{x:v.x,y:v.y,w:v.width,h:v.height}};}),v=g.v;
+    const g=await d.page.evaluate(({top,bottom})=>{const c=document.querySelector('#game').getBoundingClientRect(),v=document.querySelector('#viewport').getBoundingClientRect();return {left:c.x+21*c.width/100,right:c.x+40*c.width/100,top:c.y+top*c.height/34,bottom:c.y+bottom*c.height/34,v:{x:v.x,y:v.y,w:v.width,h:v.height}};},{top,bottom}),v=g.v;
     const dx=g.left<v.x+2?100:g.right>v.x+v.w-2?-100:0,dy=g.top<v.y+2?80:g.bottom>v.y+v.h-2?-80:0;
     if(!dx&&!dy){d.entry.feat_viewports??=[];d.entry.feat_viewports.push(g);return;}
     const count=(await d.trace()).native_trace.length,cdp=await d.page.context().newCDPSession(d.page),x=v.x+v.w/2,y=v.y+v.h/2;
@@ -40,11 +43,11 @@ async function revealFeatStatus(d){
   }
   throw Error('Feat names/status cells did not fit the touch viewport');
 }
-async function feats(d,expected){
+export async function feats(d,expected){
   const before=await d.state();if(isTouch(d)){await menu(d);await d.input('F');}else await d.input('F');
-  assert.equal((await d.wait()).kind,'anykey');if(isTouch(d))await revealFeatStatus(d);assert.ok((await publicText(d)).includes('-- FEATS --'),JSON.stringify(await publicText(d)));
+  assert.equal((await d.wait()).kind,'anykey');if(isTouch(d))await revealFeatStatus(d,expected);assert.ok((await publicText(d)).includes('-- FEATS --'),JSON.stringify(await publicText(d)));
   const rows=[];for(let i=0;i<8;i++)rows.push(await d.publicCell(37,2+i));
-  for(const [i,char]of Object.entries(expected)){if(char===' ')assert.ok(rows[i][1]===32||Math.max(...rows[i].slice(2,5))<20,'Initial feat status must be visually blank: '+JSON.stringify(rows[i]));else assert.equal(rows[i][1],char.charCodeAt(0),'Feat '+i+' public status');if(char==='-')assert.ok(rows[i][2]>rows[i][3]&&rows[i][2]>rows[i][4],'Failed feat must be red');}
+  for(const [i,char]of Object.entries(expected)){if(char===' ')assert.ok(rows[i][1]===32||Math.max(...rows[i].slice(2,5))<20,'Initial feat status must be visually blank: '+JSON.stringify(rows[i]));else assert.equal(rows[i][1],char.charCodeAt(0),'Feat '+i+' public status');if(char==='-')assert.ok(rows[i][2]>rows[i][3]&&rows[i][2]>rows[i][4],'Failed feat must be red');if(char==='+')assert.ok(rows[i][3]>rows[i][2]&&rows[i][3]>rows[i][4],'Achieved feat must be green');}
   d.entry.feat_frames??=[];d.entry.feat_frames.push({expected,rows,text:await publicText(d)});await d.screenshot('feats-'+d.entry.feat_frames.length);await d.input('Space');await d.settle();assert.deepEqual(observed(await d.state()),observed(before),'Inspecting feats must preserve all original observed game state');
 }
 function namingUnchanged(before,after,letter){const expected=structuredClone(observed(before)),actual=observed(after),old=item(expected,letter),current=item(actual,letter);for(const field of letter==='d'?['called','callTitle']:['inscription'])old[field]=current[field];assert.deepEqual(actual,expected,'Only the permitted naming fields may change, including within the named item');}
@@ -67,4 +70,4 @@ for(const input_path of ['pc-keyboard','touch']){
   }});
 }
 assert.equal(cases.length,8);return cases;}
-await runFixtureSuite({name:'knowledge-feats',createCases,filter:process.env.BROGUE_KNOWLEDGE_FEATS});
+if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href)await runFixtureSuite({name:'knowledge-feats',createCases,filter:process.env.BROGUE_KNOWLEDGE_FEATS});

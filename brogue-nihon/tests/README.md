@@ -89,3 +89,17 @@ CHECKを拡張した後の比較は新しいmanifestと生成物で再実行す�
 `world-variants.mjs` はworldのcase factoryをRapid／Bulletの原作設定で実行する。CASEのvariant名と実際の `gameConst->variantName` は綴りが異なるため、各ページの準備前と効果前に実値を確認する。CHECKの起動設定として原作 `--variant` を渡し、未実装のURL queryに依存しない。productionのURLは `lang/seed/load` の既存範囲を保ち、タイトルのvariant選択は別の操作経路である。IDとPC／タッチ比較キャッシュはvariantごとに分ける。CEの絶対半径・ダメージ・位置列を他variantへ流用しない。
 
 共通fixture suiteの `progress.json` はrun ID、選択case数、完了／合格／失敗数、実行中case、更新時刻を各caseの前後に保存する。終端の進捗保存失敗もFAILと診断へ反映してから `results.json` を確定し、処理終了と古い成功結果を混同しない。進捗のsuccessと準備失敗・進捗書込失敗はharness回帰検査で確認する。
+
+`advanced-contracts.mjs` はCEのPC／タッチ34ケースで、Pink Jellyの分裂／空きなし、Spiderの近接毒／接触遅延、Acid Moundの防具腐食／保護、Monkeyの盗難数量と実逃走／装備品のみ、Bog Monsterの拘束と可視時取消／浮遊、Conjurerの実召喚とleader／麻痺を確認する。怪物の元infoを保ち、効果を準備で呼び出さない。STUCK、HP100、回復停止、行動時刻と地形制約は人工条件として記録する。遅延と麻痺は行動gateの対照であり、能力消去とは扱わない。
+
+同suiteは鍵の座標一致・異machine、金貨取得によるUntempted失敗、実強化の+15→+16と+14→+15でのSpecialist達成境界も扱う。Fのstatus列は期待行に合わせてタッチ画面を実panし、赤minus／緑plusと閲覧の非消費を保存する。`BROGUE_ADVANCED_CONTRACTS` はカンマ区切りの完全case IDで絞り込む。
+
+未訪問階のcase45だけは既存の生成地形・品物・怪物・階層情報を残し、playerを安全な実階段の隣へ移す。地下1階の上口は`DUNGEON_EXIT`である。実移動1→2→1→2でseed、visited、生成後の階段位置と再訪を確認する。未訪問階の座標は生成ヒントなので初回生成前後の不変を要求しない。`awaySince`は退出時に初期化されるため、訪問済みかつ非現在階だけを読み、他の人工sceneでは階層metadataを観測しない。通常攻略による到達や全profile生成の証拠とは区別する。
+
+```powershell
+node brogue-nihon/tests/advanced-contracts.mjs
+$env:BROGUE_FIXTURE_RESULTS='brogue-nihon/.local/feature-verification/advanced-contracts/results.json'
+$env:BROGUE_COMPARE_NAME='advanced-contracts'
+$env:BROGUE_COMPARE_DOMAINS='none'
+node brogue-nihon/tests/compare-fixtures.mjs
+```
