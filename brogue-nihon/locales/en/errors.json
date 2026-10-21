@@ -11,8 +11,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7663,
-          "end_line": 7663,
+          "line": 7675,
+          "end_line": 7675,
           "symbol": "itemAtLoc",
           "function": "itemAtLoc",
           "scope": "function",

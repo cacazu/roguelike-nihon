@@ -1000,7 +1000,7 @@ fn create_window() -> Result<(), JsValue> {
 <div id="command-area"><div id="commands">
 <button data-key="105">持ち物 I</button><button data-key="97">使う A</button><button data-key="101">装備 E</button>
 <button data-key="114">外す R</button><button data-key="116">投げる T</button><button data-key="100">置く D</button>
-<button data-key="120">探索 X</button><button data-key="122">休息 Z</button><button data-key="62">降りる &gt;</button>
+<button data-key="120">探索 X</button><button data-key="115">探す s</button><button data-key="65">自動プレイ A</button><button data-key="122">休息 Z</button><button data-key="62">降りる &gt;</button>
 <button data-key="60">上る &lt;</button><button data-key="83">保存 S</button><button data-key="63">？</button>
 <button data-key="2000">日本語 / English</button><button data-key="44">撮影 ,</button></div><div id="choices"></div>
 <div id="modifiers"><button id="control-key" aria-pressed="false">Ctrl</button><button id="shift-key" aria-pressed="false">Shift</button></div>

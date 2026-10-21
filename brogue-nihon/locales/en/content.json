@@ -33135,8 +33135,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6916,
-          "end_line": 6916,
+          "line": 6928,
+          "end_line": 6928,
           "symbol": "describeMonsterClass",
           "function": "describeMonsterClass",
           "scope": "function",
@@ -33153,8 +33153,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6916,
-          "end_line": 6916,
+          "line": 6928,
+          "end_line": 6928,
           "symbol": "describeMonsterClass",
           "function": "describeMonsterClass",
           "scope": "function",

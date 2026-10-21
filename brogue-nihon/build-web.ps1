@@ -74,7 +74,9 @@ try {
     $inputFiles += @((Get-ChildItem -LiteralPath (Join-Path $project 'locales\ja') -File -Filter '*.json').FullName)
     $inputFiles += @((Join-Path $project 'web\library.js'),(Join-Path $project 'build-web.ps1'),(Join-Path $project 'tools\compile-locales.py'),(Join-Path $project 'tools\locale-source.py'))
     $inputFiles += @('web\index.html','web\host.js','web\style.css','web\assets\illustrations.json','web\assets\fonts\metadata.json') | ForEach-Object { Join-Path $project $_ }
-    if ($Check) { $inputFiles += (Join-Path $project 'tests\fixtures.c') }
+    if ($Check) {
+        $inputFiles += (Join-Path $project 'tests\fixtures.c'),(Join-Path $project 'tests\fixture-scenes.h')
+    }
     foreach ($rustRoot in @((Join-Path $project 'rust'),(Join-Path (Split-Path -Parent $project) 'rust-common'))) {
         $inputFiles += @((Get-ChildItem -LiteralPath $rustRoot -Recurse -File | Where-Object {
             $_.FullName -notmatch '[\\/]target[\\/]' -and ($_.Extension -eq '.rs' -or $_.Name -in 'Cargo.toml','Cargo.lock')

@@ -5407,7 +5407,16 @@ boolean moveCursor(boolean *targetConfirmed,
             clearDisplayBuffer(&dbuf);
             drawButtonsInState(state, &dbuf);
 
+#if defined(BROGUE_BROWSER) && defined(BROGUE_BROWSER_CHECK)
+            /* A CHECK scene may replace the initial dungeon while this exact
+             * input owner is suspended. Keep its saved UI initial state aligned. */
+            extern void brogue_check_bind_command_display(SavedDisplayBuffer *saved);
+            extern void brogue_check_unbind_command_display(SavedDisplayBuffer *saved);
+            SavedDisplayBuffer rbuf = saveDisplayBuffer();
+            brogue_check_bind_command_display(&rbuf);
+#else
             const SavedDisplayBuffer rbuf = saveDisplayBuffer();
+#endif
             // Update the display.
             overlayDisplayBuffer(&dbuf);
 
@@ -5423,6 +5432,9 @@ boolean moveCursor(boolean *targetConfirmed,
 
             // Revert the display.
             restoreDisplayBuffer(&rbuf);
+#if defined(BROGUE_BROWSER) && defined(BROGUE_BROWSER_CHECK)
+            brogue_check_unbind_command_display(&rbuf);
+#endif
 
         } else { // No buttons to worry about.
             nextBrogueEvent(&theEvent, false, colorsDance, true);

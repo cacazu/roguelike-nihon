@@ -2775,8 +2775,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6542,
-          "end_line": 6542,
+          "line": 6554,
+          "end_line": 6554,
           "symbol": "playerCancelsBlinking",
           "function": "playerCancelsBlinking",
           "scope": "function",
@@ -2847,8 +2847,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7627,
-          "end_line": 7627,
+          "line": 7639,
+          "end_line": 7639,
           "symbol": "promptForItemOfType",
           "function": "promptForItemOfType",
           "scope": "function",
@@ -2865,8 +2865,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7635,
-          "end_line": 7635,
+          "line": 7647,
+          "end_line": 7647,
           "symbol": "promptForItemOfType",
           "function": "promptForItemOfType",
           "scope": "function",
@@ -2883,8 +2883,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6449,
-          "end_line": 6449,
+          "line": 6461,
+          "end_line": 6461,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2901,8 +2901,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6449,
-          "end_line": 6449,
+          "line": 6461,
+          "end_line": 6461,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2919,8 +2919,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6414,
-          "end_line": 6414,
+          "line": 6426,
+          "end_line": 6426,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2937,8 +2937,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6443,
-          "end_line": 6443,
+          "line": 6455,
+          "end_line": 6455,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2955,8 +2955,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6443,
-          "end_line": 6443,
+          "line": 6455,
+          "end_line": 6455,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2973,8 +2973,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6409,
-          "end_line": 6409,
+          "line": 6421,
+          "end_line": 6421,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2991,8 +2991,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6409,
-          "end_line": 6409,
+          "line": 6421,
+          "end_line": 6421,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3009,8 +3009,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6438,
-          "end_line": 6438,
+          "line": 6450,
+          "end_line": 6450,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3034,8 +3034,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6447,
-          "end_line": 6447,
+          "line": 6459,
+          "end_line": 6459,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3060,8 +3060,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6443,
-          "end_line": 6443,
+          "line": 6455,
+          "end_line": 6455,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3086,8 +3086,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6335,
-          "end_line": 6335,
+          "line": 6347,
+          "end_line": 6347,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3110,8 +3110,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6349,
-          "end_line": 6349,
+          "line": 6361,
+          "end_line": 6361,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3135,8 +3135,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6312,
-          "end_line": 6312,
+          "line": 6324,
+          "end_line": 6324,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3153,8 +3153,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6312,
-          "end_line": 6312,
+          "line": 6324,
+          "end_line": 6324,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3171,8 +3171,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6340,
-          "end_line": 6340,
+          "line": 6352,
+          "end_line": 6352,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3195,8 +3195,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6350,
-          "end_line": 6350,
+          "line": 6362,
+          "end_line": 6362,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3213,8 +3213,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6574,
-          "end_line": 6574,
+          "line": 6586,
+          "end_line": 6586,
           "symbol": "useStaffOrWand",
           "function": "useStaffOrWand",
           "scope": "function",

@@ -11,11 +11,23 @@
 #include "GlobalsBase.h"
 #include "Globals.h"
 #include "BrowserIO.h"
+#include "fixture-scenes.h"
 
 extern int brogue_check_wait_kind(void);
 extern void brogue_check_publish(void);
 
 static int preparedScene;
+#if defined(BROGUE_BROWSER)
+static SavedDisplayBuffer *initialCommandDisplay;
+void brogue_check_bind_command_display(SavedDisplayBuffer *saved) {
+    if (!preparedScene && rogue.seed == 42 && rogue.playerTurnNumber == 0
+        && !rogue.playbackMode && !rogue.cursorMode && rogue.cursorLoc.x < 0 && rogue.cursorLoc.y < 0)
+        initialCommandDisplay = saved;
+}
+void brogue_check_unbind_command_display(SavedDisplayBuffer *saved) {
+    if (initialCommandDisplay == saved) initialCommandDisplay = NULL;
+}
+#endif
 static char featureJSON[65536];
 static size_t featureLength;
 static boolean featureOverflow;
@@ -44,10 +56,10 @@ static void featureItem(item *it) {
     itemTable *table = tableForItemCategory(it->category);
     featureAppend("{\"letter\":%d,\"category\":%u,\"kind\":%d,\"quantity\":%d,\"charges\":%d,"
            "\"enchant\":%d,\"flags\":%lu,\"identified\":%d,\"equipped\":%d,\"protected\":%d,"
-           "\"x\":%d,\"y\":%d,\"inscription\":",
+           "\"rechargeTimer\":%d,\"magicDetected\":%d,\"x\":%d,\"y\":%d,\"inscription\":",
            it->inventoryLetter, it->category, it->kind, it->quantity, it->charges,
            it->enchant1, it->flags, !!(it->flags & ITEM_IDENTIFIED), !!(it->flags & ITEM_EQUIPPED),
-           !!(it->flags & ITEM_PROTECTED), it->loc.x, it->loc.y);
+           !!(it->flags & ITEM_PROTECTED), it->enchant2, !!(it->flags & ITEM_MAGIC_DETECTED), it->loc.x, it->loc.y);
     featureString(it->inscription);
     featureAppend(",\"kindKnown\":%d,\"called\":%d,\"callTitle\":", table ? table[it->kind].identified : 0,
            table ? table[it->kind].called : 0);
@@ -55,15 +67,29 @@ static void featureItem(item *it) {
     featureAppend("}");
 }
 
+static void featureStatuses(const short *statuses) {
+    featureAppend("[");
+    for (int i = 0; i < NUMBER_OF_STATUS_EFFECTS; i++) featureAppend("%s%d", i ? "," : "", statuses[i]);
+    featureAppend("]");
+}
+
+static void featureCell(pos loc) {
+    featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,"
+           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu}",
+           loc.x, loc.y, pmapAt(loc)->flags, pmapAt(loc)->layers[DUNGEON], pmapAt(loc)->layers[LIQUID],
+           pmapAt(loc)->layers[SURFACE], pmapAt(loc)->layers[GAS], pmapAt(loc)->volume, terrainFlags(loc));
+}
+
 const char *brogue_check_features(void) {
+    if (!gameConst) return "{\"error\":\"CHECK game has not started\"}";
     featureLength = 0;
     featureOverflow = false;
-    featureAppend("{\"fixture\":%d,\"seed\":\"%llu\",\"turn\":%lu,\"rng\":%lu,\"x\":%d,\"y\":%d,"
+    featureAppend("{\"fixture\":%d,\"seed\":\"%llu\",\"turn\":%lu,\"absoluteTurnNumber\":%lu,\"rng\":%lu,\"x\":%d,\"y\":%d,"
            "\"hp\":%d,\"maxHP\":%d,\"depth\":%d,\"deepest\":%d,\"ended\":%d,\"inProgress\":%d,"
            "\"highScoreSaved\":%d,\"gold\":%lu,\"strength\":%d,\"poisonAmount\":%d,\"ready\":%d,"
            "\"weapon\":%d,\"armor\":%d,\"ringLeft\":%d,\"ringRight\":%d,"
            "\"upX\":%d,\"upY\":%d,\"downX\":%d,\"downY\":%d,\"statuses\":[",
-           preparedScene, (unsigned long long) rogue.seed, rogue.playerTurnNumber, randomNumbersGenerated,
+           preparedScene, (unsigned long long) rogue.seed, rogue.playerTurnNumber, rogue.absoluteTurnNumber, randomNumbersGenerated,
            player.loc.x, player.loc.y, player.currentHP, player.info.maxHP, rogue.depthLevel,
            gameConst->deepestLevel, rogue.gameHasEnded, rogue.gameInProgress, rogue.highScoreSaved,
            rogue.gold, rogue.strength, player.poisonAmount, brogue_check_wait_kind() == BROWSER_COMMAND,
@@ -73,7 +99,22 @@ const char *brogue_check_features(void) {
            rogue.gameInProgress && rogue.ringRight ? rogue.ringRight->inventoryLetter : 0,
            rogue.upLoc.x, rogue.upLoc.y, rogue.downLoc.x, rogue.downLoc.y);
     for (int i = 0; i < NUMBER_OF_STATUS_EFFECTS; i++) featureAppend("%s%d", i ? "," : "", player.status[i]);
-    featureAppend("],\"status\":{\"nutrition\":%d,\"burning\":%d,\"poisoned\":%d,\"slowed\":%d,"
+    featureAppend("],\"maxStatuses\":");
+    featureStatuses(player.maxStatus);
+    featureAppend(",\"variant\":");
+    featureString(gameConst->variantName);
+    featureAppend(",\"mode\":%d,\"kindCounts\":{\"potion\":%d,\"charm\":%d},"
+           "\"movementSpeed\":%d,\"attackSpeed\":%d,\"turnsUntilRegen\":%ld,\"regenPerTurn\":%d,"
+           "\"weaknessAmount\":%d,\"bookkeepingFlags\":%lu,\"searching\":%d,"
+           "\"automationActive\":%d,\"autoPlayingLevel\":%d,\"disturbed\":%d,"
+           "\"trueColorMode\":%d,\"displayStealthRangeMode\":%d,\"cursorMode\":%d,"
+           "\"cursor\":{\"x\":%d,\"y\":%d},\"lightRadius\":{\"lower\":%d,\"upper\":%d},",
+           rogue.mode, itemKindCount(POTION, 0), itemKindCount(CHARM, 0), player.movementSpeed, player.attackSpeed,
+           player.turnsUntilRegen, player.regenPerTurn, player.weaknessAmount, player.bookkeepingFlags,
+           player.status[STATUS_SEARCHING], rogue.automationActive, rogue.autoPlayingLevel, rogue.disturbed,
+           rogue.trueColorMode, rogue.displayStealthRangeMode, rogue.cursorMode, rogue.cursorLoc.x, rogue.cursorLoc.y,
+           rogue.minersLight.lightRadius.lowerBound, rogue.minersLight.lightRadius.upperBound);
+    featureAppend("\"status\":{\"nutrition\":%d,\"burning\":%d,\"poisoned\":%d,\"slowed\":%d,"
            "\"hasted\":%d,\"invisible\":%d,\"levitating\":%d,\"telepathic\":%d,\"fireImmune\":%d},\"pack\":[",
            player.status[STATUS_NUTRITION], player.status[STATUS_BURNING], player.status[STATUS_POISONED],
            player.status[STATUS_SLOWED], player.status[STATUS_HASTED], player.status[STATUS_INVISIBLE],
@@ -95,10 +136,18 @@ const char *brogue_check_features(void) {
         creature *monst = nextCreature(&iter);
         if (count++) featureAppend(",");
         featureAppend("{\"kind\":%d,\"x\":%d,\"y\":%d,\"hp\":%d,\"maxHP\":%d,\"state\":%d,"
-               "\"slowed\":%d,\"burning\":%d,\"poisoned\":%d,\"invisible\":%d,\"negated\":%d}",
+               "\"slowed\":%d,\"burning\":%d,\"poisoned\":%d,\"invisible\":%d,\"negated\":%d",
                monst->info.monsterID, monst->loc.x, monst->loc.y, monst->currentHP, monst->info.maxHP,
                monst->creatureState, monst->status[STATUS_SLOWED], monst->status[STATUS_BURNING],
                monst->status[STATUS_POISONED], monst->status[STATUS_INVISIBLE], monst->wasNegated);
+        featureAppend(",\"flags\":%lu,\"abilityFlags\":%lu,\"bookkeepingFlags\":%lu,"
+               "\"cellFlags\":%lu,\"leaderIsPlayer\":%d,\"ticksUntilTurn\":%d,\"statuses\":",
+               monst->info.flags, monst->info.abilityFlags, monst->bookkeepingFlags, pmapAt(monst->loc)->flags,
+               monst->leader == &player, monst->ticksUntilTurn);
+        featureStatuses(monst->status);
+        featureAppend(",\"maxStatuses\":");
+        featureStatuses(monst->maxStatus);
+        featureAppend("}");
     }
     featureAppend("],\"cells\":[");
     count = 0;
@@ -108,7 +157,25 @@ const char *brogue_check_features(void) {
                x, y, pmap[x][y].flags, pmap[x][y].layers[DUNGEON], pmap[x][y].layers[LIQUID],
                pmap[x][y].layers[SURFACE], pmap[x][y].layers[GAS], pmap[x][y].volume);
     }
-    featureAppend("]}");
+    featureAppend("],\"remoteCells\":[");
+    count = 0;
+    if (rogue.gameInProgress) for (int y = 12; y <= 17; y++) for (int x = 20; x <= 24; x++) {
+        if (count++) featureAppend(",");
+        featureCell((pos){x, y});
+    }
+    featureAppend("],\"playerCell\":");
+    if (rogue.gameInProgress && isPosInMap(player.loc)) featureCell(player.loc); else featureAppend("null");
+    featureAppend(",\"spawnCell\":");
+    if (rogue.gameInProgress) featureCell((pos){40, 14}); else featureAppend("null");
+    unsigned discovered = 0, visible = 0, fieldOfView = 0, mapped = 0;
+    if (rogue.gameInProgress) for (int x = 0; x < DCOLS; x++) for (int y = 0; y < DROWS; y++) {
+        discovered += !!(pmap[x][y].flags & DISCOVERED);
+        visible += !!(pmap[x][y].flags & VISIBLE);
+        fieldOfView += !!(pmap[x][y].flags & IN_FIELD_OF_VIEW);
+        mapped += !!(pmap[x][y].flags & MAGIC_MAPPED);
+    }
+    featureAppend(",\"mapMetrics\":{\"discovered\":%u,\"visible\":%u,\"fieldOfView\":%u,\"mapped\":%u}}",
+           discovered, visible, fieldOfView, mapped);
     return featureOverflow ? "{\"error\":\"fixture snapshot overflow\"}" : featureJSON;
 }
 
@@ -183,13 +250,125 @@ static creature *fixtureTarget(short kind, int x, int y) {
     return monst;
 }
 
+/* Preparation only: no apply/drinkPotion/useCharm/turn/combat function is called. */
+static void fixtureStatus(int status, short duration) {
+    player.status[status] = player.maxStatus[status] = duration;
+}
+
+static void fixtureHiddenMinds(void) {
+    for (int y = 10; y <= 18; y++) pmap[42][y].layers[DUNGEON] = WALL;
+    creature *living = fixtureTarget(MK_GOBLIN, 44, 12);
+    creature *inanimate = fixtureTarget(MK_ARROW_TURRET, 44, 16);
+    living->creatureState = inanimate->creatureState = MONSTER_SLEEPING;
+}
+
+static void fixtureRemoteRoom(void) {
+    /* It deliberately has no natural LOS from the starting room. */
+    for (int x = 20; x <= 24; x++) for (int y = 12; y <= 17; y++) pmap[x][y].layers[DUNGEON] = FLOOR;
+}
+
+static item *fixtureFloorItem(unsigned short category, short kind, int x, int y) {
+    item *it = generateItem(category, kind);
+    it->quantity = 1;
+    it->flags &= ~(ITEM_RUNIC | ITEM_EQUIPPED | ITEM_MAGIC_DETECTED | ITEM_IDENTIFIED);
+    it->enchant1 = 2;
+    it->enchant2 = 0;
+    if (category == WAND) it->charges = 3;
+    return placeItemAt(it, (pos){x, y});
+}
+
+static void fixtureConsumable(unsigned short category, short kind, boolean known, boolean cooldown) {
+    player.currentHP = player.info.maxHP;
+    player.turnsUntilRegen = 100000; /* no imminent regeneration obscures small damage/healing */
+    player.regenPerTurn = 0;
+    item *primary = give(category, kind, 'a', known);
+    primary->quantity = category == POTION ? 2 : 1;
+    if (category == CHARM && cooldown) primary->charges = 5;
+
+    if ((category == POTION && kind == POTION_LIFE) || (category == CHARM && kind == CHARM_HEALTH)) {
+        player.currentHP = player.info.maxHP / 2;
+        fixtureStatus(STATUS_CONFUSED, 20);
+        if (category == POTION) {
+            fixtureStatus(STATUS_POISONED, 20); player.poisonAmount = 2;
+            fixtureStatus(STATUS_WEAKENED, 20); player.weaknessAmount = 3;
+            fixtureStatus(STATUS_DARKNESS, 20);
+            fixtureStatus(STATUS_HALLUCINATING, 20);
+            fixtureStatus(STATUS_NAUSEOUS, 20);
+            fixtureStatus(STATUS_SLOWED, 20);
+        }
+    }
+    if (category == POTION && kind == POTION_STRENGTH) {
+        fixtureStatus(STATUS_WEAKENED, 20); player.weaknessAmount = 3;
+    }
+    if ((category == POTION && kind == POTION_TELEPATHY) || (category == CHARM && kind == CHARM_TELEPATHY)) fixtureHiddenMinds();
+    if ((category == POTION && kind == POTION_LEVITATION) || (category == CHARM && kind == CHARM_LEVITATION)) {
+        player.bookkeepingFlags |= MB_SEIZED;
+        pmap[41][14].layers[LIQUID] = CHASM;
+    }
+    if ((category == POTION && kind == POTION_HASTE_SELF) || (category == CHARM && kind == CHARM_HASTE)) fixtureStatus(STATUS_SLOWED, 20);
+    if ((category == POTION && kind == POTION_FIRE_IMMUNITY) || (category == CHARM && kind == CHARM_FIRE_IMMUNITY)) {
+        fixtureStatus(STATUS_BURNING, 20);
+        pmap[41][14].layers[SURFACE] = PLAIN_FIRE;
+    }
+    if (category == POTION && kind == POTION_DETECT_MAGIC) {
+        item *carried = give(WEAPON, SWORD, 'b', false); carried->enchant1 = 2;
+        item *floor = fixtureFloorItem(WEAPON, SWORD, 43, 13); floor->enchant1 = 2;
+        give(FOOD, RATION, 'c', true);
+    }
+    if (category == CHARM && kind == CHARM_PROTECTION) {
+        fixtureTarget(MK_GOBLIN, 41, 14)->ticksUntilTurn = 0;
+    }
+    if (category == CHARM && kind == CHARM_SHATTERING) {
+        pmap[41][13].layers[DUNGEON] = WALL;
+        pmap[39][13].layers[DUNGEON] = WALL;
+        pmap[39][13].flags |= IMPREGNABLE;
+    }
+    if (category == CHARM && kind == CHARM_TELEPORTATION) {
+        fixtureRemoteRoom();
+        fixtureStatus(STATUS_STUCK, 20);
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+    }
+    if (category == CHARM && kind == CHARM_RECHARGING) {
+        give(STAFF, STAFF_FIRE, 'b', true)->charges = 0;
+        give(WAND, WAND_SLOW, 'c', true)->charges = 3;
+        give(CHARM, CHARM_HEALTH, 'd', true)->charges = 100;
+    }
+    if (category == CHARM && kind == CHARM_NEGATION) {
+        fixtureStatus(STATUS_HASTED, 20);
+        fixtureStatus(STATUS_INVISIBLE, 20);
+        creature *target = fixtureTarget(MK_OGRE, 43, 14);
+        target->status[STATUS_SLOWED] = target->maxStatus[STATUS_SLOWED] = 50;
+        target->status[STATUS_INVISIBLE] = target->maxStatus[STATUS_INVISIBLE] = 50;
+        target->ticksUntilTurn = 10000;
+        item *weapon = fixtureFloorItem(WEAPON, SWORD, 41, 13); weapon->flags |= ITEM_CURSED | ITEM_PROTECTED;
+        fixtureFloorItem(WAND, WAND_SLOW, 41, 15);
+        item *carried = give(WEAPON, SWORD, 'b', false); carried->enchant1 = 2;
+        fixtureRemoteRoom();
+        fixtureFloorItem(WEAPON, SWORD, 22, 14);
+    }
+    updateEncumbrance();
+}
+
 int brogue_check_fixture(int scene) {
-    if (scene < 1 || scene > 11 || preparedScene || brogue_check_wait_kind() != BROWSER_COMMAND
+    if (preparedScene || !gameConst || brogue_check_wait_kind() != BROWSER_COMMAND
         || rogue.seed != 42 || rogue.playerTurnNumber != 0 || rogue.playbackMode || rogue.cursorMode
         || rogue.cursorLoc.x >= 0 || rogue.cursorLoc.y >= 0 || !rogue.gameInProgress) return -1;
+#if defined(BROGUE_BROWSER)
+    if (!initialCommandDisplay) return -1;
+#endif
+    unsigned short category = 0;
+    int group = scene / 1000 * 1000, kind = scene % 1000;
+    if (scene >= 1000) {
+        if (group == CHECK_POTION_UNKNOWN || group == CHECK_POTION_KNOWN) category = POTION;
+        else if (group == CHECK_CHARM_READY || group == CHECK_CHARM_COOLDOWN) category = CHARM;
+        else return -1;
+        const int enumCount = category == POTION ? POTION_LICHEN + 1 : CHARM_NEGATION + 1;
+        if (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0)) return -1;
+    } else if (scene < 1 || scene > 11) return -1;
     fixtureRoom();
     preparedScene = scene;
-    if (scene <= 8) fixtureInventory();
+    if (category) fixtureConsumable(category, kind, group == CHECK_POTION_KNOWN || category == CHARM, group == CHECK_CHARM_COOLDOWN);
+    else if (scene <= 8) fixtureInventory();
     switch (scene) {
         case 2: fixtureTarget(MK_OGRE, 43, 14); break;
         case 3:
@@ -235,6 +414,9 @@ int brogue_check_fixture(int scene) {
     updateVision(false);
     displayLevel();
     refreshSideBar(-1, -1, false);
+#if defined(BROGUE_BROWSER)
+    *initialCommandDisplay = saveDisplayBuffer();
+#endif
     brogue_check_publish();
     return scene;
 }

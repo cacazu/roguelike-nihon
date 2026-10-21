@@ -7376,8 +7376,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6918,
-          "end_line": 6918,
+          "line": 6930,
+          "end_line": 6930,
           "symbol": "describeMonsterClass",
           "function": "describeMonsterClass",
           "scope": "function",
@@ -7638,8 +7638,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7258,
-          "end_line": 7258,
+          "line": 7270,
+          "end_line": 7270,
           "symbol": "drinkPotion",
           "function": "drinkPotion",
           "scope": "function",
@@ -7649,8 +7649,8 @@
         },
         {
           "file": "src/brogue/Items.c",
-          "line": 7284,
-          "end_line": 7284,
+          "line": 7296,
+          "end_line": 7296,
           "symbol": "drinkPotion",
           "function": "drinkPotion",
           "scope": "function",
@@ -9032,8 +9032,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7026,
-          "end_line": 7026,
+          "line": 7038,
+          "end_line": 7038,
           "symbol": "readScroll",
           "function": "readScroll",
           "scope": "function",
@@ -9057,8 +9057,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7110,
-          "end_line": 7110,
+          "line": 7122,
+          "end_line": 7122,
           "symbol": "readScroll",
           "function": "readScroll",
           "scope": "function",
@@ -9122,8 +9122,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 8040,
-          "end_line": 8040,
+          "line": 8052,
+          "end_line": 8052,
           "symbol": "shuffleFlavors",
           "function": "shuffleFlavors",
           "scope": "function",
@@ -9148,8 +9148,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 8040,
-          "end_line": 8040,
+          "line": 8052,
+          "end_line": 8052,
           "symbol": "shuffleFlavors",
           "function": "shuffleFlavors",
           "scope": "function",
@@ -9166,8 +9166,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 8040,
-          "end_line": 8040,
+          "line": 8052,
+          "end_line": 8052,
           "symbol": "shuffleFlavors",
           "function": "shuffleFlavors",
           "scope": "function",
@@ -9231,8 +9231,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6350,
-          "end_line": 6350,
+          "line": 6362,
+          "end_line": 6362,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -9249,8 +9249,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7834,
-          "end_line": 7834,
+          "line": 7846,
+          "end_line": 7846,
           "symbol": "unequipItem",
           "function": "unequipItem",
           "scope": "function",
@@ -9370,8 +9370,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6633,
-          "end_line": 6633,
+          "line": 6645,
+          "end_line": 6645,
           "symbol": "useStaffOrWand",
           "function": "useStaffOrWand",
           "scope": "function",

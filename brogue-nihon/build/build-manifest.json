@@ -8,7 +8,7 @@
   "source_inputs": [
     {
       "file": "build-web.ps1",
-      "sha256": "1b81686cb1a6c1aa45faa804128f6db5c33664072348de580e3cbbf3382e0db8"
+      "sha256": "2633ed3c976ebf360e73d8a8d79c7ba9d1906327af82c1da386b819416326367"
     },
     {
       "file": "locales/ja/composed.json",
@@ -52,7 +52,7 @@
     },
     {
       "file": "rust/src/browser.rs",
-      "sha256": "f74a1ad243bb9cbef7b51960f5cda45a7b99ab4b43c583bb8d635a38b3fcf582"
+      "sha256": "61018b10e7ccb450bfc7acd5e0b490dc5b1873b39accc8f368b18e196d481bc2"
     },
     {
       "file": "rust/src/files.rs",
@@ -112,7 +112,7 @@
     },
     {
       "file": "src/brogue/Items.c",
-      "sha256": "645f34feb91f2bb90ca0ae8da255755bc11b88718f5e0ec8f5564f8e2c588595"
+      "sha256": "56ffc4d41ff0742fa1ef6ddc35444c787429a4296cca1c167b328100b666223d"
     },
     {
       "file": "src/brogue/Light.c",
@@ -379,8 +379,8 @@
     },
     {
       "file": "browser-ui.wasm",
-      "bytes": 2531996,
-      "sha256": "2bdcbbb1a401005084ea94b41b9fd4b93096b9e1afed95257734519717b4cc6c"
+      "bytes": 2532124,
+      "sha256": "64499ca8f4873b0a94a28f03b7dd65d1f0a7089ff79cf22efc371185e6e28c00"
     }
   ]
 }

@@ -80,7 +80,14 @@ async function text(page,value){
 async function ack(page){for(let i=0;i<8&&(await observe(page)).kind==='acknowledge';i++)await input(page,'Space');}
 async function itemAction(page,command,letter,touch=current?.touch||false){await input(page,command,touch);assert.equal((await observe(page)).kind,'item');assert.ok((await observe(page)).descriptor.slice(4).includes(letter.codePointAt(0)),letter+' is not a public candidate');await input(page,letter,touch);}
 async function shot(page,name){const filename=name+'.png';await page.screenshot({path:path.join(current.directory,filename),fullPage:true});current.screenshots.push(filename);}
-async function finish(page){await ack(page);assert.equal((await observe(page)).kind,'command');current.effectReached=true;await shot(page,'result');}
+async function finish(page){await ack(page);assert.equal((await observe(page)).kind,'command');await sceneFrame(page);current.effectReached=true;await shot(page,'result');}
+async function sceneFrame(page){
+  if(!current.origin)return;
+  const s=await state(page);if(!s.inProgress)return;
+  const cells=await page.evaluate(()=>__brogueFeature.cells);
+  assert.equal(cells[((s.y+3)*100+s.x+21)*10+1],64,'New player glyph must match C location');
+  if(s.depth===current.origin.depth)assert.equal(cells[((current.origin.y+3)*100+current.origin.x+21)*10+1],32,'Original pre-fixture player/map was restored');
+}
 const pack=(s,letter)=>s.pack.find(item=>item.letter===letter.codePointAt(0));
 async function open(scene,label='initial'){
   const page=await context.newPage();if(current.touch)await page.setViewportSize({width:390,height:844});page.on('pageerror',error=>current.errors.push(error.message));page.on('console',message=>{if(message.type()==='error')current.errors.push(message.text());});
@@ -88,10 +95,12 @@ async function open(scene,label='initial'){
   assert.equal(initial.seed,'42');assert.equal(initial.turn,0);assert.equal(initial.fixture,0);assert.equal(initial.ready,1);assert.equal(observed.serial,1);
   assert.equal(await page.evaluate(()=>__brogueFeature.module._brogue_check_fixture(99999)),-1);assert.deepEqual(await state(page),initial,'Unknown fixture mutated state');
   if(scene){
+    current.origin={x:initial.x,y:initial.y,depth:initial.depth};
     assert.equal(await page.evaluate(scene=>__brogueFeature.module._brogue_check_fixture(scene),scene),scene);
     const prepared=await state(page);assert.equal(prepared.fixture,scene);assert.equal(prepared.turn,initial.turn);
     assert.equal(await page.evaluate(scene=>__brogueFeature.module._brogue_check_fixture(scene),scene),-1);assert.deepEqual(await state(page),prepared,'Repeated fixture mutated state');
   }
+  if(scene)await sceneFrame(page);
   await record(page,'CHECK initial scene '+scene);await shot(page,label);return page;
 }
 
