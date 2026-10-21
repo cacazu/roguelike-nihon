@@ -292,7 +292,7 @@ const char *brogue_check_features(void) {
         if (monst->carriedItem) featureItem(monst->carriedItem); else featureAppend("null");
         featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d,\"defense\":%d}",
                monst->info.damage.lowerBound, monst->info.damage.upperBound, monst->info.accuracy, monst->info.defense);
-        if (preparedScene == CHECK_ENTER_SUMMONS || preparedScene == CHECK_ENTER_DIRECT_KILL) {
+        if (preparedScene >= CHECK_ENTER_SUMMONS && preparedScene <= CHECK_ENTER_PHOENIX) {
             featureAppend(",\"preparedSubject\":%d,\"carriedMonster\":", monst == enteredSubject);
             featureCarriedMonster(monst->carriedMonster);
         }
@@ -810,7 +810,7 @@ static void fixtureMonsterWhip(int scene) {
 
 /* Pure initial conditions. Native summon, storage and death run only later
  * through real rests/targeted casts. Preserve all original monster information. */
-static void fixtureMonsterEnter(void) {
+static void fixtureMonsterEnter(int scene) {
     fixtureSafeWorld();
     player.info.maxHP = player.currentHP = 2000;
     player.info.defense = 0;
@@ -819,7 +819,8 @@ static void fixtureMonsterEnter(void) {
     staff->enchant1 = 45;
     staff->charges = 1; /* Within capacity; native natural recharge is retained. */
     staff->enchant2 = 111; /* 5000/45, below the native discharge boundary185. */
-    enteredSubject = fixtureTarget(MK_PHYLACTERY, 42, 14);
+    enteredSubject = fixtureTarget(scene == CHECK_ENTER_VAMPIRE ? MK_VAMPIRE
+                                  : scene == CHECK_ENTER_PHOENIX ? MK_PHOENIX_EGG : MK_PHYLACTERY, 42, 14);
     enteredSubject->ticksUntilTurn = 1;
 }
 
@@ -1600,7 +1601,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_ENTER_DIRECT_KILL) return -1;
+    } else if (scene < 1 || scene > CHECK_ENTER_PHOENIX) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1639,7 +1640,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_KAMIKAZE_BLOAT && scene <= CHECK_KAMIKAZE_RAT) fixtureMonsterKamikaze(scene);
     else if (scene >= CHECK_BURN_UNPROTECTED && scene <= CHECK_BURN_EXPIRY) fixtureMonsterBurn(scene);
     else if (scene >= CHECK_WHIP_RANGE4 && scene <= CHECK_WHIP_OGRE) fixtureMonsterWhip(scene);
-    else if (scene == CHECK_ENTER_SUMMONS || scene == CHECK_ENTER_DIRECT_KILL) fixtureMonsterEnter();
+    else if (scene >= CHECK_ENTER_SUMMONS && scene <= CHECK_ENTER_PHOENIX) fixtureMonsterEnter(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
