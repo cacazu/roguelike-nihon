@@ -7,7 +7,7 @@ const observed=({ready,...state})=>state;
 const item=(s,letter)=>{const it=s.pack.find(it=>it.letter===letter.charCodeAt(0));assert.ok(it,'Missing '+letter);return it;};
 // Native overlays retain dim underlying glyphs in blank cells (INTERFACE_OPACITY=90).
 // Public text excludes those dim pixels; raw status cells are retained as evidence.
-const publicText=d=>d.page.evaluate(()=>Array.from({length:34},(_,y)=>Array.from({length:100},(_,x)=>__brogueFixture.cells[(y*100+x)*10]===0x110000?'':Math.max(...__brogueFixture.cells.slice((y*100+x)*10+2,(y*100+x)*10+5))<20?' ':String.fromCodePoint(__brogueFixture.cells[(y*100+x)*10+1]||32)).join('')).join('\n'));
+export const publicText=d=>d.page.evaluate(()=>Array.from({length:34},(_,y)=>Array.from({length:100},(_,x)=>__brogueFixture.cells[(y*100+x)*10]===0x110000?'':Math.max(...__brogueFixture.cells.slice((y*100+x)*10+2,(y*100+x)*10+5))<20?' ':String.fromCodePoint(__brogueFixture.cells[(y*100+x)*10+1]||32)).join('')).join('\n'));
 const isTouch=d=>d.entry.input_path==='touch';
 async function next(d,before,action){await action();await d.page.waitForFunction(serial=>__brogueFixture.waiting&&__brogueFixture.serial>serial,before.serial,{timeout:60000});await d.record('public '+(isTouch(d)?'tap ':'click ')+'text submit');}
 async function text(d,value){const before=await d.wait();assert.equal(before.kind,'text');await d.page.locator('#text-value').fill(value);await next(d,before,()=>isTouch(d)?d.page.locator('#text-entry button[type=submit]').tap():d.page.locator('#text-entry button[type=submit]').click());await d.settle();}
@@ -18,7 +18,7 @@ async function naming(d,letter){
 }
 async function inventoryContains(d,label){await d.input('i');const rows=(await publicText(d)).split('\n'),line=rows.find(row=>row.includes(label));assert.ok(line,'Public inventory must contain '+label);await d.screenshot('inventory-'+label);await d.input('Escape');await d.settle();return line.trim();}
 async function potionLine(d){await d.input('i');const line=(await publicText(d)).split('\n').find(row=>/d\)/.test(row)&&/potion/i.test(row));assert.ok(line,'Unknown potion inventory row must be public');assert.doesNotMatch(line,/strength/i,'Unknown potion must not reveal its true kind');await d.input('Escape');await d.settle();return line.trim();}
-async function menu(d){
+export async function menu(d){
   const cell=await d.page.evaluate(()=>{for(let y=0;y<34;y++){const line=Array.from({length:100},(_,x)=>__brogueFixture.cells[(y*100+x)*10]===0x110000?'':Math.max(...__brogueFixture.cells.slice((y*100+x)*10+2,(y*100+x)*10+5))<20?' ':String.fromCodePoint(__brogueFixture.cells[(y*100+x)*10+1]||32)).join('');const x=line.indexOf('Menu');if(x>=0)return {x:x+2,y:y+.5};}});assert.ok(cell,'Native Menu label missing');
   for(let attempt=0;attempt<12;attempt++){
     const p=await d.page.evaluate(c=>{const a=document.querySelector('#game').getBoundingClientRect(),v=document.querySelector('#viewport').getBoundingClientRect();return {x:a.x+c.x*a.width/100,y:a.y+c.y*a.height/34,v:{x:v.x,y:v.y,w:v.width,h:v.height}};},cell),v=p.v;

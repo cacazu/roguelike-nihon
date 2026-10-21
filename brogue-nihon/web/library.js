@@ -1,7 +1,7 @@
 /* Memory and browser-host bridge. Input meanings and rendering belong to Rust. */
 mergeInto(LibraryManager.library, {
-  brogue_browser_frame: function(ptr, count) {
-    globalThis.brogueHost.frame(HEAP32.slice(ptr >> 2, (ptr >> 2) + count));
+  brogue_browser_frame: function(ptr, count, preserveMessages) {
+    globalThis.brogueHost.frame(HEAP32.slice(ptr >> 2, (ptr >> 2) + count), preserveMessages !== 0);
   },
   brogue_browser_event__deps: ['$Asyncify'],
   brogue_browser_event__async: true,

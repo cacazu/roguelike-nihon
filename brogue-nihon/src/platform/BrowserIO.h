@@ -19,6 +19,10 @@ BrowserWait browserWaitBegin(int kind, int maxLength, int cancel);
 BrowserWait browserWaitButtons(void);
 void browserWaitKey(int32_t key);
 void browserWaitRestore(BrowserWait previous);
+/* The native overlay owner preserves the separate mobile message mirror.
+ * This is frame metadata, independent of the following input-wait owner. */
+int browserMessageMirrorHold(void);
+void browserMessageMirrorRestore(int previous);
 #else
 static inline BrowserWait browserWaitBegin(int kind, int maxLength, int cancel) {
     (void)kind; (void)maxLength; (void)cancel;
@@ -29,6 +33,8 @@ static inline BrowserWait browserWaitButtons(void) {
 }
 static inline void browserWaitKey(int32_t key) { (void)key; }
 static inline void browserWaitRestore(BrowserWait previous) { (void)previous; }
+static inline int browserMessageMirrorHold(void) { return 0; }
+static inline void browserMessageMirrorRestore(int previous) { (void)previous; }
 #endif
 
 /* Read-only playback actions offered by Recordings.c. Physical unknown keys

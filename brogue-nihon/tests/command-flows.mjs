@@ -26,8 +26,8 @@ const adapter=`
     const record={id:++observer.epoch,milliseconds:args[0],mouse:args[1],descriptor:Array.from(args[2]),resolved:false};observer.waiting=false;observer.descriptor=record.descriptor;observer.pauses.push(record);
     return pause(...args).then(value=>{record.resolved=true;record.interrupted=value;return value;});
   };
-  const frame=globalThis.brogueHost.frame;globalThis.brogueHost.frame=cells=>{
-    observer.cells=Array.from(cells);observer.text=Array.from({length:34},(_,row)=>Array.from({length:100},(_,col)=>{const i=(row*100+col)*10;return cells[i]===0x110000?'':String.fromCodePoint(cells[i+1]||32);}).join('')).join('\\n');return frame(cells);
+  const frame=globalThis.brogueHost.frame;globalThis.brogueHost.frame=(cells,...metadata)=>{
+    observer.cells=Array.from(cells);observer.text=Array.from({length:34},(_,row)=>Array.from({length:100},(_,col)=>{const i=(row*100+col)*10;return cells[i]===0x110000?'':String.fromCodePoint(cells[i+1]||32);}).join('')).join('\\n');return frame(cells,...metadata);
   };
 `;
 async function inspect(){return page.evaluate(()=>({waiting:__command.waiting,descriptor:__command.descriptor,inputs:__command.inputs,text:__command.text,kind:document.querySelector('#game').dataset.waitKind,pauses:__command.pauses}));}

@@ -22,7 +22,7 @@ const observation=`
     return event(...args).then(value=>{observation.waiting=false;return value;});
   };
   const frame = globalThis.brogueHost.frame;
-  globalThis.brogueHost.frame = cells => {observation.frameSerial++;observation.cells=Array.from(cells);return frame(cells);};
+  globalThis.brogueHost.frame = (cells,...metadata) => {observation.frameSerial++;observation.cells=Array.from(cells);return frame(cells,...metadata);};
 `;
 let browser,activePage,chromium,temporary,oldTemp,server,base,checkModule,productionHost;
 async function setup(){

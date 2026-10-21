@@ -30,8 +30,8 @@ const adapter=`
     test.waiting=false;return value;
   });};
   const frame=globalThis.brogueHost.frame;
-  globalThis.brogueHost.frame=cells=>{
-    test.cells=Array.from(cells);const result=frame(cells);
+  globalThis.brogueHost.frame=(cells,...metadata)=>{
+    test.cells=Array.from(cells);const result=frame(cells,...metadata);
     if(test.active){
       const s=snapshot(),observation={turn:s.turn,absoluteTurnNumber:s.absoluteTurnNumber,rng:s.rng,x:s.x,y:s.y,hp:s.hp,depth:s.depth,statuses:s.statuses,maxStatuses:s.maxStatuses,playerCell:s.playerCell,spawnCell:s.spawnCell,mapMetrics:s.mapMetrics,
         gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters};

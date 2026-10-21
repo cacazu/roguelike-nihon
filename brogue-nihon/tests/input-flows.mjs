@@ -21,7 +21,7 @@ const adapter=`
     return event(...args).then(value=>{observation.inputs.push(Array.from(value));observation.waiting=false;return value;});
   };
   const frame=globalThis.brogueHost.frame;
-  globalThis.brogueHost.frame=cells=>{observation.cells=Array.from(cells);return frame(cells);};
+  globalThis.brogueHost.frame=(cells,...metadata)=>{observation.cells=Array.from(cells);return frame(cells,...metadata);};
   const pause=globalThis.brogueHost.pause;
   globalThis.brogueHost.pause=(...args)=>{
     const record={milliseconds:args[0],mouse:args[1],descriptor:Array.from(args[2]),resolved:false};observation.pauses.push(record);

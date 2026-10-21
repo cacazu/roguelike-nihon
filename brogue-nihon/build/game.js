@@ -4464,8 +4464,8 @@ var UTF8Decoder = globalThis.TextDecoder && new TextDecoder();
     }
   _brogue_browser_event.isAsync = true;
 
-  function _brogue_browser_frame(ptr, count) {
-      globalThis.brogueHost.frame(HEAP32.slice(ptr >> 2, (ptr >> 2) + count));
+  function _brogue_browser_frame(ptr, count, preserveMessages) {
+      globalThis.brogueHost.frame(HEAP32.slice(ptr >> 2, (ptr >> 2) + count), preserveMessages !== 0);
     }
 
   function _brogue_browser_notify(eventId, data1, data2, str1, str2) {

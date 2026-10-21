@@ -23,7 +23,7 @@ const adapter=`
   const event = globalThis.brogueHost.event;
   globalThis.brogueHost.event = (...args) => {test.serial++;test.waiting=true;test.descriptor=Array.from(args[2]);return event(...args).then(value=>{test.events.push(Array.from(value));test.waiting=false;return value;});};
   const frame = globalThis.brogueHost.frame;
-  globalThis.brogueHost.frame = cells => {test.cells=Array.from(cells);return frame(cells);};
+  globalThis.brogueHost.frame = (cells,...metadata) => {test.cells=Array.from(cells);return frame(cells,...metadata);};
   const notify = globalThis.brogueHost.notify;
   globalThis.brogueHost.notify = (...args) => {test.notifications.push(args);return notify(...args);};
 `;

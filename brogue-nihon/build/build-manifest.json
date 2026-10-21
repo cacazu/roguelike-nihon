@@ -52,7 +52,7 @@
     },
     {
       "file": "rust/src/browser.rs",
-      "sha256": "71eabcd6d199749b05a915ec211a28bdc4fdef5206e44bb2131883f1fe4d374d"
+      "sha256": "03c8ed7dcda89a8f273678a037737953c95ec55e75f0cbadfcff0c1be30052d2"
     },
     {
       "file": "rust/src/files.rs",
@@ -108,7 +108,7 @@
     },
     {
       "file": "src/brogue/IO.c",
-      "sha256": "6bdacb2dcdb55adb6ae86d55a36eadc2a6f9ba000090a6cd099598bc64036ff6"
+      "sha256": "d13f3f65bcc53ca4c81e6b2c5cfff13d974cefa286718785ccaf7e31aa73862c"
     },
     {
       "file": "src/brogue/Items.c",
@@ -184,11 +184,11 @@
     },
     {
       "file": "src/platform/browser-platform.c",
-      "sha256": "3e945a5de7ae72ba12600e3c7a1c1c2edc1d477669cfc7af576557b29dd2cd19"
+      "sha256": "b276f9025f168c6df2772dd51d5cd2328cc8b2d8b1c1bf747353b502239d724c"
     },
     {
       "file": "src/platform/BrowserIO.h",
-      "sha256": "d5e929686476e95fd289de2da938aa6b54e770c3665d3eed946477bb8fb5b526"
+      "sha256": "8d92b9b4d241074e522dc3e09516a889695c72ff5a489014fee08bc479fac638"
     },
     {
       "file": "src/platform/curses-platform.c",
@@ -284,7 +284,7 @@
     },
     {
       "file": "web/library.js",
-      "sha256": "d63aeb14f74bed5c22d3a74bc2a9f5b82ada105dde1fbae325a86dcf66e90178"
+      "sha256": "332877850beefb3b843e66e19d86396e2748a9004d583f64c3d1b1f8d160bf3e"
     },
     {
       "file": "web/style.css",
@@ -364,23 +364,23 @@
   "outputs": [
     {
       "file": "game.js",
-      "bytes": 198099,
-      "sha256": "12e5a91cee6f27ccb34273e482cd3960cd92b6ef4973d78f72a0a2a125d9b0e4"
+      "bytes": 198141,
+      "sha256": "926a08017d1e5fb7006347cc19e916a3334d8592d405e9d994a7f30b471f6581"
     },
     {
       "file": "game.wasm",
-      "bytes": 2815191,
-      "sha256": "799313ed9f47fe3f60545acebacd6839e7b6b620f4ef773dce5025f422abc29d"
+      "bytes": 2815418,
+      "sha256": "2898ea65ce0745589b417d46c7e26b268fc11931dd951f931cf9f7b63f22f961"
     },
     {
       "file": "browser-ui.js",
-      "bytes": 45854,
-      "sha256": "2734aadcb337cf9cfa5b50ed720d06eda78094eb97481c49f84ad92836020898"
+      "bytes": 46166,
+      "sha256": "86ef63cc094c7f59acce46373a94ea6f9917f64e901e5c06a132227e47f6fab4"
     },
     {
       "file": "browser-ui.wasm",
-      "bytes": 2532315,
-      "sha256": "111e64ba034a2d046ec3f065f309407252a348b266b6e6ddf33c1bf88534c33a"
+      "bytes": 2531637,
+      "sha256": "2b90f87c99821b83d1053df5d3cf35f545ba56710a6741b91a640deea9b8ffb5"
     }
   ]
 }

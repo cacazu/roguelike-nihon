@@ -32,6 +32,7 @@ struct Session {
     touch_shift: bool,
     pending: VecDeque<InputEvent>,
     revision: u32,
+    preserve_message_mirror: bool,
     last_saved: String,
     centered: bool,
     selected_mode: String,
@@ -450,29 +451,31 @@ fn draw(session: &mut Session) -> Result<(), JsValue> {
     let sidebar_context: CanvasRenderingContext2d =
         sidebar.get_context("2d")?.unwrap().unchecked_into();
     sidebar_context.put_image_data(&pixels, 0., 0.)?;
-    let lines = (0..3)
-        .map(|row| {
-            (21..COLS)
-                .filter_map(|column| {
-                    let cell = &session.presentation.cells[(row * COLS + column) * 10..];
-                    if cell[0] == 0x110000 {
-                        None
-                    } else {
-                        Some(
-                            char::from_u32(cell[1] as u32)
-                                .filter(|c| !c.is_control())
-                                .unwrap_or(' '),
-                        )
-                    }
-                })
-                .collect::<String>()
-                .trim()
-                .to_string()
-        })
-        .filter(|line| !line.is_empty())
-        .collect::<Vec<_>>()
-        .join("\n");
-    element("mobile-messages").set_text_content(Some(&lines));
+    if !session.preserve_message_mirror {
+        let lines = (0..3)
+            .map(|row| {
+                (21..COLS)
+                    .filter_map(|column| {
+                        let cell = &session.presentation.cells[(row * COLS + column) * 10..];
+                        if cell[0] == 0x110000 {
+                            None
+                        } else {
+                            Some(
+                                char::from_u32(cell[1] as u32)
+                                    .filter(|c| !c.is_control())
+                                    .unwrap_or(' '),
+                            )
+                        }
+                    })
+                    .collect::<String>()
+                    .trim()
+                    .to_string()
+            })
+            .filter(|line| !line.is_empty())
+            .collect::<Vec<_>>()
+            .join("\n");
+        element("mobile-messages").set_text_content(Some(&lines));
+    }
     session.revision += 1;
     session
         .canvas
@@ -573,22 +576,26 @@ fn screenshot(session: &Session) -> Result<(), JsValue> {
 fn install_host(state: &Shared) -> Result<(), JsValue> {
     let host = Object::new();
     let target = state.clone();
-    let frame = Closure::<dyn FnMut(Int32Array)>::new(move |values: Int32Array| {
-        let result = (|| {
-            let mut session = target.borrow_mut();
-            let changed = session
-                .presentation
-                .snapshot(values.to_vec())
-                .map_err(failure)?;
-            if changed {
-                draw(&mut session)?;
+    let frame = Closure::<dyn FnMut(Int32Array, bool)>::new(
+        move |values: Int32Array, preserve_messages: bool| {
+            let result = (|| {
+                let mut session = target.borrow_mut();
+                let context_changed = session.preserve_message_mirror != preserve_messages;
+                session.preserve_message_mirror = preserve_messages;
+                let changed = session
+                    .presentation
+                    .snapshot(values.to_vec())
+                    .map_err(failure)?;
+                if changed || context_changed {
+                    draw(&mut session)?;
+                }
+                Ok::<_, JsValue>(())
+            })();
+            if let Err(error) = result {
+                report(error);
             }
-            Ok::<_, JsValue>(())
-        })();
-        if let Err(error) = result {
-            report(error);
-        }
-    });
+        },
+    );
     Reflect::set(&host, &"frame".into(), frame.as_ref())?;
     frame.forget();
     let target = state.clone();
@@ -1046,6 +1053,7 @@ pub async fn start_browser(game: JsValue) -> Result<JsValue, JsValue> {
         touch_shift: false,
         pending: VecDeque::new(),
         revision: 0,
+        preserve_message_mirror: false,
         last_saved: String::new(),
         centered: false,
         selected_mode: "original".into(),

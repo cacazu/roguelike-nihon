@@ -4295,9 +4295,11 @@ void displayFeatsScreen() {
         }
     }
     const SavedDisplayBuffer rbuf = saveDisplayBuffer();
+    int previousMessageMirror = browserMessageMirrorHold();
     overlayDisplayBuffer(&dbuf);
     waitForKeystrokeOrMouseClick();
     restoreDisplayBuffer(&rbuf);
+    browserMessageMirrorRestore(previousMessageMirror);
 }
 
 void printDiscoveriesScreen() {
@@ -4331,11 +4333,13 @@ void printDiscoveriesScreen() {
             dbuf.cells[i][j].opacity = (i < STAT_BAR_WIDTH ? 0 : INTERFACE_OPACITY);
         }
     }
+    int previousMessageMirror = browserMessageMirrorHold();
     overlayDisplayBuffer(&dbuf);
 
     waitForKeystrokeOrMouseClick();
 
     restoreDisplayBuffer(&rbuf);
+    browserMessageMirrorRestore(previousMessageMirror);
 }
 
 void printHighScores(boolean hiliteMostRecent) {

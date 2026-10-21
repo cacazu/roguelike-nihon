@@ -42,7 +42,7 @@ async function files(){return page.evaluate(()=>{
     await context.route('**/web/host.js',route=>route.fulfill({contentType:'text/javascript',body:host.replace(marker,`
       const observer=globalThis.__files={game,serial:0,consumed:0,eventWaiting:false,text:''};
       const frame=globalThis.brogueHost.frame;
-      globalThis.brogueHost.frame=cells=>{observer.text=Array.from({length:34},(_,row)=>Array.from({length:100},(_,col)=>String.fromCodePoint(cells[(row*100+col)*10+1]||32)).join('')).join('\\n');return frame(cells);};
+      globalThis.brogueHost.frame=(cells,...metadata)=>{observer.text=Array.from({length:34},(_,row)=>Array.from({length:100},(_,col)=>String.fromCodePoint(cells[(row*100+col)*10+1]||32)).join('')).join('\\n');return frame(cells,...metadata);};
       for(const name of ['event','pause']){const owner=globalThis.brogueHost[name];globalThis.brogueHost[name]=(...args)=>{observer.serial++;if(name==='event')observer.eventWaiting=true;return owner(...args).then(value=>{if(name==='event'){observer.consumed++;observer.eventWaiting=false;}return value;});};}
       game.callMain(${JSON.stringify(args)});
     `)}));

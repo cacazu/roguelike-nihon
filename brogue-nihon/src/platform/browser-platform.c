@@ -14,6 +14,7 @@
 #define BROWSER_CELL_FIELDS 10
 static int32_t browserCells[ROWS * COLS * BROWSER_CELL_FIELDS];
 static boolean dirty = true;
+static boolean preserveMessageMirror;
 static boolean shiftHeld, controlHeld;
 static BrowserWait inputWait;
 #ifdef BROGUE_BROWSER_CHECK
@@ -21,7 +22,7 @@ static void checkEnterEvent(boolean textInput);
 static void checkLeaveEvent(void);
 #endif
 
-extern void brogue_browser_frame(const int32_t *cells, int count);
+extern void brogue_browser_frame(const int32_t *cells, int count, int preserveMessages);
 extern void brogue_browser_event(int32_t *event, int textInput, int colorsDance,
                                  const int32_t *wait, int count);
 extern int brogue_browser_pause(int milliseconds, int interruptForMouseMove,
@@ -57,13 +58,27 @@ void browserWaitKey(int32_t key) {
 
 void browserWaitRestore(BrowserWait previous) { inputWait = previous; }
 
+int browserMessageMirrorHold(void) {
+    int previous = preserveMessageMirror;
+    if (!preserveMessageMirror) { preserveMessageMirror = true; dirty = true; }
+    return previous;
+}
+void browserMessageMirrorRestore(int previous) {
+    if (preserveMessageMirror != (previous != 0)) {
+        preserveMessageMirror = previous != 0;
+        dirty = true;
+    }
+}
+
 static void flushFrame(void) {
     if (!dirty) return;
-    brogue_browser_frame(browserCells, ROWS * COLS * BROWSER_CELL_FIELDS);
+    brogue_browser_frame(browserCells, ROWS * COLS * BROWSER_CELL_FIELDS, preserveMessageMirror);
     dirty = false;
 }
 
 static void browser_gameLoop(void) {
+    preserveMessageMirror = false;
+    dirty = true;
     rogueMain();
     flushFrame();
 }

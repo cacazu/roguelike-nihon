@@ -24,8 +24,8 @@ const adapter=`
       return owner(...args).then(value=>{if(name==='event')observer.inputs.push(Array.from(value));if(observer.eventId===id)observer.waiting=false;return value;});
     };
   }
-  const frame=globalThis.brogueHost.frame;globalThis.brogueHost.frame=cells=>{
-    observer.cells=Array.from(cells);observer.text=Array.from({length:34},(_,row)=>Array.from({length:100},(_,col)=>String.fromCodePoint(cells[(row*100+col)*10+1]||32)).join('')).join('\\n');return frame(cells);
+  const frame=globalThis.brogueHost.frame;globalThis.brogueHost.frame=(cells,...metadata)=>{
+    observer.cells=Array.from(cells);observer.text=Array.from({length:34},(_,row)=>Array.from({length:100},(_,col)=>String.fromCodePoint(cells[(row*100+col)*10+1]||32)).join('')).join('\\n');return frame(cells,...metadata);
   };
 `;
 const hash=data=>createHash('sha256').update(data).digest('hex');

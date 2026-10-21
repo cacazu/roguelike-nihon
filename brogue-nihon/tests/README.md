@@ -105,3 +105,7 @@ node brogue-nihon/tests/compare-fixtures.mjs
 ```
 
 `advanced-variants.mjs` は上記17条件をRapid/Bulletの実variantでPC／タッチ各34件、計68件実行する。Specialistの準備は原作のEnchanting powerを読んで`16-power`／`15-power`とし、実使用後の+16／+15を正負対照にする。期待する強化幅は独立にCE1、Rapid/Bullet2として検査する。怪物の基本catalogは共通でも、生成・地形・光量・RNGの同一をvariant間で要求しない。自然階層は各variant自身の生成後の階段とseedを再訪時に比較する。原作比較は`BROGUE_FIXTURE_RESULTS`と`BROGUE_COMPARE_NAME`を`advanced-variants`へ切り替える。これはタイトルUIからのvariant選択とは別のCHECK起動経路である。
+
+`overlay-messages.mjs` は製品のC／Rust描画を使い、Fと発見一覧の表示中に原作の半透明本文を上部メッセージ欄へ混入させない回帰6件を実行する。Cの表示ownerが保持scopeを開始／復元し、フレームと一緒にboolをRustへ渡す。入力待ちdescriptorから推測せず、セルと保持状態のどちらの変更でも再描画する。観測ラッパーも`frame(cells, ...metadata)`で追加情報を落とさず転送する。
+
+最初の保持frameがAnyKey到達前であること、全保持frameのDOM不変、3表示・拡縮・タッチpanの非消費、終了後の実Strength Potionによる新メッセージ更新と再表示を確認する。Item／Text／Help ACKは別の非保持対照。pan後は慣性スクロールの停止を待ってから次のボタンへ触れる。Fの原作Canvasには暗い下地glyphが残るため、公開文字を読む際は既存の輝度判定を使う。真の入れ子・metadataだけの変更は別途ソースを確認し、致命例外の復旧や全modal対応まで実証したとは扱わない。原作比較は他の追加契約と同じく`overlay-messages`の合格結果と`BROGUE_COMPARE_DOMAINS=none`を指定する。
