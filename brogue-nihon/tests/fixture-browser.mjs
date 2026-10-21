@@ -34,7 +34,7 @@ const adapter=`
     test.cells=Array.from(cells);const result=frame(cells,...metadata);
     if(test.active){
       const s=snapshot(),observation={turn:s.turn,absoluteTurnNumber:s.absoluteTurnNumber,rng:s.rng,x:s.x,y:s.y,hp:s.hp,depth:s.depth,statuses:s.statuses,maxStatuses:s.maxStatuses,playerCell:s.playerCell,spawnCell:s.spawnCell,mapMetrics:s.mapMetrics,
-        gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
+        nativeAI:s.nativeAI,stealthRange:s.stealthRange,gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
         messageRows:Array.from({length:3},(_,y)=>Array.from({length:79},(_,i)=>{const at=(y*100+i+21)*10;return Math.max(...test.cells.slice(at+2,at+5))<20?' ':String.fromCodePoint(test.cells[at+1]||32);}).join(''))};
       const signature=JSON.stringify(observation);
       if(signature!==test.lastObservation){
@@ -53,7 +53,7 @@ export class FixturePage {
   constructor(page,entry,prefix='') {this.page=page;this.entry=entry;this.prefix=prefix;}
   async state(){return this.page.evaluate(()=>{const m=__brogueFixture.module,s=JSON.parse(m.UTF8ToString(m._brogue_check_features()));if(s.error)throw Error(s.error);return s;});}
   async publicCell(x,y){return this.page.evaluate(({x,y})=>__brogueFixture.cells.slice((y*100+x)*10,(y*100+x+1)*10),{x,y});}
-  async assertSceneFrame(){const s=await this.state();if(s.inProgress){const player=await this.publicCell(s.x+21,s.y+3);assert.equal(player[1],64,'Public player glyph is missing at the actual C location');if(s.depth===this.origin.depth){const old=await this.publicCell(this.origin.x+21,this.origin.y+3);if(s.fixture===sceneGroups.NATIVE_LEVELS){if(s.x!==this.origin.x||s.y!==this.origin.y)assert.notEqual(old[1],64,'Native topology must not retain a duplicate player glyph');}else assert.equal(old[1],32,'Old pre-fixture player/map was restored');}return {player,old:await this.publicCell(this.origin.x+21,this.origin.y+3)};}}
+  async assertSceneFrame(){const s=await this.state();if(s.inProgress){const player=await this.publicCell(s.x+21,s.y+3);assert.equal(player[1],64,'Public player glyph is missing at the actual C location');if(s.depth===this.origin.depth){const old=await this.publicCell(this.origin.x+21,this.origin.y+3);if(s.fixture===sceneGroups.NATIVE_LEVELS||Math.floor(s.fixture/1000)*1000===sceneGroups.NATIVE_AI){if(s.x!==this.origin.x||s.y!==this.origin.y)assert.notEqual(old[1],64,'Native topology must not retain a duplicate player glyph');}else assert.equal(old[1],32,'Old pre-fixture player/map was restored');}return {player,old:await this.publicCell(this.origin.x+21,this.origin.y+3)};}}
   async wait(){return this.page.evaluate(()=>({serial:__brogueFixture.serial,waiting:__brogueFixture.waiting,kind:document.querySelector('#game').dataset.waitKind,descriptor:__brogueFixture.descriptor}));}
   async record(action){this.entry.steps.push({action,wait:await this.wait(),state:await this.state()});}
   async screenshot(name){
@@ -149,6 +149,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
           await page.waitForFunction(()=>globalThis.__brogueFixture?.waiting&&document.querySelector('#game').dataset.waitKind==='command',null,{timeout:60000});
           const d=new FixturePage(page,entry,prefix),startup=await d.state(),wait=await d.wait();
           assert.equal(await page.evaluate(()=>__brogueFixture.prestartFeaturesError),'CHECK game has not started');assert.equal(await page.evaluate(()=>__brogueFixture.prestartReject),-1);assert.equal(startup.fixture,0);assert.equal(startup.variant,({brogue:'brogue',rapid_brogue:'rapidBrogue',bullet_brogue:'bulletBrogue'})[test.variant],'Native launch variant mismatch');assert.equal(startup.seed,'42');assert.equal(startup.turn,0);assert.equal(startup.ready,1);assert.equal(wait.serial,1);
+          if(!prefix&&Math.floor(scene/1000)*1000===sceneGroups.NATIVE_AI)entry.startup_state=startup;
           for(const rejected of[-1,99999,Math.max(...Object.values(sceneGroups).filter(id=>id<1000))+1,
             sceneGroups.POTION_UNKNOWN+startup.kindCounts.potion,sceneGroups.CHARM_READY+startup.kindCounts.charm,
             sceneGroups.SCROLL_UNKNOWN+startup.kindCounts.scroll,sceneGroups.SCROLL_KNOWN+startup.kindCounts.scroll,
@@ -159,12 +160,12 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
             sceneGroups.ARMOR_RUNIC+11,sceneGroups.ARMOR_PLAIN+11,sceneGroups.ARMOR_CONDITION,
             sceneGroups.ARMOR_CONDITION+102,sceneGroups.ARMOR_CONDITION+204,sceneGroups.ARMOR_CONDITION+305,
             sceneGroups.RING_READY+8,sceneGroups.RING_READY+104,sceneGroups.RING_READY+200,
-            sceneGroups.RING_READY+301,sceneGroups.RING_READY+407,sceneGroups.MONSTER_ABILITIES+14,sceneGroups.MONSTER_ABILITIES+100,sceneGroups.MONSTER_ABILITIES+999,sceneGroups.MONSTER_ENVIRONMENT+20,sceneGroups.MONSTER_ENVIRONMENT+100,sceneGroups.MONSTER_ENVIRONMENT+999,sceneGroups.TERRAIN_EXPOSURE+20,sceneGroups.TERRAIN_EXPOSURE+100,sceneGroups.TERRAIN_EXPOSURE+999,sceneGroups.TERRAIN_HAZARDS+10,sceneGroups.TERRAIN_HAZARDS+100,sceneGroups.TERRAIN_HAZARDS+999,sceneGroups.MONSTER_SPELLS+10,sceneGroups.MONSTER_SPELLS+100,sceneGroups.MONSTER_SPELLS+999]){
+            sceneGroups.RING_READY+301,sceneGroups.RING_READY+407,sceneGroups.MONSTER_ABILITIES+14,sceneGroups.MONSTER_ABILITIES+100,sceneGroups.MONSTER_ABILITIES+999,sceneGroups.MONSTER_ENVIRONMENT+20,sceneGroups.MONSTER_ENVIRONMENT+100,sceneGroups.MONSTER_ENVIRONMENT+999,sceneGroups.TERRAIN_EXPOSURE+20,sceneGroups.TERRAIN_EXPOSURE+100,sceneGroups.TERRAIN_EXPOSURE+999,sceneGroups.TERRAIN_HAZARDS+10,sceneGroups.TERRAIN_HAZARDS+100,sceneGroups.TERRAIN_HAZARDS+999,sceneGroups.MONSTER_SPELLS+10,sceneGroups.MONSTER_SPELLS+100,sceneGroups.MONSTER_SPELLS+999,sceneGroups.NATIVE_AI+3,sceneGroups.NATIVE_AI+100,sceneGroups.NATIVE_AI+999]){
             assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),rejected),-1,'Unknown/unsupported kind must reject');
             assert.deepEqual(await d.state(),startup,'Rejected kind changed preparation/RNG');
           }
           assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),scene),scene,'Fixture not accepted');
-          d.origin={x:startup.x,y:startup.y,depth:startup.depth};
+          d.startup=startup;d.origin={x:startup.x,y:startup.y,depth:startup.depth};
           const prepared=await d.state();assert.equal(prepared.turn,0);assert.equal(prepared.fixture,scene);
           assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),scene),-1);assert.deepEqual(await d.state(),prepared,'Repeated preparation changed state');
           const publicFrame=await d.assertSceneFrame();if(!prefix)entry.public_initial_frame=publicFrame;
