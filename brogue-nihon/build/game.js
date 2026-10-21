@@ -4482,6 +4482,10 @@ var UTF8Decoder = globalThis.TextDecoder && new TextDecoder();
     }
   _brogue_browser_pause.isAsync = true;
 
+  function _brogue_browser_screenshot() {
+      return +globalThis.brogueHost.screenshot();
+    }
+
   var _emscripten_date_now = () => Date.now();
 
   var getHeapMax = () =>
@@ -5275,6 +5279,7 @@ var dynCall_viii = makeInvalidEarlyAccess('dynCall_viii');
 var dynCall_viiiiiiiii = makeInvalidEarlyAccess('dynCall_viiiiiiiii');
 var dynCall_ii = makeInvalidEarlyAccess('dynCall_ii');
 var dynCall_viiiii = makeInvalidEarlyAccess('dynCall_viiiii');
+var dynCall_i = makeInvalidEarlyAccess('dynCall_i');
 var dynCall_jiji = makeInvalidEarlyAccess('dynCall_jiji');
 var dynCall_iiii = makeInvalidEarlyAccess('dynCall_iiii');
 var dynCall_iidiiiii = makeInvalidEarlyAccess('dynCall_iidiiiii');
@@ -5306,6 +5311,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['dynCall_viiiiiiiii'] != 'undefined', 'missing Wasm export: dynCall_viiiiiiiii');
   assert(typeof wasmExports['dynCall_ii'] != 'undefined', 'missing Wasm export: dynCall_ii');
   assert(typeof wasmExports['dynCall_viiiii'] != 'undefined', 'missing Wasm export: dynCall_viiiii');
+  assert(typeof wasmExports['dynCall_i'] != 'undefined', 'missing Wasm export: dynCall_i');
   assert(typeof wasmExports['dynCall_jiji'] != 'undefined', 'missing Wasm export: dynCall_jiji');
   assert(typeof wasmExports['dynCall_iiii'] != 'undefined', 'missing Wasm export: dynCall_iiii');
   assert(typeof wasmExports['dynCall_iidiiiii'] != 'undefined', 'missing Wasm export: dynCall_iidiiiii');
@@ -5334,6 +5340,7 @@ function assignWasmExports(wasmExports) {
   dynCall_viiiiiiiii = dynCalls['viiiiiiiii'] = createExportWrapper('dynCall_viiiiiiiii', wasmExports['dynCall_viiiiiiiii'], 10);
   dynCall_ii = dynCalls['ii'] = createExportWrapper('dynCall_ii', wasmExports['dynCall_ii'], 2);
   dynCall_viiiii = dynCalls['viiiii'] = createExportWrapper('dynCall_viiiii', wasmExports['dynCall_viiiii'], 6);
+  dynCall_i = dynCalls['i'] = createExportWrapper('dynCall_i', wasmExports['dynCall_i'], 1);
   dynCall_jiji = dynCalls['jiji'] = createExportWrapper('dynCall_jiji', wasmExports['dynCall_jiji'], 4);
   dynCall_iiii = dynCalls['iiii'] = createExportWrapper('dynCall_iiii', wasmExports['dynCall_iiii'], 4);
   dynCall_iidiiiii = dynCalls['iidiiiii'] = createExportWrapper('dynCall_iidiiiii', wasmExports['dynCall_iidiiiii'], 8);
@@ -5385,6 +5392,8 @@ var wasmImports = {
   brogue_browser_notify: _brogue_browser_notify,
   /** @export */
   brogue_browser_pause: _brogue_browser_pause,
+  /** @export */
+  brogue_browser_screenshot: _brogue_browser_screenshot,
   /** @export */
   emscripten_date_now: _emscripten_date_now,
   /** @export */

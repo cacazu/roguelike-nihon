@@ -5649,7 +5649,11 @@ boolean chooseTarget(pos *returnLoc,
 
     BrowserWait previousWait = browserWaitBegin(BROWSER_TARGET, 0, true);
     const int targetKeys[] = {UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY, UPLEFT_KEY, UPRIGHT_KEY,
-                             DOWNLEFT_KEY, DOWNRIGHT_KEY, RETURN_KEY, TAB_KEY, ESCAPE_KEY};
+                             DOWNLEFT_KEY, DOWNRIGHT_KEY, 'H', 'J', 'K', 'L', 'Y', 'U', 'B', 'N',
+                             UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW,
+                             NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4,
+                             NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
+                             RETURN_KEY, TAB_KEY, SHIFT_TAB_KEY, ESCAPE_KEY, ACKNOWLEDGE_KEY};
     for (int key = 0; key < (int)(sizeof targetKeys / sizeof *targetKeys); key++) browserWaitKey(targetKeys[key]);
     oldRNG = rogue.RNG;
     rogue.RNG = RNG_COSMETIC;
@@ -6409,9 +6413,12 @@ void relabel(item *theItem) {
     }
     temporaryMessage("New letter? (a-z)", 0);
     newLabel = '\0';
+    BrowserWait previousWait = browserWaitBegin(BROWSER_ANY_KEY, 0, true);
+    for (int letter = 'a'; letter <= 'z'; letter++) browserWaitKey(letter);
     do {
         newLabel = nextKeyPress(true);
     } while (!newLabel);
+    browserWaitRestore(previousWait);
 
     if (newLabel >= 'A' && newLabel <= 'Z') {
         newLabel += 'a' - 'A'; // lower-case.

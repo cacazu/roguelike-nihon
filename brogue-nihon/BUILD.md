@@ -11,7 +11,7 @@ cargo install wasm-bindgen-cli --version 0.2.128 --locked
 
 SDKの既定はユーザーホームの `emsdk/` です。別のSDKは `-SdkRoot <path>` または `EMSDK`、wasm-bindgen-cliの実行ファイルは `BROGUE_WASM_BINDGEN` で指定します。SDKに同梱されたPythonを使います。
 
-`build-web.ps1` は原作CをEmscripten/Asyncifyでコンパイルし、作品固有Rustとルートの `roguelike-common` をWasmへビルドします。生成先は `build/game.js`・`game.wasm`・`browser-ui.js`・`browser-ui.wasm` と `build-manifest.json`。各段階が成功し、ハッシュを取得してから配布用ファイルへ反映します。sourceハッシュはテキストの改行をLFへ統一し、出力ハッシュは配布バイト列そのものを使います。通常ビルドはRustを省略しません。
+`build-web.ps1` は原作CをEmscripten/Asyncifyでコンパイルし、作品固有Rustとルートの `roguelike-common` をWasmへビルドします。生成先は `build/game.js`・`game.wasm`・`browser-ui.js`・`browser-ui.wasm` と `build-manifest.json`。各段階が成功し、ハッシュを取得してから配布用ファイルへ反映します。sourceハッシュはhost・HTML・CSS・画像設定を含むテキストの改行をLFへ統一します。画像・フォントは`asset_inputs`でサイズと実バイト列のハッシュを照合し、出力ハッシュも配布バイト列そのものを使います。通常ビルドはRustを省略しません。
 
 検証専用の `-Check -SkipRust` は、通常版を上書きせず `game-check.js`・`game-check.wasm` を生成します。検証手順は [tests/README.md](tests/README.md) を参照してください。
 

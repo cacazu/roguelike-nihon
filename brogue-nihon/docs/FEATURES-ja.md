@@ -8,7 +8,7 @@
 - 同梱の操作説明は [IO.c](../src/brogue/IO.c) の `printHelpScreen` と [Recordings.c](../src/brogue/Recordings.c) の `printPlaybackHelpScreen`。原作説明は [README](../README.md) の原作品節と [CHANGELOG](../CHANGELOG.md) も参照する。別ファイルの操作マニュアルは同梱されていない。
 - [Commands（oldid 855399）](https://brogue.wiki/mw/index.php?title=Commands&oldid=855399) と [Combat（oldid 856261）](https://brogue.wiki/mw/index.php?title=Combat&oldid=856261) は補助資料。CE 1.15.1専用の仕様書ではない。Commandsのvariant案内はBulletを列挙しておらず、Combatにも未確認注記がある。数式、深度、効果、操作の判定は対象版Cを優先する。
 
-ソースの参照は以下の関数・enum・テーブル名を主とする。行番号だけを機能の識別子にしない。検証用の一覧JSONはリポジトリルートの `.local/feature-verification/inventory.json` に、対象HEAD、対象ソースのLF正規化SHA256、全symbol、条件、実行証拠の有無を記録する。派生JSONや過去の成功件数を恒久仕様へ転記しない。
+ソースの参照は以下の関数・enum・テーブル名を主とする。行番号だけを機能の識別子にしない。[一覧生成器](../tests/inventory-features.mjs) は現在のソースからリポジトリルートの `.local/feature-verification/data-inventory.json` を再生成し、対象HEAD、ソースのLF正規化SHA256、全symbol・定義・テーブルを記録する。[検証表生成器](../tests/report-features.mjs) は本書の全IDと一覧を明示された実行証拠へ対応付け、同じディレクトリーの `report.json` と `report.md` へ実プレイ・自動検証・未確認を出力する。初回調査の `inventory.json` は当時のソースを示す履歴資料として区別する。派生JSONや過去の成功件数を恒久仕様へ転記しない。
 
 ## 証拠と合格の単位
 
@@ -61,7 +61,7 @@
 | cmd.discoveries | `D` | `printDiscoveriesScreen` | 鑑定済み・未鑑定・出現確率・魔力情報。未獲得の個別品の正体を漏らさない |
 | cmd.wizard_create | `C`、Wizard modeだけ | `dialogCreateItemOrMonster` / [Wizard.c](../src/brogue/Wizard.c) | 原作の品物・怪物生成メニュー。通常modeで生成しない。検証fixtureとは別機能 |
 | cmd.save | `S` → 確認 → ファイル名 → 上書き確認 → acknowledgment | `saveGame` / [Recordings.c](../src/brogue/Recordings.c) | 保存してタイトルへ戻る。取消・同名拒否・禁止文字・長さ制限・新instance復元後の次操作 |
-| cmd.new | `N`、50ターン未満／以降 | `executeKeystroke` → 必要なら確認 | 早期開始と確認を要する開始を区別。新ゲームのseed・状態が切り替わる |
+| cmd.new | `N`（原作の移動キーと衝突） | `stripShiftFromMovementKeystroke` → `DOWNRIGHT_KEY`、未到達の `NEW_GAME_KEY` case | CE 1.15.1はswitch前にNをnへ変換し、物理Nは南東移動／走行として処理される。`NEW_GAME_KEY` 内の50ターン未満／以降の再開始分岐には届かない。この原作制約を保持し、新規開始はタイトルから行う |
 | cmd.quit | `Q` → 確認 → 終了処理 | `gameOver` / [RogueMain.c](../src/brogue/RogueMain.c) | 放棄・記録・スコア・タイトル復帰。No・取消は元ゲームへ戻る |
 | cmd.graphics | `G`、原作は`hasGraphics`時 | `setGraphicsMode`、Web表示側 | 原作のtext/tiles/hybridとWebの3表示を区別。下記の環境適応契約で検証 |
 | cmd.seed | `~`、Wizardでは診断表示も追加 | `printSeed`、`displayLoops/ChokeMap/Machines/Waypoints` | seed・ターン・mode・version表示。Wizardの追加画面も送り・復帰できる |
@@ -97,8 +97,8 @@
 | replay.seek_turn | `h`/←、`l`/→、Shift、Ctrl、数字入力 | 前後1ターン、Shiftで5倍、Ctrlで20倍（両方なら両倍率）、任意ターン、先頭・末尾、巻戻し確認 |
 | replay.seek_depth | `<` / `>` | 前後階層、先頭、最深到達階。巻戻しは再初期化・再実行であり任意の状態スナップショットではない |
 | replay.omniscience | Tab | 録画観賞だけの全知表示。通常ゲームの可視性へ流用しない |
-| replay.inspect | Enter、`i`、右クリック、`D`、`F`、`M`、`?`、`~` | 観賞中の周囲・持ち物・知識・feat・履歴・専用help・seed表示。操作後は元の録画へ復帰 |
-| replay.switch_file | `V` / `O` / `N` / `Q` | 別録画、保存からの通常再開、新ゲーム、タイトルへ終了。それぞれの確認・取消・ファイルなしを含む |
+| replay.inspect | `i`、右クリック、`D`、`F`、`M`、`?`、`~`、公開対象のマウス操作 | 観賞中の持ち物・知識・feat・履歴・専用help・seed表示と復帰。観賞の通常待ちでは原作 `executePlaybackInput` にEnterのcaseがなく、`mainInputLoop` もEnterから `showCursor` を呼ばない。Enter単独のカーソル検査開始を合格条件や有効なタッチ候補にしない |
+| replay.switch_file | `V` / `O` / `Q`、到達しない原作case `N` | 別録画、保存からの通常再開、タイトルへ終了。それぞれの確認・取消・ファイルなしを含む。CE 1.15.1の `executePlaybackInput` はswitch前に `stripShiftFromMovementKeystroke` を通すため、大文字Nは移動用の小文字nになり `NEW_GAME_KEY` caseへ届かない。この原作制約を保持し、新ゲームはタイトルへ戻って開始する |
 | replay.display | `\`、`]`、`G` | 観賞設定だけを変え、記録入力列・実際のゲーム結果を変更しない |
 | replay.takeover | `P`、`ENABLE_PLAYBACK_SWITCH`ビルドだけ | 健全な途中録画から再開。通常productionで有効化していない機能は対象外として記録 |
 | replay.integrity | `RNGCheck`、`OOSCheck`、`playbackPanic` | 同版・同variant・同seed・同消費入力で結果一致。不正／不適合／途中切断録画の拒否・OOS表示・安全な復帰 |

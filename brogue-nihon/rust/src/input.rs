@@ -8,6 +8,9 @@ pub enum WaitKind {
     Menu,
     Acknowledge,
     Title,
+    AnyKey,
+    Cursor,
+    Playback,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -45,6 +48,9 @@ impl Wait {
             5 => WaitKind::Menu,
             6 => WaitKind::Acknowledge,
             7 => WaitKind::Title,
+            8 => WaitKind::AnyKey,
+            9 => WaitKind::Cursor,
+            10 => WaitKind::Playback,
             _ => return Err("Unknown Brogue input wait"),
         };
         Ok(Self {
@@ -59,13 +65,8 @@ impl Wait {
             return true;
         }
         match self.kind {
-            WaitKind::Command => true,
+            WaitKind::Command | WaitKind::Cursor | WaitKind::AnyKey | WaitKind::Playback => true,
             WaitKind::Text => [10, 127].contains(&key) || self.keys.contains(&key),
-            WaitKind::Target => {
-                "hjklyubn".chars().any(|c| c as i32 == key)
-                    || [63232, 63233, 63234, 63235, 9, 10, 27].contains(&key)
-                    || self.keys.contains(&key)
-            }
             _ => self.keys.contains(&key),
         }
     }
@@ -91,6 +92,7 @@ pub fn keycode(key: &str, shift: bool) -> Option<i32> {
         "PageUp" => 63276,
         "PageDown" => 63277,
         "F2" => 2000,
+        "PrintScreen" => 44,
         _ => {
             let mut chars = key.chars();
             let c = chars.next()?;
@@ -100,6 +102,18 @@ pub fn keycode(key: &str, shift: bool) -> Option<i32> {
             c as i32
         }
     })
+}
+
+/// Keypad identity is stable when Num Lock turns a digit into Home/End/etc.
+/// Text fields retain their normal editing key semantics in the browser host.
+pub fn physical_keycode(key: &str, code: &str, shift: bool) -> Option<i32> {
+    if let Some(digit) = code.strip_prefix("Numpad").filter(|value| value.len() == 1) {
+        let digit = digit.as_bytes()[0];
+        if digit.is_ascii_digit() {
+            return Some(i32::from(digit));
+        }
+    }
+    keycode(key, shift)
 }
 
 pub type InputEvent = [i32; 5];
@@ -116,6 +130,9 @@ mod tests {
         assert_eq!(keycode("ArrowUp", false), Some(63232));
         assert_eq!(keycode("Tab", true), Some(25));
         assert_eq!(keycode("Shift", true), None);
+        assert_eq!(physical_keycode("End", "Numpad1", false), Some(49));
+        assert_eq!(physical_keycode("Home", "Numpad7", true), Some(55));
+        assert_eq!(keycode("End", false), None);
     }
     #[test]
     fn candidates_reject_out_of_context_keys() {

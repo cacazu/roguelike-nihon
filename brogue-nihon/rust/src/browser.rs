@@ -1,6 +1,7 @@
 //! Browser APIs and lifetime management. No game state is inferred from screen text.
 use crate::{
-    input::{InputEvent, Wait, WaitKind, key_event, keycode},
+    files::{persisted_filename, saved_game_filename, validate_capacity, validate_file_size},
+    input::{InputEvent, Wait, WaitKind, key_event, keycode, physical_keycode},
     presentation::{COLS, Mode, Presentation, ROWS},
 };
 use js_sys::{Array, Function, Int32Array, Object, Promise, Reflect, Uint8Array};
@@ -25,6 +26,10 @@ struct Session {
     event_resolver: Option<Function>,
     pause_resolver: Option<Function>,
     pause_generation: u32,
+    pause_mouse_interrupt: bool,
+    hover_cell: Option<(i32, i32)>,
+    touch_control: bool,
+    touch_shift: bool,
     pending: VecDeque<InputEvent>,
     revision: u32,
     last_saved: String,
@@ -94,16 +99,6 @@ fn storage() -> Result<web_sys::Storage, JsValue> {
         .local_storage()?
         .ok_or_else(|| failure("Browser storage is unavailable"))
 }
-fn safe_filename(name: &str) -> bool {
-    !name.is_empty()
-        && name.len() <= 255
-        && !name.contains(['/', '\\', '\0'])
-        && name != "."
-        && name != ".."
-        && (name.ends_with(".broguesave")
-            || name.ends_with(".broguerec")
-            || name == "BrogueHighScores.txt")
-}
 fn filesystem(game: &JsValue) -> Result<JsValue, JsValue> {
     Reflect::get(game, &JsValue::from_str("FS"))
 }
@@ -114,28 +109,26 @@ fn initialize_files(game: &JsValue) -> Result<(), JsValue> {
     }
     call(&fs, "chdir", &["/brogue".into()])?;
     if let Some(saved) = storage()?.get_item(SAVE_KEY)? {
-        if saved.len() > 32 * 1024 * 1024 {
-            return Err(failure("Saved files exceed the storage limit"));
-        }
+        validate_capacity(saved.len(), 0).map_err(failure)?;
         let envelope: Value = serde_json::from_str(&saved).map_err(failure)?;
         if envelope["version"] != 1 || envelope["game"] != "BrogueCE1.15.1" {
             return Err(failure("Unsupported Brogue save container"));
         }
         let files = envelope["files"]
             .as_array()
-            .filter(|files| files.len() <= 64)
             .ok_or_else(|| failure("Invalid Brogue save files"))?;
+        validate_capacity(saved.len(), files.len()).map_err(failure)?;
         // Validate the whole container before mutating the fresh filesystem.
         let mut validated = Vec::new();
         for file in files {
             let name = file["name"]
                 .as_str()
-                .filter(|name| safe_filename(name))
+                .filter(|name| persisted_filename(name))
                 .ok_or_else(|| failure("Invalid saved filename"))?;
             let values = file["bytes"]
                 .as_array()
-                .filter(|values| values.len() <= 8 * 1024 * 1024)
                 .ok_or_else(|| failure("Invalid saved file size"))?;
+            validate_file_size(values.len()).map_err(failure)?;
             let data: Result<Vec<u8>, _> = values
                 .iter()
                 .map(|value| {
@@ -165,18 +158,18 @@ fn persist_files(session: &mut Session) -> Result<(), JsValue> {
     for name in names
         .iter()
         .filter_map(|name| name.as_string())
-        .filter(|name| safe_filename(name))
+        .filter(|name| persisted_filename(name))
     {
         let data = Uint8Array::new(&call(&fs, "readFile", &[name.clone().into()])?).to_vec();
-        if data.len() > 8 * 1024 * 1024 {
-            return Err(failure("A Brogue save file exceeds the storage limit"));
-        }
+        validate_file_size(data.len()).map_err(failure)?;
         if name.ends_with(".broguesave") {
             saves.push(name.clone());
         }
         files.push(json!({"name":name,"bytes":data}));
     }
+    let file_count = files.len();
     let saved = json!({"version":1,"game":"BrogueCE1.15.1","files":files}).to_string();
+    validate_capacity(saved.len(), file_count).map_err(failure)?;
     if saved != session.last_saved {
         storage()?.set_item(SAVE_KEY, &saved)?;
         session.last_saved = saved;
@@ -203,6 +196,13 @@ fn send(state: &Shared, event: InputEvent) {
     if let Some(resolve) = session.event_resolver.take() {
         let _ = resolve.call1(&JsValue::UNDEFINED, &Int32Array::from(event.as_slice()));
     } else if let Some(resolve) = session.pause_resolver.take() {
+        if event[0] == 5 && !session.pause_mouse_interrupt {
+            session.pause_resolver = Some(resolve);
+            session.pending.retain(|queued| queued[0] != 5);
+            session.pending.push_back(event);
+            return;
+        }
+        session.pending.retain(|queued| queued[0] != 5);
         session.pending.push_back(event);
         let _ = resolve.call1(&JsValue::UNDEFINED, &JsValue::TRUE);
     }
@@ -236,12 +236,13 @@ fn send_text(state: &Shared, text: &str) {
         let _ = resolve.call1(&JsValue::UNDEFINED, &Int32Array::from(event.as_slice()));
     }
 }
-fn send_pointer_click(state: &Shared, col: i32, row: i32, control: bool, shift: bool) {
+fn send_pointer_click(state: &Shared, col: i32, row: i32, control: bool, shift: bool, right: bool) {
     let mut session = state.borrow_mut();
     if session.event_resolver.is_none() && session.pause_resolver.is_none() {
         return;
     }
-    for kind in [2, 1] {
+    session.pending.retain(|event| event[0] != 5);
+    for kind in if right { [3, 4] } else { [2, 1] } {
         session
             .pending
             .push_back([kind, col, row, i32::from(control), i32::from(shift)]);
@@ -258,38 +259,91 @@ fn update_controls(state: &Shared) -> Result<(), JsValue> {
     let wait = &session.wait;
     visible("mobile-summary", wait.kind != WaitKind::Title);
     element("game").set_attribute("data-wait-kind", &format!("{:?}", wait.kind).to_lowercase())?;
-    visible("commands", wait.kind == WaitKind::Command);
+    visible(
+        "commands",
+        matches!(wait.kind, WaitKind::Command | WaitKind::Cursor),
+    );
     visible(
         "directions",
-        matches!(wait.kind, WaitKind::Command | WaitKind::Target),
+        matches!(
+            wait.kind,
+            WaitKind::Command | WaitKind::Target | WaitKind::Cursor
+        ),
     );
     visible("text-entry", wait.kind == WaitKind::Text);
     visible("cancel", wait.cancel);
-    visible("submit", wait.kind == WaitKind::Target);
+    visible("tab-action", wait.allows(9));
+    visible(
+        "modifiers",
+        matches!(
+            wait.kind,
+            WaitKind::Command | WaitKind::Cursor | WaitKind::Target | WaitKind::Playback
+        ),
+    );
+    visible(
+        "submit",
+        matches!(wait.kind, WaitKind::Target | WaitKind::Cursor),
+    );
     element("choices").set_inner_html("");
     if !matches!(
         wait.kind,
-        WaitKind::Command | WaitKind::Text | WaitKind::Target
+        WaitKind::Command | WaitKind::Text | WaitKind::Target | WaitKind::Cursor
     ) {
         for code in &wait.keys {
+            if *code == 27 && wait.cancel {
+                continue;
+            }
+            let playback_label = if wait.kind == WaitKind::Playback {
+                let label = match *code {
+                    32 => "再生 / 停止",
+                    104 => "前のターン",
+                    108 => "次のターン",
+                    107 => "速く",
+                    106 => "遅く",
+                    48 => "ターンへ移動",
+                    60 => "前の階",
+                    62 => "次の階",
+                    105 => "持ち物",
+                    68 => "識別一覧",
+                    70 => "実績",
+                    77 => "履歴",
+                    63 => "再生ヘルプ",
+                    86 => "別の録画",
+                    79 => "ゲーム再開",
+                    81 => "再生を終了",
+                    92 => "色",
+                    93 => "隠密範囲",
+                    71 => "表示切替",
+                    126 => "シード",
+                    80 => "操作を引き継ぐ",
+                    _ => continue,
+                };
+                Some(label)
+            } else {
+                None
+            };
             let button = document().create_element("button")?;
             button.set_attribute("type", "button")?;
             button.set_attribute("data-key", &code.to_string())?;
-            let label = match *code {
-                10 => "Enter".into(),
-                27 => "Esc".into(),
-                32 => "Space".into(),
-                9 => "Tab".into(),
-                2000 => "日本語 / English".into(),
-                63232 => "↑".into(),
-                63233 => "↓".into(),
-                63234 => "←".into(),
-                63235 => "→".into(),
-                63276 => "Page Up".into(),
-                63277 => "Page Down".into(),
-                _ => char::from_u32(*code as u32)
-                    .map(|c| c.to_string())
-                    .unwrap_or_else(|| code.to_string()),
+            let label = if let Some(label) = playback_label {
+                label.into()
+            } else {
+                match *code {
+                    10 => "Enter".into(),
+                    27 => "Esc".into(),
+                    32 => "Space".into(),
+                    9 => "Tab".into(),
+                    2000 => "日本語 / English".into(),
+                    63232 => "↑".into(),
+                    63233 => "↓".into(),
+                    63234 => "←".into(),
+                    63235 => "→".into(),
+                    63276 => "Page Up".into(),
+                    63277 => "Page Down".into(),
+                    _ => char::from_u32(*code as u32)
+                        .map(|c| c.to_string())
+                        .unwrap_or_else(|| code.to_string()),
+                }
             };
             button.set_text_content(Some(&label));
             element("choices").append_child(&button)?;
@@ -314,11 +368,25 @@ fn receive_wait(state: &Shared, descriptor: Int32Array) -> Result<(), JsValue> {
                     report(error);
                 }
             }
-            session.pending.clear();
+            // Native SDL retains the event that interrupted a pause until the
+            // next input owner consumes it. A descriptor change must not drop
+            // that event (or the up half of a validated pointer gesture).
+            if !matches!(
+                wait.kind,
+                WaitKind::Command | WaitKind::Cursor | WaitKind::Target | WaitKind::Playback
+            ) {
+                session.touch_control = false;
+                session.touch_shift = false;
+                element("control-key").set_attribute("aria-pressed", "false")?;
+                element("shift-key").set_attribute("aria-pressed", "false")?;
+            }
             element("text-value")
                 .unchecked_into::<HtmlInputElement>()
                 .set_value("");
-            let modal = !matches!(wait.kind, WaitKind::Command | WaitKind::Target);
+            let modal = !matches!(
+                wait.kind,
+                WaitKind::Command | WaitKind::Target | WaitKind::Cursor | WaitKind::Playback
+            );
             let zoom = if modal {
                 if session.viewport.client_width() < 700 {
                     "10".to_string()
@@ -335,7 +403,7 @@ fn receive_wait(state: &Shared, descriptor: Int32Array) -> Result<(), JsValue> {
             draw(&mut session)?;
             let (x, y) = match wait.kind {
                 WaitKind::Title => (90, 28),
-                WaitKind::Command | WaitKind::Target => {
+                WaitKind::Command | WaitKind::Target | WaitKind::Cursor | WaitKind::Playback => {
                     session.presentation.player_cell().unwrap_or((50, 17))
                 }
                 WaitKind::Item => (84, 8),
@@ -436,6 +504,69 @@ fn set_zoom(session: &mut Session, value: &str) {
     session.presentation.cell_width = width;
     session.presentation.cell_height = (width * 11 / 7).max(width + 1);
 }
+fn focus_game(session: &Session) {
+    let _ = session.canvas.focus();
+}
+fn cycle_mode(session: &mut Session) -> Result<(), JsValue> {
+    let (mode, value) = match session.presentation.mode {
+        Mode::Original => (Mode::Dot, "dot"),
+        Mode::Dot => (Mode::Illustration, "illustration"),
+        Mode::Illustration => (Mode::Original, "original"),
+    };
+    session.presentation.mode = mode;
+    session.selected_mode = value.into();
+    element("display-mode")
+        .unchecked_into::<HtmlSelectElement>()
+        .set_value(value);
+    draw(session)
+}
+fn step_zoom(session: &mut Session, larger: bool) -> Result<(), JsValue> {
+    let current = session.presentation.cell_width;
+    let next = if larger {
+        [10, 14, 18, 24].into_iter().find(|value| *value > current)
+    } else {
+        [24, 18, 14, 10].into_iter().find(|value| *value < current)
+    };
+    let Some(next) = next else {
+        return Ok(());
+    };
+    let value = next.to_string();
+    session.preferred_zoom = value.clone();
+    set_zoom(session, &value);
+    element("zoom")
+        .unchecked_into::<HtmlSelectElement>()
+        .set_value(&value);
+    draw(session)
+}
+fn toggle_fullscreen() -> Result<(), JsValue> {
+    let document = document();
+    if document.fullscreen_element().is_some() {
+        document.exit_fullscreen();
+    } else {
+        document.document_element().unwrap().request_fullscreen()?;
+    }
+    Ok(())
+}
+fn screenshot(session: &Session) -> Result<(), JsValue> {
+    let png = session.canvas.to_data_url_with_type("image/png")?;
+    if !png.starts_with("data:image/png;base64,") {
+        return Err(failure("PNG encoding failed"));
+    }
+    // A data URL is scoped to this detached anchor; no object URL is allocated.
+    let anchor = document().create_element("a")?;
+    anchor.set_attribute("href", &png)?;
+    let stamp = js_sys::Date::new_0()
+        .to_iso_string()
+        .as_string()
+        .unwrap_or_default()
+        .replace([':', '.'], "-");
+    anchor.set_attribute("download", &format!("Brogue-{stamp}.png"))?;
+    document().body().unwrap().append_child(&anchor)?;
+    anchor.unchecked_ref::<HtmlElement>().click();
+    anchor.remove();
+    status("PNGのダウンロードを開始しました");
+    Ok(())
+}
 fn install_host(state: &Shared) -> Result<(), JsValue> {
     let host = Object::new();
     let target = state.clone();
@@ -484,7 +615,7 @@ fn install_host(state: &Shared) -> Result<(), JsValue> {
     event.forget();
     let target = state.clone();
     let pause = Closure::<dyn FnMut(i32, bool, Int32Array) -> Promise>::new(
-        move |milliseconds: i32, _mouse: bool, descriptor: Int32Array| {
+        move |milliseconds: i32, mouse: bool, descriptor: Int32Array| {
             if let Err(error) = receive_wait(&target, descriptor) {
                 return Promise::reject(&error);
             }
@@ -492,7 +623,8 @@ fn install_host(state: &Shared) -> Result<(), JsValue> {
             Promise::new(&mut move |resolve, _reject| {
                 let generation = {
                     let mut session = target.borrow_mut();
-                    if !session.pending.is_empty() {
+                    session.pause_mouse_interrupt = mouse;
+                    if session.pending.iter().any(|event| event[0] != 5 || mouse) {
                         let _ = resolve.call1(&JsValue::UNDEFINED, &JsValue::TRUE);
                         return;
                     }
@@ -527,22 +659,77 @@ fn install_host(state: &Shared) -> Result<(), JsValue> {
         Closure::<dyn FnMut(i32, i32, i32, String, String)>::new(|_event, _a, _b, _one, _two| {});
     Reflect::set(&host, &"notify".into(), notify.as_ref())?;
     notify.forget();
+    let target = state.clone();
+    let capture = Closure::<dyn FnMut() -> bool>::new(move || match screenshot(&target.borrow()) {
+        Ok(()) => true,
+        Err(error) => {
+            report(error);
+            false
+        }
+    });
+    Reflect::set(&host, &"screenshot".into(), capture.as_ref())?;
+    capture.forget();
     Reflect::set(&js_sys::global(), &"brogueHost".into(), &host)?;
     Ok(())
 }
 fn install_inputs(state: &Shared) -> Result<(), JsValue> {
     let target = state.clone();
     listen::<KeyboardEvent>(document().as_ref(), "keydown", move |event| {
-        if event.is_composing() || event.meta_key() || event.alt_key() {
+        if event.is_composing() || event.meta_key() {
             return;
         }
-        if event.target().is_some_and(|target| {
-            target.dyn_ref::<HtmlInputElement>().is_some()
-                || target.dyn_ref::<HtmlSelectElement>().is_some()
-        }) {
+        if event.alt_key() {
+            if event.key() == "Enter" {
+                event.prevent_default();
+                if let Err(error) = toggle_fullscreen() {
+                    report(error);
+                }
+            }
             return;
         }
-        if let Some(code) = keycode(&event.key(), event.shift_key()) {
+        if event
+            .target()
+            .is_some_and(|value| value.dyn_ref::<HtmlInputElement>().is_some())
+        {
+            if event.key() == "Escape" && target.borrow().wait.kind == WaitKind::Text {
+                event.prevent_default();
+                send(&target, key_event(27, false, false));
+                focus_game(&target.borrow());
+            }
+            return;
+        }
+        if event
+            .target()
+            .is_some_and(|target| target.dyn_ref::<HtmlSelectElement>().is_some())
+        {
+            return;
+        }
+        let kind = target.borrow().wait.kind;
+        if matches!(
+            kind,
+            WaitKind::Command | WaitKind::Cursor | WaitKind::Playback
+        ) {
+            if event.key() == "G" {
+                event.prevent_default();
+                if let Err(error) = cycle_mode(&mut target.borrow_mut()) {
+                    report(error);
+                }
+                return;
+            }
+            if matches!(event.key().as_str(), "PageUp" | "PageDown") {
+                event.prevent_default();
+                if let Err(error) = step_zoom(&mut target.borrow_mut(), event.key() == "PageUp") {
+                    report(error);
+                }
+                return;
+            }
+        }
+        let code = if kind == WaitKind::Text {
+            keycode(&event.key(), event.shift_key())
+        } else {
+            physical_keycode(&event.key(), &event.code(), event.shift_key())
+        };
+        if let Some(code) = code {
             event.prevent_default();
             send(
                 &target,
@@ -563,7 +750,20 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
             .get_attribute("data-key")
             .and_then(|code| code.parse::<i32>().ok())
         {
-            send(&target, key_event(code, false, (65..=90).contains(&code)));
+            if code == 71 && target.borrow().wait.kind == WaitKind::Playback {
+                if let Err(error) = cycle_mode(&mut target.borrow_mut()) {
+                    report(error);
+                }
+                return;
+            }
+            let (control, shift) = {
+                let session = target.borrow();
+                (session.touch_control, session.touch_shift)
+            };
+            send(
+                &target,
+                key_event(code, control, shift || (65..=90).contains(&code)),
+            );
         }
     })?;
     let target = state.clone();
@@ -580,6 +780,7 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
         if let Err(error) = result {
             report(error);
         }
+        focus_game(&target.borrow());
     })?;
     let target = state.clone();
     listen::<Event>(element("zoom").as_ref(), "change", move |_event| {
@@ -592,11 +793,31 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
         if let Err(error) = draw(&mut session) {
             report(error);
         }
+        focus_game(&session);
     })?;
     let target = state.clone();
     listen::<Event>(element("center-player").as_ref(), "click", move |_event| {
         center_player(&mut target.borrow_mut())
     })?;
+    listen::<Event>(element("fullscreen").as_ref(), "click", move |_event| {
+        if let Err(error) = toggle_fullscreen() {
+            report(error);
+        }
+    })?;
+    for (id, control) in [("control-key", true), ("shift-key", false)] {
+        let target = state.clone();
+        listen::<Event>(element(id).as_ref(), "click", move |_event| {
+            let mut session = target.borrow_mut();
+            let value = if control {
+                session.touch_control = !session.touch_control;
+                session.touch_control
+            } else {
+                session.touch_shift = !session.touch_shift;
+                session.touch_shift
+            };
+            let _ = element(id).set_attribute("aria-pressed", if value { "true" } else { "false" });
+        })?;
+    }
     let target = state.clone();
     listen::<Event>(element("text-entry").as_ref(), "submit", move |event| {
         event.prevent_default();
@@ -620,11 +841,15 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
             let _ = resolve.call1(&JsValue::UNDEFINED, &Int32Array::from(event.as_slice()));
         }
     })?;
-    let down = Rc::new(RefCell::new(None::<(f64, f64)>));
+    let down = Rc::new(RefCell::new(None::<(f64, f64, i16)>));
     let pointer = down.clone();
     listen::<PointerEvent>(element("game").as_ref(), "pointerdown", move |event| {
-        if event.button() == 0 {
-            *pointer.borrow_mut() = Some((event.client_x() as f64, event.client_y() as f64));
+        if event.button() == 0 || event.button() == 2 {
+            *pointer.borrow_mut() = Some((
+                event.client_x() as f64,
+                event.client_y() as f64,
+                event.button(),
+            ));
         }
     })?;
     let pointer = down.clone();
@@ -632,11 +857,47 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
         pointer.borrow_mut().take();
     })?;
     let target = state.clone();
+    listen::<PointerEvent>(element("game").as_ref(), "pointermove", move |event| {
+        if event.pointer_type() != "mouse" || event.buttons() != 0 {
+            return;
+        }
+        let mut session = target.borrow_mut();
+        let rect = session.canvas.get_bounding_client_rect();
+        let col =
+            ((event.client_x() as f64 - rect.left()) / rect.width() * COLS as f64).floor() as i32;
+        let row =
+            ((event.client_y() as f64 - rect.top()) / rect.height() * ROWS as f64).floor() as i32;
+        if !(0..COLS as i32).contains(&col)
+            || !(0..ROWS as i32).contains(&row)
+            || session.hover_cell == Some((col, row))
+        {
+            return;
+        }
+        session.hover_cell = Some((col, row));
+        drop(session);
+        send(
+            &target,
+            [
+                5,
+                col,
+                row,
+                i32::from(event.ctrl_key()),
+                i32::from(event.shift_key()),
+            ],
+        );
+    })?;
+    let target = state.clone();
+    listen::<PointerEvent>(element("game").as_ref(), "pointerleave", move |_event| {
+        target.borrow_mut().hover_cell = None;
+    })?;
+    let target = state.clone();
     listen::<PointerEvent>(element("game").as_ref(), "pointerup", move |event| {
-        let Some((x, y)) = down.borrow_mut().take() else {
+        let Some((x, y, button)) = down.borrow_mut().take() else {
             return;
         };
-        if (event.client_x() as f64 - x).abs() + (event.client_y() as f64 - y).abs() > 12. {
+        if event.button() != button
+            || (event.client_x() as f64 - x).abs() + (event.client_y() as f64 - y).abs() > 12.
+        {
             return;
         }
         let session = target.borrow();
@@ -647,13 +908,18 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
             ((event.client_y() as f64 - rect.top()) / rect.height() * ROWS as f64).floor() as i32;
         drop(session);
         if (0..COLS as i32).contains(&col) && (0..ROWS as i32).contains(&row) {
-            send_pointer_click(&target, col, row, event.ctrl_key(), event.shift_key());
+            send_pointer_click(
+                &target,
+                col,
+                row,
+                event.ctrl_key(),
+                event.shift_key(),
+                button == 2,
+            );
         }
     })?;
-    let target = state.clone();
     listen::<Event>(element("game").as_ref(), "contextmenu", move |event| {
         event.prevent_default();
-        send(&target, key_event(27, false, false));
     })?;
     let target = state.clone();
     listen::<Event>(
@@ -688,7 +954,7 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
         let name = element("save-files")
             .unchecked_into::<HtmlSelectElement>()
             .value();
-        if !safe_filename(&name) {
+        if !saved_game_filename(&name) {
             return;
         }
         if let Err(error) = persist_files(&mut target.borrow_mut()) {
@@ -724,7 +990,7 @@ fn create_window() -> Result<(), JsValue> {
 <main id="brogue-app"><header><strong>Brogue 日本語</strong>
 <label>表示 <select id="display-mode"><option value="original">オリジナル</option><option value="dot">ドット絵</option><option value="illustration">イラスト</option></select></label>
 <label>倍率 <select id="zoom"><option value="fit">全体</option><option value="10">小</option><option value="14" selected>標準</option><option value="18">大</option><option value="24">特大</option></select></label>
-<button id="center-player" type="button">＠</button><a href="https://github.com/cacazu/roguelike-nihon/tree/codex/brogue-web-common-rust/brogue-nihon" target="_blank" rel="noopener">GitHub</a></header>
+<button id="center-player" type="button">＠</button><button id="fullscreen" type="button">全画面</button><a href="https://github.com/cacazu/roguelike-nihon/tree/codex/brogue-web-common-rust/brogue-nihon" target="_blank" rel="noopener">GitHub</a></header>
 <section id="mobile-summary"><pre id="mobile-messages"></pre><canvas id="mobile-sidebar" aria-label="状態"></canvas></section>
 <div id="viewport"><canvas id="game" tabindex="0" aria-label="Brogue"></canvas></div>
 <div id="controls"><div id="directions" aria-label="方向">
@@ -736,8 +1002,9 @@ fn create_window() -> Result<(), JsValue> {
 <button data-key="114">外す R</button><button data-key="116">投げる T</button><button data-key="100">置く D</button>
 <button data-key="120">探索 X</button><button data-key="122">休息 Z</button><button data-key="62">降りる &gt;</button>
 <button data-key="60">上る &lt;</button><button data-key="83">保存 S</button><button data-key="63">？</button>
-<button data-key="2000">日本語 / English</button></div><div id="choices"></div>
-<div id="actions"><button id="submit" data-key="10">Enter</button><button id="cancel" data-key="27">Esc</button><button data-key="9">Tab</button></div>
+<button data-key="2000">日本語 / English</button><button data-key="44">撮影 ,</button></div><div id="choices"></div>
+<div id="modifiers"><button id="control-key" aria-pressed="false">Ctrl</button><button id="shift-key" aria-pressed="false">Shift</button></div>
+<div id="actions"><button id="submit" data-key="10">Enter</button><button id="cancel" data-key="27">Esc</button><button id="tab-action" data-key="9">Tab</button></div>
 <form id="text-entry" hidden><input id="text-value" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="入力"><button type="submit">Enter</button><button id="erase-text" type="button">全消去</button></form></div></div>
 <footer><select id="save-files" aria-label="保存済みゲーム"></select><button id="load-save">再開</button><span id="status" role="status"></span></footer></main>"#);
     Ok(())
@@ -769,6 +1036,10 @@ pub async fn start_browser(game: JsValue) -> Result<JsValue, JsValue> {
         event_resolver: None,
         pause_resolver: None,
         pause_generation: 0,
+        pause_mouse_interrupt: false,
+        hover_cell: None,
+        touch_control: false,
+        touch_shift: false,
         pending: VecDeque::new(),
         revision: 0,
         last_saved: String::new(),
@@ -803,7 +1074,7 @@ pub async fn start_browser(game: JsValue) -> Result<JsValue, JsValue> {
             .unwrap_or_else(|| "ja".into())
             .into(),
     );
-    if let Some(load) = query.get("load").filter(|name| safe_filename(name)) {
+    if let Some(load) = query.get("load").filter(|name| saved_game_filename(name)) {
         arguments.push(&"-o".into());
         arguments.push(&load.into());
     } else if let Some(seed) = query

@@ -8,7 +8,7 @@
   "source_inputs": [
     {
       "file": "build-web.ps1",
-      "sha256": "36b072dfe7b7e882913ddd2028df215f340d9d6e187f7fe54656527e2d7ac7df"
+      "sha256": "1b81686cb1a6c1aa45faa804128f6db5c33664072348de580e3cbbf3382e0db8"
     },
     {
       "file": "locales/ja/composed.json",
@@ -20,7 +20,7 @@
     },
     {
       "file": "locales/ja/coverage.json",
-      "sha256": "2cb05ba3c915a77165c1825738067b4fb0c84e2e88bf411c52bad24e3fc55c3b"
+      "sha256": "caa7813b395edf5364b3620202bcc0066db29214c8b0ffbaafb1b0ddfe32e9e7"
     },
     {
       "file": "locales/ja/display.json",
@@ -40,7 +40,7 @@
     },
     {
       "file": "locales/ja/ui.json",
-      "sha256": "2a01e87380edf8bc693b2ada2185c09c68277815783173a42eb52a42bee68b1c"
+      "sha256": "d13bea198fa228582c3236e6116a32179b48ca462570b3bb2b7e7c69ebb43054"
     },
     {
       "file": "rust/Cargo.lock",
@@ -52,15 +52,19 @@
     },
     {
       "file": "rust/src/browser.rs",
-      "sha256": "3ff0954cf4bf9f56e8124583061cda77cfdd869f4da1cf95a3d58e05f0a76f5a"
+      "sha256": "f74a1ad243bb9cbef7b51960f5cda45a7b99ab4b43c583bb8d635a38b3fcf582"
+    },
+    {
+      "file": "rust/src/files.rs",
+      "sha256": "b1af84226182a3bd5b1a46876a5278509e9469d180ff2dbaf6e00febd50e3b10"
     },
     {
       "file": "rust/src/input.rs",
-      "sha256": "7418816796232d633806ebb7d4685408b7819c88cdba2e58ae91d577d42b0b29"
+      "sha256": "bdf4944e54037ff12516e5d30a97146eb7a2f134e6adfc1f954e5d03b8c1fd89"
     },
     {
       "file": "rust/src/lib.rs",
-      "sha256": "9fb93ae141190328893f0b1544eaf2ff3cb5c9b285999f4af0959b7ef8a53348"
+      "sha256": "4ddf1902093a85bcbfe4f1f4fa5891aed4d3a60d9d963e927b1bd35dbe2ccd3b"
     },
     {
       "file": "rust/src/presentation.rs",
@@ -72,7 +76,7 @@
     },
     {
       "file": "src/brogue/Buttons.c",
-      "sha256": "a08806deb44a5c5a9d1e06afe274952d0c52d99a9736675cb7c66982e05e284b"
+      "sha256": "c75aeea89347f25f5434b3daa3cf4a55896092ce698a3be6575d3a8c492e9a32"
     },
     {
       "file": "src/brogue/Combat.c",
@@ -104,11 +108,11 @@
     },
     {
       "file": "src/brogue/IO.c",
-      "sha256": "9030545f7db6fb19456e7d586fadfe6e74ae1347b3591b73c7303273185b0c93"
+      "sha256": "6bdacb2dcdb55adb6ae86d55a36eadc2a6f9ba000090a6cd099598bc64036ff6"
     },
     {
       "file": "src/brogue/Items.c",
-      "sha256": "182a8580350d53b42104645f721914a3d6344feb952044184d892274f22d3e9e"
+      "sha256": "645f34feb91f2bb90ca0ae8da255755bc11b88718f5e0ec8f5564f8e2c588595"
     },
     {
       "file": "src/brogue/Light.c",
@@ -128,7 +132,7 @@
     },
     {
       "file": "src/brogue/LocalizedTextData.h",
-      "sha256": "902df57b7d0daef54ff3ed3ac53a408403f0d3bd502e3160742095cda4e1fa08"
+      "sha256": "bb2c0c5e5417f98c58c39c18de49270919152c19827214c3a3c3e84527c0d6bb"
     },
     {
       "file": "src/brogue/MainMenu.c",
@@ -180,11 +184,11 @@
     },
     {
       "file": "src/platform/browser-platform.c",
-      "sha256": "0972015d493a549dd841149ca7d5ef80db4facb0be2d79c61859eebc4a3a85f2"
+      "sha256": "3e945a5de7ae72ba12600e3c7a1c1c2edc1d477669cfc7af576557b29dd2cd19"
     },
     {
       "file": "src/platform/BrowserIO.h",
-      "sha256": "4238adebb55063afe1d54a29a700920bd6f3b5c0cff1bb07e9bc9f322d47ef72"
+      "sha256": "d5e929686476e95fd289de2da938aa6b54e770c3665d3eed946477bb8fb5b526"
     },
     {
       "file": "src/platform/curses-platform.c",
@@ -263,8 +267,28 @@
       "sha256": "55a9bce29f6a4848875fe515e2d52627264b05b1aa432691240f052ed8267e3d"
     },
     {
+      "file": "web/assets/fonts/metadata.json",
+      "sha256": "4e698812619033ccb0a22f08514a1e36d671b7e79756e312364d40c55c664404"
+    },
+    {
+      "file": "web/assets/illustrations.json",
+      "sha256": "c34cef1eef251e2319ff9ffc6ee90c33da797b20e6e3f2a1c605d21a38ac3151"
+    },
+    {
+      "file": "web/host.js",
+      "sha256": "c88fe5ef838d6167b3b4ad6c283c4bbd19b7f42723863634496b730085a34244"
+    },
+    {
+      "file": "web/index.html",
+      "sha256": "51933b5a6c3ee28e42f4b9d19d5ac05f0566c9796080fdfc8efc2be0600aa072"
+    },
+    {
       "file": "web/library.js",
-      "sha256": "fa84be9952ff29178f2aaa51c3bc2f537ce25d0546cfabe60a9ce96613ff7e29"
+      "sha256": "d63aeb14f74bed5c22d3a74bc2a9f5b82ada105dde1fbae325a86dcf66e90178"
+    },
+    {
+      "file": "web/style.css",
+      "sha256": "0d51c13ac8a8bd2227458681349e7130d19a62ca148c009896c7c0c24b4d9b41"
     },
     {
       "file": "../rust-common/Cargo.lock",
@@ -285,6 +309,28 @@
     {
       "file": "../rust-common/src/lib.rs",
       "sha256": "c502841ff4a6c3f5904d1a111d2f9c44730d7bc2f013782245ae6184ac28ed31"
+    }
+  ],
+  "asset_inputs": [
+    {
+      "file": "web/assets/dot-tiles.png",
+      "bytes": 405688,
+      "sha256": "40bb927cf8f1816f16720e7630e1d004974f7e780c9f137258ad017d554ec7af"
+    },
+    {
+      "file": "web/assets/illustrations.png",
+      "bytes": 2636341,
+      "sha256": "f8e057e276590a0cf068c30a23c6560747e7f7c3fb6757b0083919c3bdbe9418"
+    },
+    {
+      "file": "web/assets/fonts/NotoSansJP.ttf",
+      "bytes": 9589900,
+      "sha256": "c2f3b4d463500a2ddcd3849cded1fceeb9fd6d1c32e6cbecd568453ba50fc68f"
+    },
+    {
+      "file": "web/assets/fonts/NotoColorEmoji.ttf",
+      "bytes": 10730124,
+      "sha256": "15671215ab769fdc7162a045d56fd7d7e477c51b04e6b3c761d914d8fdd6cc44"
     }
   ],
   "c_arguments": [
@@ -318,23 +364,23 @@
   "outputs": [
     {
       "file": "game.js",
-      "bytes": 197679,
-      "sha256": "efebf22f964946e7f3fbe2e24201456f911a2def84cfff8f883461f04a5c617a"
+      "bytes": 198099,
+      "sha256": "12e5a91cee6f27ccb34273e482cd3960cd92b6ef4973d78f72a0a2a125d9b0e4"
     },
     {
       "file": "game.wasm",
-      "bytes": 2813855,
-      "sha256": "ee6c68e7e174c9975a5385ee26c4a377c293ecf74639e902fe5c3ed8312d7017"
+      "bytes": 2815191,
+      "sha256": "799313ed9f47fe3f60545acebacd6839e7b6b620f4ef773dce5025f422abc29d"
     },
     {
       "file": "browser-ui.js",
-      "bytes": 42557,
-      "sha256": "e22a4051cb303117e8b7ef7ec9d412d74364f8e472cbcf2095ffca036bb605ef"
+      "bytes": 45854,
+      "sha256": "2734aadcb337cf9cfa5b50ed720d06eda78094eb97481c49f84ad92836020898"
     },
     {
       "file": "browser-ui.wasm",
-      "bytes": 2506694,
-      "sha256": "b254042d5bb5daed5c07a1fa19bc6f825543a664767680318e91d696ea198fc3"
+      "bytes": 2531996,
+      "sha256": "2bdcbbb1a401005084ea94b41b9fd4b93096b9e1afed95257734519717b4cc6c"
     }
   ]
 }

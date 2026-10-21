@@ -47,7 +47,8 @@ try {
     $compilerArguments.Add('-Wl,-Map,' + (Join-Path $temporary ($outputName + '.map')))
     if ($Check) {
         $compilerArguments.Add('-DBROGUE_BROWSER_CHECK')
-        $exports += '_brogue_check_snapshot'
+        $compilerArguments.Add((Join-Path $project 'tests\fixtures.c'))
+        $exports += '_brogue_check_snapshot','_brogue_check_fixture','_brogue_check_features'
     }
     foreach ($flag in @('-std=c11','-O1','-fwrapv','-fno-strict-aliasing','-DBROGUE_BROWSER','-DDATADIR=.','-DBROGUE_EXTRA_VERSION=""','-sASYNCIFY=1','-sASYNCIFY_STACK_SIZE=131072','-sALLOW_MEMORY_GROWTH=1','-sSTACK_SIZE=8388608','-sINITIAL_MEMORY=67108864','-sASSERTIONS=1','-sMODULARIZE=1','-sEXPORT_ES6=1','-sEXPORT_NAME=createBrogue','-sENVIRONMENT=web,worker,node','-sINVOKE_RUN=0','-sEXIT_RUNTIME=0','-sFILESYSTEM=1')) {
         $compilerArguments.Add($flag)
@@ -72,6 +73,8 @@ try {
     $inputFiles = @((Get-ChildItem -LiteralPath (Join-Path $project 'src') -Recurse -File | Where-Object { $_.Extension -in '.c','.h' }).FullName)
     $inputFiles += @((Get-ChildItem -LiteralPath (Join-Path $project 'locales\ja') -File -Filter '*.json').FullName)
     $inputFiles += @((Join-Path $project 'web\library.js'),(Join-Path $project 'build-web.ps1'),(Join-Path $project 'tools\compile-locales.py'),(Join-Path $project 'tools\locale-source.py'))
+    $inputFiles += @('web\index.html','web\host.js','web\style.css','web\assets\illustrations.json','web\assets\fonts\metadata.json') | ForEach-Object { Join-Path $project $_ }
+    if ($Check) { $inputFiles += (Join-Path $project 'tests\fixtures.c') }
     foreach ($rustRoot in @((Join-Path $project 'rust'),(Join-Path (Split-Path -Parent $project) 'rust-common'))) {
         $inputFiles += @((Get-ChildItem -LiteralPath $rustRoot -Recurse -File | Where-Object {
             $_.FullName -notmatch '[\\/]target[\\/]' -and ($_.Extension -eq '.rs' -or $_.Name -in 'Cargo.toml','Cargo.lock')
@@ -90,11 +93,15 @@ try {
         $outputFile = Join-Path $temporary $_
         [ordered]@{file=$_;bytes=(Get-Item -LiteralPath $outputFile).Length;sha256=(Get-FileHash -LiteralPath $outputFile -Algorithm SHA256).Hash.ToLowerInvariant()}
     })
+    $assetRecords = @('web\assets\dot-tiles.png','web\assets\illustrations.png','web\assets\fonts\NotoSansJP.ttf','web\assets\fonts\NotoColorEmoji.ttf') | ForEach-Object {
+        $assetFile = Join-Path $project $_
+        [ordered]@{file=$_.Replace('\','/');bytes=(Get-Item -LiteralPath $assetFile).Length;sha256=(Get-FileHash -LiteralPath $assetFile -Algorithm SHA256).Hash.ToLowerInvariant()}
+    }
     $manifest = [ordered]@{
         format=1; game='brogue-ce-1.15.1'; test_hooks=[bool]$Check; source_eol='LF'
         compiler=((& $python $emcc --version | Select-Object -First 1) -join '')
         rust=((& rustc --version) -join '')
-        source_inputs=$inputRecords; c_arguments=@($compilerArguments | Where-Object { $_ -like '-*' -and $_ -notlike '-IC:*' } | ForEach-Object { $_.Replace($project,'.') }); outputs=$outputRecords
+        source_inputs=$inputRecords; asset_inputs=@($assetRecords); c_arguments=@($compilerArguments | Where-Object { $_ -like '-*' -and $_ -notlike '-IC:*' } | ForEach-Object { $_.Replace($project,'.') }); outputs=$outputRecords
     }
     $manifestName = if ($Check) { 'build-manifest-check.json' } else { 'build-manifest.json' }
     [IO.File]::WriteAllText((Join-Path $temporary $manifestName),(ConvertTo-Json -Depth 8 -InputObject $manifest) + "`n",[Text.UTF8Encoding]::new($false))

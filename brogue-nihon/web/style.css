@@ -2,3 +2,4 @@
 #mobile-summary{display:none}
 @media(max-width:700px){#mobile-summary{display:grid;grid-template-columns:minmax(0,1fr) 124px;gap:6px;padding:5px 6px;max-height:116px;overflow:hidden}#mobile-messages{font:12px/1.45 system-ui,sans-serif;white-space:pre-wrap;overflow:auto;margin:0;max-height:106px}#mobile-sidebar{width:124px;height:auto;max-height:106px;object-fit:contain;object-position:top}#viewport{height:40dvh}#directions{grid-template-columns:repeat(3,44px)}#directions button{min-width:44px}}
 @media(max-height:500px) and (orientation:landscape){#mobile-summary{display:none}#viewport{height:60dvh}}
+#modifiers{display:flex;gap:6px;margin-top:7px}button[aria-pressed="true"]{background:#375b78;border-color:#9bdbff}

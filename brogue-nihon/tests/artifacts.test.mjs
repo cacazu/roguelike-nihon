@@ -18,6 +18,7 @@ test('production manifest matches the shipped modules and current sources',async
     assert.equal(data.length,record.bytes,record.file+' size');assert.equal(digest(data),record.sha256,record.file+' hash');
   }
   assert.ok(manifest.source_inputs.length>50,'Source provenance is missing');
+  for(const required of ['web/index.html','web/host.js','web/style.css','web/assets/illustrations.json','web/assets/fonts/metadata.json'])assert.ok(manifest.source_inputs.some(record=>record.file===required),'Missing Web source: '+required);
   const repository=path.dirname(root.slice(0,-1));
   for(const record of manifest.source_inputs){
     const filename=path.resolve(root,record.file),relative=path.relative(repository,filename);
@@ -25,12 +26,22 @@ test('production manifest matches the shipped modules and current sources',async
     const source=await readFile(filename,'utf8');
     assert.equal(digest(Buffer.from(source.replaceAll('\r\n','\n'),'utf8')),record.sha256,record.file+' source hash');
   }
+  assert.deepEqual(manifest.asset_inputs.map(record=>record.file).sort(),['web/assets/dot-tiles.png','web/assets/illustrations.png','web/assets/fonts/NotoSansJP.ttf','web/assets/fonts/NotoColorEmoji.ttf'].sort());
+  for(const record of manifest.asset_inputs){const data=await readFile(path.join(root,record.file));assert.equal(data.length,record.bytes,record.file+' size');assert.equal(digest(data),record.sha256,record.file+' asset hash');}
 });
 
 test('playable Wasm excludes verification state access',async()=>{
-  const game=await WebAssembly.compile(await readFile(path.join(root,'build/game.wasm')));
+  const bytes=await readFile(path.join(root,'build/game.wasm'));
+  const game=await WebAssembly.compile(bytes);
   const names=WebAssembly.Module.exports(game).map(record=>record.name);
   assert.ok(!names.some(name=>name.includes('brogue_check')));
+  const manifest=JSON.parse(await readFile(path.join(root,'build/build-manifest.json'),'utf8'));
+  assert.ok(!manifest.source_inputs.some(record=>record.file==='tests/fixtures.c'));
+  assert.ok(!manifest.c_arguments.includes('-DBROGUE_BROWSER_CHECK'));
+  const bridge=await readFile(path.join(root,'build/game.js'),'utf8');
+  assert.ok(!bridge.includes('_brogue_check_'));
+  assert.ok(!bytes.includes(Buffer.from('fixture snapshot overflow')));
+  assert.ok(!(await readFile(path.join(root,'web/host.js'),'utf8')).includes('__brogueFeature'));
 });
 
 test('browser notices contain only the selected runtime graph and valid original bodies',async()=>{

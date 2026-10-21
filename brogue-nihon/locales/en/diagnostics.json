@@ -612,8 +612,8 @@
       "sources": [
         {
           "file": "src/platform/browser-platform.c",
-          "line": 122,
-          "end_line": 123,
+          "line": 156,
+          "end_line": 157,
           "symbol": "brogue_check_snapshot",
           "function": "brogue_check_snapshot",
           "scope": "function",
@@ -4474,8 +4474,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 3623,
-          "end_line": 3623,
+          "line": 3640,
+          "end_line": 3640,
           "symbol": "decodeMessageColor",
           "function": "decodeMessageColor",
           "scope": "function",

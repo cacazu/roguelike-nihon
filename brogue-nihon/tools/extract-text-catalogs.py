@@ -376,7 +376,7 @@ def build_catalogs():
         "upstream": {"project": "Brogue: Community Edition", "version": "1.15.1", "url": "https://github.com/tmewett/BrogueCE/releases/tag/v1.15.1"},
         "scope": "All string literals in src/**/*.c and src/**/*.h, including all variants and conditional build branches, except the derived Japanese dictionary header LocalizedTextData.h. Its sources are locales/ja/*.json. Comments and character literals are excluded. Documentation and development scripts are outside this game-source inventory.",
         "excluded_derived_sources": ["src/brogue/LocalizedTextData.h"],
-        "runtime_integration": {"source_inventory": False, "display_dictionary": ["ja/ui.json", "ja/messages.json", "ja/content.json", "ja/help.json", "ja/errors.json", "ja/display.json", "ja/composed.json"], "compilation": "tools/compile-locales.py", "backend": "SDL"},
+        "runtime_integration": {"source_inventory": False, "display_dictionary": ["ja/ui.json", "ja/messages.json", "ja/content.json", "ja/help.json", "ja/errors.json", "ja/display.json", "ja/composed.json"], "compilation": "tools/compile-locales.py", "backend": "SDL and browser"},
         "diagnostic_language": "en",
         "classification": "Source-context classification; display strings can have additional consumers. Verify consumers when integrating each entry.",
         "totals": {"files": len(files), "literal_tokens": literal_count, "logical_strings": logical_count, "entries": sum(c["entries"] for c in counts.values())},

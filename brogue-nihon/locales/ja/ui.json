@@ -1521,6 +1521,26 @@
         }
       ]
     },
+    "io.executekeystroke.png_download_started.a3684ad72641": {
+      "source": " PNG download started ",
+      "pattern": "PNG download started",
+      "text": "PNGのダウンロードを開始した。",
+      "arguments": [],
+      "omitted_arguments": [],
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 2720,
+          "end_line": 2720,
+          "symbol": "executeKeystroke",
+          "function": "executeKeystroke",
+          "scope": "function",
+          "call": "flashTemporaryAlert",
+          "argument_index": 0,
+          "literal_count": 1
+        }
+      ]
+    },
     "io.executekeystroke.quit_and_abandon_this_game_the_save_will_be_dele.fa2270514bed": {
       "source": "Quit and abandon this game? (The save will be deleted.)",
       "pattern": "Quit and abandon this game? (The save will be deleted.)",

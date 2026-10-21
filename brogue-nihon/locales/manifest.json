@@ -21,21 +21,21 @@
       "ja/composed.json"
     ],
     "compilation": "tools/compile-locales.py",
-    "backend": "SDL"
+    "backend": "SDL and browser"
   },
   "diagnostic_language": "en",
   "classification": "Source-context classification; display strings can have additional consumers. Verify consumers when integrating each entry.",
   "totals": {
     "files": 46,
-    "literal_tokens": 4933,
-    "logical_strings": 4905,
-    "entries": 3915
+    "literal_tokens": 4934,
+    "logical_strings": 4906,
+    "entries": 3916
   },
   "catalogs": [
     {
       "file": "en/ui.json",
-      "entries": 294,
-      "occurrences": 312
+      "entries": 295,
+      "occurrences": 313
     },
     {
       "file": "en/messages.json",
@@ -82,7 +82,7 @@
     },
     {
       "file": "src/brogue/Buttons.c",
-      "sha256": "6c62dfdeed6a753210c55d886946eb03cb81dbd9fed6aaf388ff6b182c94cd4f",
+      "sha256": "ae7eb7b10a82324be76c72922d2ac626cfc41037258463891af85a76aeca9a65",
       "literal_tokens": 6,
       "logical_strings": 6
     },
@@ -130,13 +130,13 @@
     },
     {
       "file": "src/brogue/IO.c",
-      "sha256": "597f98b1c1c7870a99ec97e931f9c777c1ce52a8565be8365c798fdae6513482",
-      "literal_tokens": 302,
-      "logical_strings": 302
+      "sha256": "a6a6adab20e8ecc4e7b625cf07b62cd64de76181a9f8d86c82276e1de8aecc4f",
+      "literal_tokens": 303,
+      "logical_strings": 303
     },
     {
       "file": "src/brogue/Items.c",
-      "sha256": "c0d941e5a462bbe0f304158e8bb61ee06d66c053ec5549929fc69ba912a075ac",
+      "sha256": "996e9535590f4a8fb4bef5ec709a943124f4290f1d2734a8567548c0574eef89",
       "literal_tokens": 632,
       "logical_strings": 632
     },
@@ -238,13 +238,13 @@
     },
     {
       "file": "src/platform/browser-platform.c",
-      "sha256": "0972015d493a549dd841149ca7d5ef80db4facb0be2d79c61859eebc4a3a85f2",
+      "sha256": "51a23ffe595d1be3f891c36555595f0487b8b43c95175498611314804f5ef92b",
       "literal_tokens": 5,
       "logical_strings": 4
     },
     {
       "file": "src/platform/BrowserIO.h",
-      "sha256": "4238adebb55063afe1d54a29a700920bd6f3b5c0cff1bb07e9bc9f322d47ef72",
+      "sha256": "d5e929686476e95fd289de2da938aa6b54e770c3665d3eed946477bb8fb5b526",
       "literal_tokens": 0,
       "logical_strings": 0
     },

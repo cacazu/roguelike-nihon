@@ -694,7 +694,11 @@ void mainInputLoop() {
 
             // Get the input!
             rogue.playbackMode = playingBack;
+            BrowserWait previousWait = playingBack ? browserWaitPlayback()
+                : browserWaitBegin(isPosInMap(rogue.cursorLoc) ? BROWSER_CURSOR : BROWSER_COMMAND,
+                                   0, isPosInMap(rogue.cursorLoc));
             doEvent = moveCursor(&targetConfirmed, &canceled, &tabKey, &rogue.cursorLoc, &theEvent, &state, !textDisplayed, rogue.cursorMode, true);
+            browserWaitRestore(previousWait);
             rogue.playbackMode = false;
 
             if (state.buttonChosen == 3) { // Actions menu button.
@@ -2409,6 +2413,7 @@ void nextBrogueEvent(rogueEvent *returnEvent, boolean textInput, boolean colorsD
     returnEvent->eventType = EVENT_ERROR;
 
     if (rogue.playbackMode && !realInputEvenInPlayback) {
+        BrowserWait previousWait = browserWaitPlayback();
         do {
             repeatAgain = false;
             if ((!rogue.playbackFastForward && rogue.playbackBetweenTurns)
@@ -2425,6 +2430,7 @@ void nextBrogueEvent(rogueEvent *returnEvent, boolean textInput, boolean colorsD
         } while ((repeatAgain || rogue.playbackOOS) && !rogue.gameHasEnded);
         rogue.playbackDelayThisTurn = rogue.playbackDelayPerTurn;
         recallEvent(returnEvent);
+        browserWaitRestore(previousWait);
     } else {
         commitDraws();
         if (rogue.creaturesWillFlashThisTurn) {
@@ -2713,7 +2719,11 @@ void executeKeystroke(signed long keystroke, boolean controlKey, boolean shiftKe
             break;
         case PRINTSCREEN_KEY:
             if (takeScreenshot()) {
+#ifdef BROGUE_BROWSER
+                flashTemporaryAlert(" PNG download started ", 2000);
+#else
                 flashTemporaryAlert(" Screenshot saved in save directory ", 2000);
+#endif
             }
             break;
         default:
@@ -2959,8 +2969,10 @@ void waitForAcknowledgment() {
 
 void waitForKeystrokeOrMouseClick() {
     rogueEvent theEvent;
-    BrowserWait previousWait = browserWaitBegin(BROWSER_ACK, 0, true);
+    BrowserWait previousWait = browserWaitBegin(BROWSER_ANY_KEY, 0, true);
     browserWaitKey(ACKNOWLEDGE_KEY);
+    browserWaitKey(RETURN_KEY);
+    browserWaitKey(ESCAPE_KEY);
     do {
         nextBrogueEvent(&theEvent, false, false, false);
     } while (theEvent.eventType != KEYSTROKE && theEvent.eventType != MOUSE_UP);
@@ -3340,6 +3352,10 @@ static short scrollMessageArchive(char messages[MESSAGE_ARCHIVE_LINES][COLS*2], 
     const SavedDisplayBuffer rbuf = saveDisplayBuffer();
 
     exit = false;
+    BrowserWait previousWait = browserWaitBegin(BROWSER_MENU, 0, true);
+    const int archiveKeys[] = {UP_KEY, DOWN_KEY, 'K', 'J', UP_ARROW, DOWN_ARROW,
+                               NUMPAD_8, NUMPAD_2, ACKNOWLEDGE_KEY, ESCAPE_KEY};
+    for (int index = 0; index < (int)(sizeof archiveKeys / sizeof *archiveKeys); index++) browserWaitKey(archiveKeys[index]);
     do {
         if (offset != lastOffset) {
             restoreDisplayBuffer(&rbuf);
@@ -3391,6 +3407,7 @@ static short scrollMessageArchive(char messages[MESSAGE_ARCHIVE_LINES][COLS*2], 
         offset = max(height, min(offset, length));
     } while (!exit);
 
+    browserWaitRestore(previousWait);
     restoreDisplayBuffer(&rbuf);
     return offset;
 }

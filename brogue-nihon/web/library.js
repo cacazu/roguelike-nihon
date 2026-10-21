@@ -21,6 +21,9 @@ mergeInto(LibraryManager.library, {
         HEAP32.slice(wait >> 2, (wait >> 2) + count)));
     });
   },
+  brogue_browser_screenshot: function() {
+    return +globalThis.brogueHost.screenshot();
+  },
   brogue_browser_notify: function(eventId, data1, data2, str1, str2) {
     globalThis.brogueHost.notify(eventId, data1, data2,
       str1 ? UTF8ToString(str1) : '', str2 ? UTF8ToString(str2) : '');

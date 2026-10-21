@@ -1,6 +1,7 @@
 //! Brogue-specific input and presentation. Rules, random state and saves stay in C.
 #[cfg(target_arch = "wasm32")]
 mod browser;
+mod files;
 mod input;
 mod presentation;
 
