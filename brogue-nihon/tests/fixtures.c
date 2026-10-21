@@ -64,7 +64,10 @@ static void featureItem(item *it) {
     featureAppend(",\"kindKnown\":%d,\"called\":%d,\"callTitle\":", table ? table[it->kind].identified : 0,
            table ? table[it->kind].called : 0);
     featureString(table ? table[it->kind].callTitle : "");
-    featureAppend("}");
+    featureAppend(",\"cursed\":%d,\"strengthRequired\":%d,\"timesEnchanted\":%d,"
+           "\"maxChargesKnown\":%d,\"lastUsed\":[%lu,%lu,%lu]}",
+           !!(it->flags & ITEM_CURSED), it->strengthRequired, it->timesEnchanted,
+           !!(it->flags & ITEM_MAX_CHARGES_KNOWN), it->lastUsed[0], it->lastUsed[1], it->lastUsed[2]);
 }
 
 static void featureStatuses(const short *statuses) {
@@ -75,9 +78,10 @@ static void featureStatuses(const short *statuses) {
 
 static void featureCell(pos loc) {
     featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,"
-           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu}",
+           "\"surface\":%d,\"gas\":%d,\"volume\":%d,\"terrainFlags\":%lu,\"rememberedTerrain\":%d}",
            loc.x, loc.y, pmapAt(loc)->flags, pmapAt(loc)->layers[DUNGEON], pmapAt(loc)->layers[LIQUID],
-           pmapAt(loc)->layers[SURFACE], pmapAt(loc)->layers[GAS], pmapAt(loc)->volume, terrainFlags(loc));
+           pmapAt(loc)->layers[SURFACE], pmapAt(loc)->layers[GAS], pmapAt(loc)->volume, terrainFlags(loc),
+           pmapAt(loc)->rememberedTerrain);
 }
 
 const char *brogue_check_features(void) {
@@ -103,13 +107,14 @@ const char *brogue_check_features(void) {
     featureStatuses(player.maxStatus);
     featureAppend(",\"variant\":");
     featureString(gameConst->variantName);
-    featureAppend(",\"mode\":%d,\"kindCounts\":{\"potion\":%d,\"charm\":%d},"
+    featureAppend(",\"mode\":%d,\"kindCounts\":{\"potion\":%d,\"charm\":%d,\"scroll\":%d,\"staff\":%d,\"wand\":%d},"
            "\"movementSpeed\":%d,\"attackSpeed\":%d,\"turnsUntilRegen\":%ld,\"regenPerTurn\":%d,"
            "\"weaknessAmount\":%d,\"bookkeepingFlags\":%lu,\"searching\":%d,"
            "\"automationActive\":%d,\"autoPlayingLevel\":%d,\"disturbed\":%d,"
            "\"trueColorMode\":%d,\"displayStealthRangeMode\":%d,\"cursorMode\":%d,"
            "\"cursor\":{\"x\":%d,\"y\":%d},\"lightRadius\":{\"lower\":%d,\"upper\":%d},",
-           rogue.mode, itemKindCount(POTION, 0), itemKindCount(CHARM, 0), player.movementSpeed, player.attackSpeed,
+           rogue.mode, itemKindCount(POTION, 0), itemKindCount(CHARM, 0), itemKindCount(SCROLL, 0),
+           itemKindCount(STAFF, 0), itemKindCount(WAND, 0), player.movementSpeed, player.attackSpeed,
            player.turnsUntilRegen, player.regenPerTurn, player.weaknessAmount, player.bookkeepingFlags,
            player.status[STATUS_SEARCHING], rogue.automationActive, rogue.autoPlayingLevel, rogue.disturbed,
            rogue.trueColorMode, rogue.displayStealthRangeMode, rogue.cursorMode, rogue.cursorLoc.x, rogue.cursorLoc.y,
@@ -147,15 +152,17 @@ const char *brogue_check_features(void) {
         featureStatuses(monst->status);
         featureAppend(",\"maxStatuses\":");
         featureStatuses(monst->maxStatus);
-        featureAppend("}");
+        featureAppend(",\"poisonAmount\":%d,\"movementSpeed\":%d,\"attackSpeed\":%d,"
+               "\"newPowerCount\":%d,\"totalPowerCount\":%d}", monst->poisonAmount,
+               monst->movementSpeed, monst->attackSpeed, monst->newPowerCount, monst->totalPowerCount);
     }
     featureAppend("],\"cells\":[");
     count = 0;
     if (rogue.gameInProgress) for (int y = 10; y <= 18; y++) for (int x = 36; x <= 44; x++) {
         if (count++) featureAppend(",");
-        featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,\"surface\":%d,\"gas\":%d,\"volume\":%d}",
+        featureAppend("{\"x\":%d,\"y\":%d,\"flags\":%lu,\"dungeon\":%d,\"liquid\":%d,\"surface\":%d,\"gas\":%d,\"volume\":%d,\"rememberedTerrain\":%d}",
                x, y, pmap[x][y].flags, pmap[x][y].layers[DUNGEON], pmap[x][y].layers[LIQUID],
-               pmap[x][y].layers[SURFACE], pmap[x][y].layers[GAS], pmap[x][y].volume);
+               pmap[x][y].layers[SURFACE], pmap[x][y].layers[GAS], pmap[x][y].volume, pmap[x][y].rememberedTerrain);
     }
     featureAppend("],\"remoteCells\":[");
     count = 0;
@@ -349,6 +356,233 @@ static void fixtureConsumable(unsigned short category, short kind, boolean known
     updateEncumbrance();
 }
 
+/* These helpers set initial data only. All effects and costs are subsequently
+ * performed by the unchanged command/item/turn functions through real input. */
+static void fixtureMonsterStatus(creature *monst, int status, short duration) {
+    monst->status[status] = monst->maxStatus[status] = duration;
+}
+
+static creature *fixtureFrozenTarget(short kind, int x, int y) {
+    creature *monst = fixtureTarget(kind, x, y);
+    monst->ticksUntilTurn = 10000;
+    monst->turnsUntilRegen = 100000;
+    monst->regenPerTurn = 0;
+    return monst;
+}
+
+static void fixtureScroll(short kind, boolean known) {
+    player.currentHP = player.info.maxHP;
+    player.turnsUntilRegen = 100000;
+    player.regenPerTurn = 0;
+    item *primary = give(SCROLL, kind, 'a', known);
+    primary->quantity = 2;
+    primary->flags &= ~ITEM_MAGIC_DETECTED;
+    switch (kind) {
+        case SCROLL_ENCHANTING: case SCROLL_IDENTIFY: {
+            item *weapon = give(WEAPON, SWORD, 'b', false);
+            weapon->enchant1 = 0;
+            weapon->timesEnchanted = 0;
+            weapon->flags |= ITEM_CURSED;
+            give(WEAPON, DAGGER, 'c', false);
+            break;
+        }
+        case SCROLL_TELEPORT:
+            fixtureRemoteRoom();
+            fixtureStatus(STATUS_STUCK, 20);
+            pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+            break;
+        case SCROLL_REMOVE_CURSE:
+            give(WEAPON, SWORD, 'b', true)->flags |= ITEM_CURSED;
+            give(ARMOR, LEATHER_ARMOR, 'c', true)->flags |= ITEM_CURSED;
+            give(RING, RING_REGENERATION, 'd', true)->flags |= ITEM_CURSED;
+            fixtureFloorItem(WEAPON, SWORD, 41, 13)->flags |= ITEM_CURSED;
+            break;
+        case SCROLL_RECHARGING:
+            give(STAFF, STAFF_FIRE, 'b', true)->charges = 0;
+            give(CHARM, CHARM_HEALTH, 'c', true)->charges = 100;
+            give(WAND, WAND_SLOW, 'd', true)->charges = 3;
+            break;
+        case SCROLL_PROTECT_ARMOR: case SCROLL_PROTECT_WEAPON: {
+            unsigned short category = kind == SCROLL_PROTECT_ARMOR ? ARMOR : WEAPON;
+            short itemKind = category == ARMOR ? LEATHER_ARMOR : SWORD;
+            item *equipped = give(category, itemKind, 'b', true);
+            equipped->flags = (equipped->flags | ITEM_CURSED | ITEM_EQUIPPED) & ~ITEM_PROTECTED;
+            item *other = give(category, itemKind, 'c', true);
+            other->flags = (other->flags | ITEM_CURSED) & ~ITEM_PROTECTED;
+            if (category == ARMOR) rogue.armor = equipped; else rogue.weapon = equipped;
+            break;
+        }
+        case SCROLL_MAGIC_MAPPING:
+            fixtureRemoteRoom();
+            pmap[41][13].layers[DUNGEON] = SECRET_DOOR;
+            break;
+        case SCROLL_NEGATION: {
+            fixtureStatus(STATUS_HASTED, 20);
+            creature *near = fixtureFrozenTarget(MK_OGRE, 43, 14);
+            fixtureMonsterStatus(near, STATUS_SLOWED, 50);
+            fixtureMonsterStatus(near, STATUS_INVISIBLE, 50);
+            fixtureRemoteRoom();
+            creature *far = fixtureFrozenTarget(MK_RAT, 22, 15);
+            fixtureMonsterStatus(far, STATUS_SLOWED, 50);
+            fixtureMonsterStatus(far, STATUS_INVISIBLE, 50);
+            fixtureFloorItem(WEAPON, SWORD, 41, 13)->flags |= ITEM_CURSED;
+            fixtureFloorItem(WEAPON, SWORD, 22, 14)->flags |= ITEM_CURSED;
+            give(WEAPON, SWORD, 'b', false)->enchant1 = 2;
+            break;
+        }
+        case SCROLL_SHATTERING:
+            pmap[41][13].layers[DUNGEON] = WALL;
+            pmap[39][13].layers[DUNGEON] = WALL;
+            pmap[39][13].flags |= IMPREGNABLE;
+            break;
+        case SCROLL_DISCORD:
+            fixtureFrozenTarget(MK_OGRE, 43, 14);
+            fixtureFrozenTarget(MK_ARROW_TURRET, 43, 16);
+            fixtureRemoteRoom();
+            fixtureFrozenTarget(MK_RAT, 22, 14);
+            break;
+        case SCROLL_AGGRAVATE_MONSTER:
+            fixtureStatus(STATUS_INVISIBLE, 50);
+            fixtureFrozenTarget(MK_GOBLIN, 44, 14)->creatureState = MONSTER_SLEEPING;
+            break;
+        case SCROLL_SANCTUARY: case SCROLL_SUMMON_MONSTER:
+            break; /* empty initial surface / neighbors */
+    }
+    updateEncumbrance();
+}
+
+static creature *fixtureBoltTarget(int x) {
+    creature *monst = fixtureFrozenTarget(MK_OGRE, x, 14);
+    /* No innate immunities, reflection, regeneration or pre-existing statuses
+     * obscure the particular effect. The original monster identity is retained. */
+    monst->info.flags = monst->info.abilityFlags = 0;
+    monst->info.turnsBetweenRegen = 0;
+    monst->info.maxHP = monst->currentHP = 100;
+    memset(monst->status, 0, sizeof monst->status);
+    memset(monst->maxStatus, 0, sizeof monst->maxStatus);
+    monst->poisonAmount = 0;
+    return monst;
+}
+
+static void fixtureBoltAlly(creature *monst) {
+    monst->creatureState = MONSTER_ALLY;
+    monst->leader = &player;
+    monst->bookkeepingFlags |= MB_FOLLOWER;
+}
+
+static void fixtureBoltStairs(void) {
+    /* The original movement and environment rules use these coordinates, not
+     * only the displayed tile. Keep stairs away from targets and walking tests. */
+    pmapAt(rogue.upLoc)->layers[DUNGEON] = FLOOR;
+    pmapAt(rogue.upLoc)->flags &= ~HAS_STAIRS;
+    pmapAt(rogue.downLoc)->layers[DUNGEON] = FLOOR;
+    pmapAt(rogue.downLoc)->flags &= ~HAS_STAIRS;
+    rogue.upLoc = (pos){37, 11};
+    rogue.downLoc = (pos){37, 17};
+    pmapAt(rogue.upLoc)->layers[DUNGEON] = UP_STAIRS;
+    pmapAt(rogue.upLoc)->flags |= HAS_STAIRS;
+    pmapAt(rogue.downLoc)->layers[DUNGEON] = DOWN_STAIRS;
+    pmapAt(rogue.downLoc)->flags |= HAS_STAIRS;
+    levels[rogue.depthLevel - 1].upStairsLoc = rogue.upLoc;
+    levels[rogue.depthLevel - 1].downStairsLoc = rogue.downLoc;
+}
+
+static void fixtureBolt(unsigned short category, short kind, int condition) {
+    fixtureBoltStairs();
+    player.info.maxHP = player.currentHP = 100;
+    player.turnsUntilRegen = 100000;
+    player.regenPerTurn = 0;
+    item *primary = give(category, kind, 'a', condition != 2);
+    /* A known kind can still have an unidentified instance/unknown charges. */
+    tableForItemCategory(category)[kind].identified = true;
+    primary->charges = condition == 1 || condition == 2 ? 0 : category == STAFF ? 2 : 3;
+    primary->flags &= ~ITEM_MAX_CHARGES_KNOWN;
+    memset(primary->lastUsed, 0, sizeof primary->lastUsed);
+    if (category == STAFF) primary->enchant2 = 1000;
+
+    const boolean primarySetup = condition <= 2;
+    const boolean unsuitable = condition == 3;
+    const boolean reflection = condition == 4;
+    creature *target = NULL;
+    boolean hasTarget = true;
+    if (category == STAFF) {
+        if (primarySetup && (kind == STAFF_TUNNELING || kind == STAFF_BLINKING || kind == STAFF_CONJURATION)) hasTarget = false;
+        if (unsuitable && (kind == STAFF_TUNNELING || kind == STAFF_BLINKING
+                           || kind == STAFF_OBSTRUCTION || kind == STAFF_CONJURATION)) hasTarget = false;
+    }
+    if (hasTarget) target = fixtureBoltTarget(43);
+
+    if (category == STAFF && primarySetup) {
+        if (kind == STAFF_LIGHTNING || kind == STAFF_FIRE) fixtureBoltTarget(42);
+        if (kind == STAFF_TUNNELING) for (int x = 41; x <= 43; x++) pmap[x][14].layers[DUNGEON] = WALL;
+        if (kind == STAFF_BLINKING) {
+            for (int x = 41; x <= 47; x++) pmap[x][14].layers[DUNGEON] = FLOOR;
+            fixtureStatus(STATUS_STUCK, 20);
+        }
+        if (kind == STAFF_HEALING) {
+            target->currentHP = 20;
+            fixtureMonsterStatus(target, STATUS_CONFUSED, 20);
+        }
+        if (kind == STAFF_HASTE) {
+            fixtureMonsterStatus(target, STATUS_SLOWED, 20);
+            target->movementSpeed = target->info.movementSpeed * 2;
+            target->attackSpeed = target->info.attackSpeed * 2;
+        }
+    }
+    if (category == WAND && primarySetup) {
+        if (kind == WAND_TELEPORT || kind == WAND_BECKONING) fixtureMonsterStatus(target, STATUS_STUCK, 20);
+        if (kind == WAND_TELEPORT) fixtureRemoteRoom();
+        if (kind == WAND_SLOW || kind == WAND_NEGATION) {
+            fixtureMonsterStatus(target, STATUS_HASTED, 20);
+            target->movementSpeed = target->info.movementSpeed / 2;
+            target->attackSpeed = target->info.attackSpeed / 2;
+        }
+        if (kind == WAND_NEGATION) {
+            fixtureMonsterStatus(target, STATUS_INVISIBLE, 20);
+            target->info.flags |= MONST_IMMUNE_TO_FIRE;
+        }
+        if (kind == WAND_DOMINATION) {
+            target->currentHP = 1;
+            fixtureMonsterStatus(target, STATUS_DISCORDANT, 20);
+        }
+        if (kind == WAND_PLENTY || kind == WAND_INVISIBILITY || kind == WAND_EMPOWERMENT) fixtureBoltAlly(target);
+        if (kind == WAND_PLENTY) target->currentHP = 9;
+        if (kind == WAND_EMPOWERMENT) {
+            target->currentHP = 20;
+            fixtureMonsterStatus(target, STATUS_POISONED, 20);
+            target->poisonAmount = 1;
+        }
+    }
+    if (unsuitable) {
+        if (category == STAFF) {
+            if (kind == STAFF_LIGHTNING) target->info.flags |= MONST_INVULNERABLE;
+            if (kind == STAFF_FIRE) fixtureMonsterStatus(target, STATUS_IMMUNE_TO_FIRE, 20);
+            if (kind == STAFF_POISON || kind == STAFF_ENTRANCEMENT || kind == STAFF_DISCORD || kind == STAFF_HASTE) target->info.flags |= MONST_INANIMATE;
+            if (kind == STAFF_TUNNELING || kind == STAFF_BLINKING) pmap[41][14].layers[DUNGEON] = WALL;
+            if (kind == STAFF_TUNNELING) pmap[41][14].flags |= IMPREGNABLE;
+            if (kind == STAFF_OBSTRUCTION || kind == STAFF_CONJURATION) pmap[43][14].layers[DUNGEON] = WALL;
+            if (kind == STAFF_PROTECTION) fixtureMonsterStatus(target, STATUS_SHIELDED, 500);
+        } else {
+            if (kind == WAND_TELEPORT || kind == WAND_BECKONING) target->info.flags |= MONST_IMMOBILE;
+            else if (kind != WAND_NEGATION) target->info.flags |= MONST_INANIMATE;
+        }
+    }
+    if (reflection) {
+        target->info.abilityFlags = MA_REFLECT_100;
+        if (category == STAFF) {
+            if (kind == STAFF_BLINKING) fixtureStatus(STATUS_STUCK, 20);
+            if (kind == STAFF_HEALING) player.currentHP = 20;
+            if (kind == STAFF_HASTE) fixtureStatus(STATUS_SLOWED, 20);
+        } else {
+            if (kind == WAND_TELEPORT) { fixtureRemoteRoom(); fixtureStatus(STATUS_STUCK, 20); }
+            if (kind == WAND_SLOW || kind == WAND_NEGATION) fixtureStatus(STATUS_HASTED, 20);
+            if (kind == WAND_NEGATION) fixtureStatus(STATUS_INVISIBLE, 20);
+            if (kind == WAND_PLENTY) player.currentHP = 9;
+        }
+    }
+    updateEncumbrance();
+}
+
 int brogue_check_fixture(int scene) {
     if (preparedScene || !gameConst || brogue_check_wait_kind() != BROWSER_COMMAND
         || rogue.seed != 42 || rogue.playerTurnNumber != 0 || rogue.playbackMode || rogue.cursorMode
@@ -357,19 +591,38 @@ int brogue_check_fixture(int scene) {
     if (!initialCommandDisplay) return -1;
 #endif
     unsigned short category = 0;
-    int group = scene / 1000 * 1000, kind = scene % 1000;
+    int group = scene / 1000 * 1000, kind = scene % 1000, condition = 0;
     if (scene >= 1000) {
         if (group == CHECK_POTION_UNKNOWN || group == CHECK_POTION_KNOWN) category = POTION;
         else if (group == CHECK_CHARM_READY || group == CHECK_CHARM_COOLDOWN) category = CHARM;
+        else if (group == CHECK_SCROLL_UNKNOWN || group == CHECK_SCROLL_KNOWN) category = SCROLL;
+        else if (group == CHECK_STAFF_READY || group == CHECK_WAND_READY) {
+            category = group == CHECK_STAFF_READY ? STAFF : WAND;
+            condition = kind / 100;
+            kind %= 100;
+            if (condition > 4 && !(category == WAND && condition == 5 && kind == WAND_DOMINATION)) return -1;
+        }
         else return -1;
-        const int enumCount = category == POTION ? POTION_LICHEN + 1 : CHARM_NEGATION + 1;
+        const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
+            : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0)) return -1;
-    } else if (scene < 1 || scene > 11) return -1;
+    } else if (scene < 1 || scene > CHECK_TARGET_CYCLE) return -1;
     fixtureRoom();
     preparedScene = scene;
-    if (category) fixtureConsumable(category, kind, group == CHECK_POTION_KNOWN || category == CHARM, group == CHECK_CHARM_COOLDOWN);
+    if (category == POTION || category == CHARM) fixtureConsumable(category, kind, group == CHECK_POTION_KNOWN || category == CHARM, group == CHECK_CHARM_COOLDOWN);
+    else if (category == SCROLL) fixtureScroll(kind, group == CHECK_SCROLL_KNOWN);
+    else if (category == STAFF || category == WAND) fixtureBolt(category, kind, condition);
     else if (scene <= 8) fixtureInventory();
     switch (scene) {
+        case CHECK_TARGET_CYCLE:
+            /* Three independently targetable enemies distinguish forward and
+             * reverse order. Keep the bolt-effect scenes' collinear targets. */
+            fixtureBoltStairs();
+            give(STAFF, STAFF_LIGHTNING, 'a', true);
+            fixtureFrozenTarget(MK_OGRE, 42, 14);
+            fixtureFrozenTarget(MK_OGRE, 43, 16);
+            fixtureFrozenTarget(MK_OGRE, 38, 12);
+            break;
         case 2: fixtureTarget(MK_OGRE, 43, 14); break;
         case 3:
             pmap[40][13].layers[DUNGEON] = WALL;

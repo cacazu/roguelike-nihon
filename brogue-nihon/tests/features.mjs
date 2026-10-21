@@ -219,10 +219,14 @@ try{
   results.result=results.cases.every(c=>c.result==='pass')?'pass':'fail';
 }catch(error){results.result='fail';results.fatal={message:error.message,stack:error.stack};console.error(error.stack);}
 finally{
-  await browser?.close();if(server)await new Promise(resolve=>server.close(resolve));await mkdir(output,{recursive:true});await writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2)+'\n');
+  const cleanupErrors=[];
+  try{await browser?.close();}catch(error){cleanupErrors.push(error.message);}
+  try{if(server)await new Promise((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}catch(error){cleanupErrors.push(error.message);}
   for(const[k,v]of Object.entries(oldTemp||{}))if(v===undefined)delete process.env[k];else process.env[k]=v;
-  if(temporary){assert.equal(path.dirname(await realpath(temporary)),await realpath(output));assert.ok(path.basename(temporary).startsWith('runtime-'));
-  await rm(temporary,{recursive:true,force:true,maxRetries:10,retryDelay:100});}
+  try{if(temporary){assert.equal(path.dirname(await realpath(temporary)),await realpath(output));assert.ok(path.basename(temporary).startsWith('runtime-'));
+  await rm(temporary,{recursive:true,force:true,maxRetries:10,retryDelay:100});}}catch(error){cleanupErrors.push(error.message);}
+  if(cleanupErrors.length){results.result='fail';results.cleanup_errors=cleanupErrors;}
+  await mkdir(output,{recursive:true});await writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2)+'\n');
 }
 if(results.result!=='pass')throw Error('Brogue fixture verification failed: '+path.join(output,'results.json'));
 console.log(`Brogue CHECK features: ${results.cases.length} scenarios; ${output}`);

@@ -1,7 +1,7 @@
 //! Browser APIs and lifetime management. No game state is inferred from screen text.
 use crate::{
     files::{persisted_filename, saved_game_filename, validate_capacity, validate_file_size},
-    input::{InputEvent, Wait, WaitKind, key_event, keycode, physical_keycode},
+    input::{InputEvent, Wait, WaitKind, key_event, keycode, physical_keycode, touch_key_event},
     presentation::{COLS, Mode, Presentation, ROWS},
 };
 use js_sys::{Array, Function, Int32Array, Object, Promise, Reflect, Uint8Array};
@@ -407,6 +407,9 @@ fn receive_wait(state: &Shared, descriptor: Int32Array) -> Result<(), JsValue> {
                     session.presentation.player_cell().unwrap_or((50, 17))
                 }
                 WaitKind::Item => (84, 8),
+                // Native confirm() draws a COLS/3-wide textbox at COLS/3.
+                // Center that box so its first words fit a narrow viewport.
+                WaitKind::Confirm => (COLS / 2, ROWS / 2),
                 _ => (55, 17),
             };
             session.viewport.set_scroll_left(
@@ -756,14 +759,15 @@ fn install_inputs(state: &Shared) -> Result<(), JsValue> {
                 }
                 return;
             }
-            let (control, shift) = {
+            let (kind, control, shift) = {
                 let session = target.borrow();
-                (session.touch_control, session.touch_shift)
+                (
+                    session.wait.kind,
+                    session.touch_control,
+                    session.touch_shift,
+                )
             };
-            send(
-                &target,
-                key_event(code, control, shift || (65..=90).contains(&code)),
-            );
+            send(&target, touch_key_event(kind, code, control, shift));
         }
     })?;
     let target = state.clone();

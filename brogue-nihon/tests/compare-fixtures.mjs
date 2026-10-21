@@ -1,6 +1,6 @@
 // Replay actual browser-consumed inputs with the same initial fixture against
 // hash-pinned, unmodified upstream C. Independent effect assertions live in the
-// consumables suite; agreement alone is not an oracle for correct game rules.
+// each browser suite; agreement alone is not an oracle for correct game rules.
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -10,7 +10,9 @@ import {fileURLToPath} from 'node:url';
 import {generateDataInventory,validateDataSnapshot} from './inventory-features.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
-const output=path.join(root,'.local/feature-verification/fixture-compare');
+const comparisonName=process.env.BROGUE_COMPARE_NAME||'';
+const validComparisonName=comparisonName===''||/^[a-z][a-z0-9-]{0,39}$/.test(comparisonName);
+const output=path.join(root,'.local/feature-verification',validComparisonName?'fixture-compare'+(comparisonName?'-'+comparisonName:''):'fixture-compare-invalid-name');
 const source=process.env.BROGUE_ORIGINAL_SOURCE;
 const input=process.env.BROGUE_FIXTURE_RESULTS||path.join(root,'.local/feature-verification/consumables/results.json');
 const requestedDomains=(process.env.BROGUE_COMPARE_DOMAINS||'potionKind,charmKind').split(',');
@@ -25,6 +27,7 @@ const result={run_id:new Date().toISOString(),result:'fail',checks:[],cases:[],e
 let temporary;
 await mkdir(output,{recursive:true});
 try{
+  assert.ok(validComparisonName,'BROGUE_COMPARE_NAME must be a short lowercase name without path separators.');
   assert.ok(source,'Set BROGUE_ORIGINAL_SOURCE to the verified official v1.15.1 source tree.');
   const pin=JSON.parse(await readFile(path.join(root,'tests/upstream-1.15.1.json'),'utf8'));
   const actualSources={};

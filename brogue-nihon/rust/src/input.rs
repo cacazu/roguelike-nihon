@@ -121,6 +121,30 @@ pub fn key_event(key: i32, control: bool, shift: bool) -> InputEvent {
     [0, key, 0, i32::from(control), i32::from(shift)]
 }
 
+/// Command buttons represent keyboard letters. Native SDL delivers the shifted
+/// letter itself (e.g. T for rethrow), in addition to its modifier flags. Modal
+/// buttons instead represent the literal candidates published by their owner.
+pub fn touch_key_event(kind: WaitKind, key: i32, control: bool, shift: bool) -> InputEvent {
+    // Match the existing physical-key path's native Shift-Tab alias. The
+    // original cursor accepts both aliases; playback distinguishes them.
+    let key = if shift
+        && key == 9
+        && matches!(
+            kind,
+            WaitKind::Command | WaitKind::Cursor | WaitKind::Target | WaitKind::Playback
+        ) {
+        25
+    } else if matches!(kind, WaitKind::Command | WaitKind::Cursor)
+        && shift
+        && (97..=122).contains(&key)
+    {
+        key - 32
+    } else {
+        key
+    };
+    key_event(key, control, shift || (65..=90).contains(&key))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -151,5 +175,97 @@ mod tests {
         assert!(text.allows(127));
         assert!(!text.allows('日' as i32));
         assert!(!text.allows('a' as i32));
+    }
+    #[test]
+    fn touch_shift_uses_original_command_letters_and_preserves_run_modifiers() {
+        for kind in [WaitKind::Command, WaitKind::Cursor] {
+            // Native dispatch distinguishes rethrow, save, auto-rest,
+            // discoveries, feats and relabel from their lowercase commands.
+            for (plain, command) in [
+                ('t', 'T'),
+                ('s', 'S'),
+                ('z', 'Z'),
+                ('d', 'D'),
+                ('f', 'F'),
+                ('r', 'R'),
+            ] {
+                assert_eq!(
+                    touch_key_event(kind, plain as i32, false, true),
+                    [0, command as i32, 0, 0, 1]
+                );
+            }
+            // C strips the uppercase movement alias, then uses either modifier
+            // to run. Ctrl+Shift+S remains Save, rather than Ctrl+s search.
+            assert_eq!(
+                touch_key_event(kind, 'h' as i32, true, true),
+                [0, 72, 0, 1, 1]
+            );
+            assert_eq!(
+                touch_key_event(kind, 's' as i32, true, true),
+                [0, 83, 0, 1, 1]
+            );
+            assert_eq!(
+                touch_key_event(kind, 's' as i32, true, false),
+                [0, 115, 0, 1, 0]
+            );
+            assert_eq!(
+                touch_key_event(kind, 'T' as i32, false, false),
+                [0, 84, 0, 0, 1]
+            );
+            for key in [46, 54, 60, 62, 63232, 2000] {
+                assert_eq!(touch_key_event(kind, key, true, true), [0, key, 0, 1, 1]);
+            }
+        }
+    }
+    #[test]
+    fn touch_shift_tab_matches_physical_identity_without_rewriting_modal_candidates() {
+        for kind in [
+            WaitKind::Command,
+            WaitKind::Cursor,
+            WaitKind::Target,
+            WaitKind::Playback,
+        ] {
+            assert_eq!(touch_key_event(kind, 9, false, false), [0, 9, 0, 0, 0]);
+            assert_eq!(touch_key_event(kind, 9, true, true), [0, 25, 0, 1, 1]);
+            assert_eq!(touch_key_event(kind, 25, false, true), [0, 25, 0, 0, 1]);
+        }
+        for kind in [
+            WaitKind::Item,
+            WaitKind::Confirm,
+            WaitKind::Text,
+            WaitKind::Menu,
+            WaitKind::Acknowledge,
+            WaitKind::Title,
+            WaitKind::AnyKey,
+        ] {
+            assert_eq!(touch_key_event(kind, 9, false, true), [0, 9, 0, 0, 1]);
+        }
+    }
+    #[test]
+    fn touch_modal_candidates_keep_their_literal_letter() {
+        for kind in [
+            WaitKind::Target,
+            WaitKind::Item,
+            WaitKind::Confirm,
+            WaitKind::Text,
+            WaitKind::Menu,
+            WaitKind::Acknowledge,
+            WaitKind::Title,
+            WaitKind::AnyKey,
+            WaitKind::Playback,
+        ] {
+            assert_eq!(
+                touch_key_event(kind, 't' as i32, true, true),
+                [0, 116, 0, 1, 1]
+            );
+            assert_eq!(
+                touch_key_event(kind, 'a' as i32, false, false),
+                [0, 97, 0, 0, 0]
+            );
+            assert_eq!(
+                touch_key_event(kind, 'R' as i32, false, false),
+                [0, 82, 0, 0, 1]
+            );
+        }
     }
 }

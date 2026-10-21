@@ -52,7 +52,7 @@
     },
     {
       "file": "rust/src/browser.rs",
-      "sha256": "61018b10e7ccb450bfc7acd5e0b490dc5b1873b39accc8f368b18e196d481bc2"
+      "sha256": "71eabcd6d199749b05a915ec211a28bdc4fdef5206e44bb2131883f1fe4d374d"
     },
     {
       "file": "rust/src/files.rs",
@@ -60,7 +60,7 @@
     },
     {
       "file": "rust/src/input.rs",
-      "sha256": "bdf4944e54037ff12516e5d30a97146eb7a2f134e6adfc1f954e5d03b8c1fd89"
+      "sha256": "a1fe51b28eb96320e5e71614373b78e642cd652d8ce1eb6df68e65d6f1215197"
     },
     {
       "file": "rust/src/lib.rs",
@@ -379,8 +379,8 @@
     },
     {
       "file": "browser-ui.wasm",
-      "bytes": 2532124,
-      "sha256": "64499ca8f4873b0a94a28f03b7dd65d1f0a7089ff79cf22efc371185e6e28c00"
+      "bytes": 2532315,
+      "sha256": "111e64ba034a2d046ec3f065f309407252a348b266b6e6ddf33c1bf88534c33a"
     }
   ]
 }

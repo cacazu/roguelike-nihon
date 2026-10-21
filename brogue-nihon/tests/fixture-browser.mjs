@@ -80,7 +80,7 @@ export class FixturePage {
   async trace(){return this.page.evaluate(()=>({native_trace:__brogueFixture.native_trace,observations:__brogueFixture.observations,captures:__brogueFixture.captures}));}
 }
 
-export async function runFixtureSuite({name,cases,filter=process.env.BROGUE_CONSUMABLES}){
+export async function runFixtureSuite({name,createCases,filter=process.env.BROGUE_CONSUMABLES}){
   const output=path.join(root,'.local/feature-verification',name);
   const run_id=new Date().toISOString(),runFolder='run-'+run_id.replaceAll(/[:.]/g,'-');
   const result={run_id,result:'fail',mode:'CHECK initial scenes; not a normal playthrough',cases:[],notSelected:[],artifacts:[],native_comparison_excluded_fields:['ready'],native_control_comparison:'control_runs are browser evidence; native comparator covers primary runs only'};
@@ -91,6 +91,12 @@ export async function runFixtureSuite({name,cases,filter=process.env.BROGUE_CONS
     try{const old=await readFile(path.join(output,'results.json'));const prior=JSON.parse(old);await mkdir(path.join(output,'history'),{recursive:true});await writeFile(path.join(output,'history',(prior.run_id||'legacy').replaceAll(/[:.]/g,'-')+'-'+hash(old).slice(0,8)+'.json'),old);}catch(error){if(error.code!=='ENOENT')throw error;}
     await writeFile(path.join(output,'results.json'),JSON.stringify(result,null,2)+'\n');
     if(sceneGroupError)throw sceneGroupError;
+    assert.equal(typeof createCases,'function','A case factory is required');
+    const cases=await createCases();
+    assert.ok(Array.isArray(cases)&&cases.length>0,'Case factory must return a nonempty array');
+    assert.equal(new Set(cases.map(test=>test.id)).size,cases.length,'Case IDs must be unique');
+    for(const test of cases)assert.ok(Number.isSafeInteger(test.fixture_id)&&test.fixture_id>0,'Invalid or unavailable fixture ID for '+test.id);
+    if(selected)assert.ok(cases.some(test=>selected.includes(test.id)),'No known fixture cases selected');
     const {chromium}=require(process.env.BROGUE_PLAYWRIGHT||'playwright');
     const manifestBytes=await readFile(path.join(root,'build/build-manifest-check.json'));
     const manifest=JSON.parse(manifestBytes),production=JSON.parse(await readFile(path.join(root,'build/build-manifest.json'),'utf8'));
@@ -106,9 +112,6 @@ export async function runFixtureSuite({name,cases,filter=process.env.BROGUE_CONS
     assert.equal(artifacts.length,4);
     for(const artifact of artifacts){assert.equal(hash(await readFile(path.join(root,'build',artifact.file))),artifact.sha256,artifact.file+' changed');result.artifacts.push({file:'build/'+artifact.file,sha256:artifact.sha256});}
     result.provenance={source_manifest_sha256:hash(manifestBytes),artifacts:Object.fromEntries(artifacts.map(record=>[record.file,record.sha256]))};
-    assert.equal(new Set(cases.map(test=>test.id)).size,cases.length,'Case IDs must be unique');
-    for(const test of cases)assert.ok(Number.isSafeInteger(test.fixture_id)&&test.fixture_id>0,'Invalid or unavailable fixture ID for '+test.id);
-    if(selected)assert.ok(cases.some(test=>selected.includes(test.id)),'No known consumable cases selected');
     checkModule=await readFile(path.join(root,'build/game-check.js'),'utf8');host=await readFile(path.join(root,'web/host.js'),'utf8');assert.ok(host.includes(marker));
     server=createPreviewServer({root});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}/`;
     temporary=await mkdtemp(path.join(output,'runtime-'));oldTemp={TEMP:process.env.TEMP,TMP:process.env.TMP};process.env.TEMP=temporary;process.env.TMP=temporary;
@@ -127,7 +130,12 @@ export async function runFixtureSuite({name,cases,filter=process.env.BROGUE_CONS
           await page.waitForFunction(()=>globalThis.__brogueFixture?.waiting&&document.querySelector('#game').dataset.waitKind==='command',null,{timeout:60000});
           const d=new FixturePage(page,entry,prefix),startup=await d.state(),wait=await d.wait();
           assert.equal(await page.evaluate(()=>__brogueFixture.prestartFeaturesError),'CHECK game has not started');assert.equal(await page.evaluate(()=>__brogueFixture.prestartReject),-1);assert.equal(startup.fixture,0);assert.equal(startup.seed,'42');assert.equal(startup.turn,0);assert.equal(startup.ready,1);assert.equal(wait.serial,1);
-          for(const rejected of[-1,99999,1000+startup.kindCounts.potion,3000+startup.kindCounts.charm]){
+          for(const rejected of[-1,99999,
+            sceneGroups.POTION_UNKNOWN+startup.kindCounts.potion,sceneGroups.CHARM_READY+startup.kindCounts.charm,
+            sceneGroups.SCROLL_UNKNOWN+startup.kindCounts.scroll,sceneGroups.SCROLL_KNOWN+startup.kindCounts.scroll,
+            sceneGroups.STAFF_READY+startup.kindCounts.staff,sceneGroups.WAND_READY+startup.kindCounts.wand,
+            sceneGroups.STAFF_READY+500,sceneGroups.STAFF_READY+900,
+            sceneGroups.WAND_READY+500,sceneGroups.WAND_READY+505,sceneGroups.WAND_READY+900]){
             assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),rejected),-1,'Unknown/unsupported kind must reject');
             assert.deepEqual(await d.state(),startup,'Rejected kind changed preparation/RNG');
           }

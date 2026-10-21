@@ -122,6 +122,7 @@ async function charmEffect(d,kind,control,b){
   const charged=primary(await d.state()).charges;await rest(d);assert.ok(primary(await d.state()).charges<charged);
 }
 
+export function createConsumableCases(){
 const cases=[];
 for(const input_path of['pc-keyboard','touch']){
   for(const[category,names,base]of[['potion',potionNames,sceneGroups.POTION_UNKNOWN],['charm',charmNames,sceneGroups.CHARM_READY]]){
@@ -149,4 +150,6 @@ for(const input_path of['pc-keyboard','touch']){
     execute:async d=>{const before=await d.state();await d.input('a');assert.equal((await d.wait()).kind,'item');await d.input('Escape');await d.settle();assert.deepEqual(physical(await d.state()),physical(before));},
   });
 }
-await runFixtureSuite({name:'consumables',cases});
+return cases;
+}
+await runFixtureSuite({name:'consumables',createCases:createConsumableCases});

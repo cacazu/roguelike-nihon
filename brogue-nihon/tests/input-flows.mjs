@@ -270,7 +270,7 @@ try{
     await page.locator('#control-key').tap();assert.equal(await page.locator('#control-key').getAttribute('aria-pressed'),'true');
     assert.deepEqual((await input(page,()=>page.locator('#directions button[data-key="108"]').tap())).at(-1),[0,108,0,1,0]);
     await page.locator('#control-key').tap();await page.locator('#shift-key').tap();
-    assert.deepEqual((await input(page,()=>page.locator('#directions button[data-key="104"]').tap())).at(-1),[0,104,0,0,1]);
+    assert.deepEqual((await input(page,()=>page.locator('#directions button[data-key="104"]').tap())).at(-1),[0,72,0,0,1]);
     await page.locator('#shift-key').tap();const before=await state(page);
     const downloadPromise=page.waitForEvent('download',{timeout:5000});
     await page.locator('#commands button[data-key="44"]').tap();const download=await downloadPromise;

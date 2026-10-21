@@ -126,6 +126,31 @@ try{
     await press('&');await kind('acknowledge');await press('Space');await kind('confirm');await press('y');await kind('acknowledge');await press('Space');await kind('command');
     await press('~');await text('easy mode;');assert.deepEqual(await state(),before);await screenshot('easy-mode-enabled');
   },{mode:'normal-to-easy',assertions:['Easy-mode warning and confirm can be rejected without mode change; accepting changes native seed mode indicator while turn/HP/position/RNG remain unchanged.']});
+  await check('mobile-confirmation-body-and-buttons-visible',['cmd.save','cmd.quit','dialog.ack_confirm'],async()=>{
+    await seeded();const before=await state();
+    for(const [command,prompt]of [['S','Save this game and exit?'],['Q','Quit and abandon this game? (The save will be deleted.)']]){
+      if(command==='S'){
+        const count=(await inspect()).inputs.length;await page.locator('#commands button[data-key="83"]').tap();
+        await page.waitForFunction(count=>__menu.inputs.length>count,count);
+      }else await press(command);
+      await kind('confirm');await text(prompt.slice(0,20));
+      const geometry=await page.evaluate(()=>{
+        const game=document.querySelector('#game'),viewport=document.querySelector('#viewport'),box=game.getBoundingClientRect(),visible=viewport.getBoundingClientRect();
+        const lines=__menu.text.split('\n'),body=lines.slice(11,16).map(line=>line.slice(33,66).trim()).join(' ').replace(/\s+/g,' ');
+        return {body,cellWidth:box.width/100,scrollLeft:viewport.scrollLeft,viewport:{left:visible.left,top:visible.top,right:visible.left+viewport.clientWidth,bottom:visible.top+viewport.clientHeight},
+          confirmation:{left:box.left+33*box.width/100,right:box.left+66*box.width/100,top:box.top+11*box.height/34,bottom:box.top+16*box.height/34}};
+      });
+      result.evidence.push({id:'mobile-confirmation-'+command,geometry});
+      assert.ok(geometry.body.includes(prompt),'The complete original confirmation text must be in the public C frame');
+      assert.match(geometry.body,/No/);assert.match(geometry.body,/Yes/);
+      await screenshot('mobile-confirmation-'+command);
+      const {confirmation,viewport}=geometry;
+      assert.ok(confirmation.left>=viewport.left&&confirmation.right<=viewport.right,'Original confirmation body and buttons must fit horizontally without panning');
+      assert.ok(confirmation.top>=viewport.top&&confirmation.bottom<=viewport.bottom,'Original confirmation body and buttons must fit vertically');
+      await press(null,{touch:true,code:110});await kind('command');assert.deepEqual(await state(),before,'Declining the confirmation must preserve original game state');
+    }
+    await press('.');await page.waitForFunction(turn=>JSON.parse(__menu.game.UTF8ToString(__menu.game._brogue_check_snapshot())).turn===turn,before.turn+1);
+  },{mobile:true,assertions:['At 390x844 English Save (touch) and wrapped Quit (physical preparation) confirmations show the full native body and Yes/No area without panning. Both touch No choices preserve observed C state; the following rest advances once. This does not certify other screen widths, languages or travel confirmation layout.']});
   await check('wizard-create-menu-cancel-and-native-food',['menu.modes','mode.wizard','cmd.wizard_create'],async()=>{
     await press('p');await choice(109);await press('m');await choice(119);await press('w');await kind('title');await seeded();
     await press('C');await text('Create:');await screenshot('wizard-create-type');await cancel();await kind('command');
@@ -189,6 +214,21 @@ try{
     assert.equal((await inspect()).inputs.length,count);await screenshot('recording-touch-after-inspection');
     await press(null,{touch:true,code:81});await kind('title');assert.deepEqual(await recordedFiles(),files);
   },{mobile:true,assertions:['Normal gameplay prepares the recording; all replay actions use touch: play/pause, numeric seek, next frame, speed, omniscience, inventory/help cancellation, three display modes and quit. Original recording bytes remain unchanged.']});
+  await check('recording-shift-tab-keeps-native-special-key-meaning',['replay.omniscience','replay.integrity'],async()=>{
+    await recording();const files=await recordedFiles(),before=await state();
+    await press('Tab');await text('Omniscience enabled.');
+    const physicalCount=(await inspect()).inputs.length;await press('Shift+Tab');await page.waitForFunction(()=>__menu.waiting);
+    assert.deepEqual((await inspect()).inputs[physicalCount],[0,25,0,0,1]);assert.match((await inspect()).text,/Omniscience enabled\./);assert.deepEqual(await state(),before);
+    await page.locator('#shift-key').tap();const touchCount=(await inspect()).inputs.length;await press(null,{touch:true,code:9});await page.waitForFunction(()=>__menu.waiting);
+    assert.deepEqual((await inspect()).inputs[touchCount],[0,25,0,0,1],'Touch Shift+Tab must retain native Shift-Tab key identity');assert.match((await inspect()).text,/Omniscience enabled\./);assert.deepEqual(await state(),before);await screenshot('recording-shift-tab');
+    await page.locator('#shift-key').tap();await press(null,{touch:true,code:9});await text('Omniscience disabled.');await press(null,{touch:true,code:81});await kind('title');assert.deepEqual(await recordedFiles(),files);
+  },{mobile:true,assertions:['Physical Shift+Tab delivers key25, which the original playback owner ignores rather than toggling omniscience. Touch Shift+Tab must match; unmodified touch Tab still toggles and source recording bytes remain unchanged.']});
+  await check('recording-disabled-takeover-stays-in-playback',['replay.pause_speed','replay.seek_turn','replay.integrity'],async()=>{
+    await recording();const files=await recordedFiles(),before=await state();assert.equal((await inspect()).descriptor.slice(4).includes(80),false);assert.equal(await page.locator('#choices button[data-key="80"]').count(),0);
+    const count=(await inspect()).inputs.length;await press('P');await page.waitForFunction(()=>__menu.waiting);assert.equal((await inspect()).inputs[count][1],80);assert.equal((await inspect()).kind,'playback');assert.deepEqual(await state(),before);
+    result.cases.push({id:'native-recording-takeover-build-option-disabled',feature_ids:['replay.takeover'],status:'not_applicable',method:'automated_browser',fixture:false,variant:'brogue',mode:'normal',input_path:'pc-keyboard',coverage:'partial',assertions:['ENABLE_PLAYBACK_SWITCH is disabled in this build: no P candidate is offered, and physical P is consumed without switching out of native playback. This is configuration evidence, not enabled takeover coverage.'],evidence:['brogue-nihon/.local/feature-verification/menus/results.json']});
+    await press('Space');await page.waitForFunction(()=>JSON.parse(__menu.game.UTF8ToString(__menu.game._brogue_check_snapshot())).turn>0);await press('Space');await text('[PAUSED]');await kind('playback');await press('0');await kind('text');await page.locator('#text-value').fill('0');await page.locator('#text-entry button[type=submit]').click();await page.waitForFunction(()=>JSON.parse(__menu.game.UTF8ToString(__menu.game._brogue_check_snapshot())).turn===0);await press('l');await page.waitForFunction(()=>JSON.parse(__menu.game.UTF8ToString(__menu.game._brogue_check_snapshot())).turn===1);await screenshot('recording-disabled-takeover');await press('Q');await kind('title');assert.deepEqual(await recordedFiles(),files);
+  },{assertions:['The disabled native takeover option offers no P action and physical P leaves replay/state unchanged; subsequent play/pause, seek, next-turn and quit still work without modifying recording bytes.']});
   await check('unpaused-recording-file-dialog-offers-touch-candidates',['replay.switch_file','menu.file_pages'],async()=>{
     await recording();const files=await recordedFiles();
     for(let step=0;step<3;step++)await press('ArrowDown');
