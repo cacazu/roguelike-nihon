@@ -133,18 +133,24 @@ const char *brogue_check_features(void) {
     featureStatuses(player.maxStatus);
     featureAppend(",\"variant\":");
     featureString(gameConst->variantName);
-    featureAppend(",\"mode\":%d,\"kindCounts\":{\"potion\":%d,\"charm\":%d,\"scroll\":%d,\"staff\":%d,\"wand\":%d},"
+    featureAppend(",\"mode\":%d,\"kindCounts\":{\"potion\":%d,\"charm\":%d,\"scroll\":%d,\"staff\":%d,\"wand\":%d,\"ring\":%d},"
            "\"movementSpeed\":%d,\"attackSpeed\":%d,\"turnsUntilRegen\":%ld,\"regenPerTurn\":%d,"
            "\"weaknessAmount\":%d,\"bookkeepingFlags\":%lu,\"searching\":%d,"
            "\"automationActive\":%d,\"autoPlayingLevel\":%d,\"disturbed\":%d,"
            "\"trueColorMode\":%d,\"displayStealthRangeMode\":%d,\"cursorMode\":%d,"
            "\"cursor\":{\"x\":%d,\"y\":%d},\"lightRadius\":{\"lower\":%d,\"upper\":%d},",
            rogue.mode, itemKindCount(POTION, 0), itemKindCount(CHARM, 0), itemKindCount(SCROLL, 0),
-           itemKindCount(STAFF, 0), itemKindCount(WAND, 0), player.movementSpeed, player.attackSpeed,
+           itemKindCount(STAFF, 0), itemKindCount(WAND, 0), itemKindCount(RING, 0), player.movementSpeed, player.attackSpeed,
            player.turnsUntilRegen, player.regenPerTurn, player.weaknessAmount, player.bookkeepingFlags,
            player.status[STATUS_SEARCHING], rogue.automationActive, rogue.autoPlayingLevel, rogue.disturbed,
            rogue.trueColorMode, rogue.displayStealthRangeMode, rogue.cursorMode, rogue.cursorLoc.x, rogue.cursorLoc.y,
            rogue.minersLight.lightRadius.lowerBound, rogue.minersLight.lightRadius.upperBound);
+    featureAppend("\"ringBonuses\":{\"clairvoyance\":%d,\"stealth\":%d,\"regeneration\":%d,"
+           "\"transference\":%d,\"lightMultiplier\":%d,\"awareness\":%d,\"wisdom\":%d,\"reaping\":%d},"
+           "\"stealthRange\":%d,\"regenInterval\":%ld,",
+           rogue.clairvoyance, rogue.stealthBonus, rogue.regenerationBonus, rogue.transference,
+           rogue.lightMultiplier, rogue.awarenessBonus, rogue.wisdomBonus, rogue.reaping,
+           rogue.stealthRange, player.info.turnsBetweenRegen);
     featureAppend("\"levels\":[");
     /* Only native topology has meaningful visited/awaySince metadata. Some older
      * terminal fixtures deliberately change depth without travelling there. */
@@ -711,6 +717,56 @@ static void fixtureArmorRunic(int kind, boolean plain, int condition) {
     updateEncumbrance();
 }
 
+/* Unworn known rings and native actors/charge clocks; effects follow real equip. */
+static void fixtureRing(short kind, int condition) {
+    fixtureSafeWorld();
+    item *ring = give(RING, kind, 'a', true);
+    ring->enchant1 = condition == 2 ? -2 : 2;
+    /* Negative-ring scenes represent an already-uncursed item; curse locking is separate. */
+    if (condition == 1) give(RING, kind, 'b', true)->enchant1 = 2;
+    if (kind == RING_CLAIRVOYANCE) {
+        for (int y = 10; y <= 18; y++) pmap[41][y].layers[DUNGEON] = WALL;
+        pmap[42][14].layers[DUNGEON] = CARPET;
+    } else if (kind == RING_LIGHT) {
+        rogue.minersLightRadius = FP_FACTOR;
+        fixtureFrozenTarget(MK_KOBOLD, 42, 14);
+    } else if (kind == RING_STEALTH) {
+        fixtureTarget(MK_ARROW_TURRET, 44, 14)->ticksUntilTurn = 101;
+    } else if (kind == RING_AWARENESS) {
+        pmapAt(player.loc)->flags |= SEARCHED_FROM_HERE;
+        pmap[42][14].layers[DUNGEON] = GAS_TRAP_POISON_HIDDEN;
+    }
+    if (kind == RING_TRANSFERENCE || kind == RING_REAPING) {
+        player.currentHP = 50;
+        item *weapon = give(WEAPON, BROADSWORD, 'b', true);
+        weapon->flags |= ITEM_EQUIPPED;
+        weapon->enchant1 = 0;
+        weapon->strengthRequired = rogue.strength;
+        rogue.weapon = weapon;
+        creature *target = fixtureFrozenTarget(condition == 3 ? MK_ARROW_TURRET : MK_OGRE, 41, 14);
+        target->info.maxHP = 1000;
+        target->currentHP = 600;
+        target->status[STATUS_STUCK] = target->maxStatus[STATUS_STUCK] = 50;
+        pmapAt(target->loc)->layers[SURFACE] = SPIDERWEB;
+    }
+    if (kind == RING_WISDOM || kind == RING_REAPING) {
+        item *staff = give(STAFF, STAFF_LIGHTNING, 'c', true);
+        staff->enchant1 = 2;
+        staff->charges = 0;
+        staff->enchant2 = kind == RING_WISDOM && condition == 0 ? 31 : 1000;
+        item *charm = give(CHARM, CHARM_HEALTH, 'd', true);
+        charm->enchant1 = 1;
+        charm->charges = 100;
+    }
+    updateEncumbrance();
+    /* Establish derived, unequipped maxHP/light baseline; no ring is equipped here. */
+    updateRingBonuses();
+    if (kind == RING_REGENERATION) {
+        player.currentHP = 50;
+        player.turnsUntilRegen = 1000;
+    }
+}
+
 static void fixtureContracts(int scene) {
     fixtureSafeWorld();
     if (scene == CHECK_SLAYING_MATCH || scene == CHECK_SLAYING_OTHER) {
@@ -895,9 +951,18 @@ int brogue_check_fixture(int scene) {
                     && !(condition == 2 && kind == A_REFLECTION))) return -1;
             category = ARMOR;
         }
+        else if (group == CHECK_RING_READY) {
+            condition = kind / 100;
+            kind %= 100;
+            if (kind < 0 || kind >= NUMBER_RING_KINDS || condition > 3
+                || (condition == 1 && kind != RING_AWARENESS && kind != RING_WISDOM)
+                || (condition == 2 && kind != RING_AWARENESS && kind != RING_WISDOM)
+                || (condition == 3 && kind != RING_TRANSFERENCE && kind != RING_REAPING)) return -1;
+            category = RING;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
-            : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
+            : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
     } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
     if (scene == CHECK_NATIVE_LEVELS) {
@@ -913,6 +978,7 @@ int brogue_check_fixture(int scene) {
     else if (category == STAFF || category == WAND) fixtureBolt(category, kind, condition);
     else if (category == WEAPON) fixtureWeaponRunic(kind, group == CHECK_WEAPON_PLAIN, group == CHECK_WEAPON_INANIMATE);
     else if (category == ARMOR) fixtureArmorRunic(kind, group == CHECK_ARMOR_PLAIN, condition);
+    else if (category == RING) fixtureRing(kind, condition);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

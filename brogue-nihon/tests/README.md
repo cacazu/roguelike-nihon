@@ -125,3 +125,11 @@ Absorption+1の軽減と完全吸収時のみID、Mutuality丸め・非隣接、
 防具Multiplicity発動後は実際のremove/item選択で鎧を外し、再発動を止めてから元の像のAI・寿命を追う。観測やfixtureで装備を直接変更しない。
 
 既配置GAS_EXPLOSIONへの東移動は、環境更新で消滅して爆発へ未到達だったため受入証拠にしない。DampeningはHP1の元Explosive Bloatを実素手攻撃で倒し、原作death DFの即時爆発を検査する。Multiplicityは元のdamage/accuracy/speed・性別以外のflagsとability継承、元床非占有を確認し、実remove後の生存TTL1→次rest消滅と公開文を追う。
+
+`ring-effects.mjs` は全8ringの+2実効果/同準備の未装備対照、Awareness/Wisdomの2個合算と負値、Transference/Reapingの元INANIMATE対照を3variant・PC/touchで132件検査する。knownは個体ITEM_IDENTIFIED、初期は全て未装備。実equip/remove/移動/待機/攻撃から視界・回復・認知・自動検索・充填へ進み、bonus値だけで効果成功にしない。
+
+Clairは壁裏CARPETの現在透視と解除後の発見記憶。Lightは人工base1の派生値を未装備状態で初期計算し、実+2で半径100→300→解除100と元Koboldの公開glyph/可視性。RegenはmaxHP100/HP50/timer1000から実equip/rest2で52対51、解除時は残timerを保持。Transferenceは元broadsword14～22実被害に対するCE比率20/RapidBullet10の回復と解除/無生物。Stealthは元TRACKING ArrowTurret/ticks101/攻撃速度250を保ち、装備+3restでrange2睡眠、未装備range4追跡、解除+restで再認知を確認する。
+
+Awarenessは開始床だけ既検索にし、実装備後の未検索床への移動から隣接隠しtrapを発見する。2個+4の強度110と未踏隣接42,15の確定安全flag、-2の自動検索停止を区別し、plainの確率発見は許容する。Wisdomはstaff timer31の実充填、stack/negativeは高timer1000で28/5、解除10を測り、charmは通常1のまま。Reapingはstaff timer1000/charm100から最大20実hitで充填/readyを必須にし、実Health charm使用まで接続する。充填前の抽選Nは0..2D、timer差10(1+N)/cooldown差1+N、充填後の乱数timerと末尾pairRNGは比較しない。解除後追加gain停止はstaffの10差で示す。
+
+負ringは既に呪いを解いた人工状態で、呪いによる固定・全強化値・全相互作用・自然生成までの完了とは呼ばない。追加observerは直接読む8bonus/保持stealthRange/再生間隔（千分の1turn）とring種類数。初期派生計算以外にeffect/RNG helperをfixtureで呼ばない。`BROGUE_RING_EFFECTS` は完全case IDのCSV。実行は`node brogue-nihon/tests/ring-effects.mjs`、原作比較は結果`brogue-nihon/.local/feature-verification/ring-effects/results.json`、`BROGUE_COMPARE_NAME=ring-effects`、`BROGUE_COMPARE_DOMAINS=none`。
