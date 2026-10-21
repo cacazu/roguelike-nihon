@@ -144,7 +144,7 @@ static void featureDistanceObservation(creature *monst) {
     featureAppend("]");
 }
 
-/* Pure shape/scent/FOV evidence for the corridor scenes; never ask the AI
+/* Pure shape/scent/FOV evidence for corridor and aggravation scenes; never ask the AI
  * to choose a direction. The prepared pointers are compared, not dereferenced. */
 static void featureCorridorObservation(creature *monst) {
     featureAppend(",\"corridorSubject\":%d,\"corridorCompanion\":%d,\"passableArcs\":%d,"
@@ -328,10 +328,16 @@ const char *brogue_check_features(void) {
             featureAppend(",\"preparedSubject\":%d,\"carriedMonster\":", monst == enteredSubject);
             featureCarriedMonster(monst->carriedMonster);
         }
-        if (preparedScene >= CHECK_CORRIDOR_GROUP && preparedScene <= CHECK_CORRIDOR_WIDE)
+        if ((preparedScene >= CHECK_CORRIDOR_GROUP && preparedScene <= CHECK_CORRIDOR_WIDE)
+            || (preparedScene >= CHECK_AGGRAVATE_MYSTIC && preparedScene <= CHECK_AGGRAVATE_OGRE))
             featureCorridorObservation(monst);
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
+        if (preparedScene >= CHECK_AGGRAVATE_MYSTIC && preparedScene <= CHECK_AGGRAVATE_OGRE) {
+            featureAppend(",\"nativeBolts\":[");
+            for (int i = 0; i < 20; i++) featureAppend("%s%d", i ? "," : "", monst->info.bolts[i]);
+            featureAppend("]");
+        }
         featureAppend("}");
     }
     featureAppend("],\"cells\":[");
@@ -912,6 +918,27 @@ static void fixtureFruit(int scene) {
     player.status[STATUS_NUTRITION] = scene == CHECK_FRUIT_STACK ? 300 : scene == CHECK_FRUIT_BOUNDARY ? 600 : 601;
     item *fruit = give(FOOD, FRUIT, 'a', true);
     fruit->quantity = scene == CHECK_FRUIT_STACK ? 2 : 1;
+}
+
+/* Artificial native actors/group and delayed clocks only. The real scroll
+ * must remove traits, real rests must expire it, then original AI must act. */
+static void fixtureMonsterAggravate(int scene) {
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    give(SCROLL, SCROLL_AGGRAVATE_MONSTER, 'a', true);
+    if (scene == CHECK_AGGRAVATE_OGRE) {
+        for (int y = 10; y <= 18; y++) pmap[41][y].layers[DUNGEON] = y == 14 ? FLOOR : WALL;
+        corridorSubject = fixtureTarget(MK_OGRE, 44, 14);
+        pmap[20][14].layers[DUNGEON] = FLOOR;
+        corridorCompanion = fixtureTarget(MK_KOBOLD, 20, 14);
+        corridorCompanion->ticksUntilTurn = 20000;
+        corridorSubject->bookkeepingFlags |= MB_LEADER;
+        corridorCompanion->bookkeepingFlags |= MB_FOLLOWER;
+        corridorCompanion->leader = corridorSubject;
+    } else {
+        corridorSubject = fixtureTarget(MK_GOBLIN_MYSTIC, 42, 14);
+    }
+    corridorSubject->ticksUntilTurn = 10801;
 }
 
 /* Native runic preparation only. Combat and proc RNG are never called here. */
@@ -1691,7 +1718,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_FRUIT_OVERFLOW) return -1;
+    } else if (scene < 1 || scene > CHECK_AGGRAVATE_OGRE) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1735,6 +1762,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_CORRIDOR_GROUP && scene <= CHECK_CORRIDOR_WIDE) fixtureMonsterCorridor(scene);
     else if (scene >= CHECK_DISTANCE_CLOSE && scene <= CHECK_DISTANCE_KOBOLD) fixtureMonsterDistance(scene);
     else if (scene >= CHECK_FRUIT_STACK && scene <= CHECK_FRUIT_OVERFLOW) fixtureFruit(scene);
+    else if (scene >= CHECK_AGGRAVATE_MYSTIC && scene <= CHECK_AGGRAVATE_OGRE) fixtureMonsterAggravate(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
