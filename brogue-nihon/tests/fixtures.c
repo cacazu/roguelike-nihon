@@ -941,6 +941,25 @@ static void fixtureMonsterAggravate(int scene) {
     corridorSubject->ticksUntilTurn = 10801;
 }
 
+/* Artificial cage/key/captive data only. Real movement/confirmation must
+ * invoke the unchanged original key, promotion and liberation paths. */
+static void fixtureCageKey(int scene) {
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    pmap[41][14].layers[DUNGEON] = MONSTER_CAGE_CLOSED;
+    pmap[41][14].machineNumber = 7;
+    pmap[41][14].flags |= IS_IN_ROOM_MACHINE;
+    creature *subject = fixtureTarget(MK_JACKAL, 41, 14);
+    subject->bookkeepingFlags |= MB_CAPTIVE;
+    subject->ticksUntilTurn = 10000;
+    item *key = give(KEY, KEY_CAGE, 'a', true);
+    key->flags |= ITEM_IS_KEY;
+    key->originDepth = rogue.depthLevel + (scene == CHECK_CAGE_WRONG_DEPTH ? 1 : 0);
+    memset(key->keyLoc, 0, sizeof key->keyLoc);
+    key->keyLoc[0] = (keyLocationProfile) {{20, 14},
+        scene == CHECK_CAGE_WRONG_MACHINE ? 8 : 7, scene != CHECK_CAGE_REUSABLE};
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1718,7 +1737,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_AGGRAVATE_OGRE) return -1;
+    } else if (scene < 1 || scene > CHECK_CAGE_WRONG_MACHINE) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1763,6 +1782,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_DISTANCE_CLOSE && scene <= CHECK_DISTANCE_KOBOLD) fixtureMonsterDistance(scene);
     else if (scene >= CHECK_FRUIT_STACK && scene <= CHECK_FRUIT_OVERFLOW) fixtureFruit(scene);
     else if (scene >= CHECK_AGGRAVATE_MYSTIC && scene <= CHECK_AGGRAVATE_OGRE) fixtureMonsterAggravate(scene);
+    else if (scene >= CHECK_CAGE_DISPOSABLE && scene <= CHECK_CAGE_WRONG_MACHINE) fixtureCageKey(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
