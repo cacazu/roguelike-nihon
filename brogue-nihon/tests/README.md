@@ -115,3 +115,13 @@ node brogue-nihon/tests/compare-fixtures.mjs
 麻痺・減速・混乱は適用と実restによる自然解除、Multiplicityはplayer leader・元武器damage/accuracy・自律攻撃・寿命消滅、Forceは衝突前の実frameと末尾HPから衝突被害を分離する。Mercyはdefender回復、Plentyは親と同HPの敵cloneを検査する。凍結対象の状態適用を麻痺/混乱AI経路の網羅と呼ばない。各variant/PCtouch状態を照合し、各primaryを独立原作traceへ比較する。`BROGUE_WEAPON_RUNICS` は完全case IDのCSV。原作比較は `BROGUE_FIXTURE_RESULTS` を `brogue-nihon/.local/feature-verification/weapon-runics/results.json`、`BROGUE_COMPARE_NAME=weapon-runics`、`BROGUE_COMPARE_DOMAINS=none` とする。読取専用observerに装備netEnchant（16bit固定小数点）・player accuracy・monster damage/accuracyを追加し、効果は変更しない。
 
 `weapon-runic-edges.mjs` は武器suiteからPlenty/Multiplicityの3variant・PCtouch12件とPCを選ばないtouch単独1件を抽出する。新個体の種類、生成前の床/非占有、player/親/他個体との非重複を実検査し、touch単独はPC同値未比較と結果へ明記する。通常120件では60組のPC/touch同値を維持する。初回120件実行後に追加した配置assertionはこの13件でも検証し、全件を理由なく繰り返さない。native比較名/結果は`weapon-runic-edges`へ替え、domain=noneを維持する。
+
+`armor-runics.mjs` は防具11runic＋同条件のplain11＋対象外/保護条件7をCE/Rapid/Bullet・PC/touchで実行する174件。既知leather/raw30、未知runic、HP100/回復停止、DONNING0、弱体0、必要筋力=実筋力を準備し、効果・RNGをhelperで実行しない。近接はplayer web/STUCKと元のKobold/Goblin/SpectralBladeの実攻撃、ガスは攻撃者なし、爆発は元Explosive Bloatの実killでdeath DFを発生させ、反射は元SparkTurret/Spiderで分離する。SpiderとBloat攻撃にはSTUCKを準備せず、Spark/偶発効果は20実turnまで待って未到達を失敗にする。
+
+Absorption+1の軽減と完全吸収時のみID、Mutuality丸め・非隣接、Reprisal+20/Immunity種族/無生物gate、Multiplicity+3の1HP像・leader/防御0/寿命・後続AI、Burden必要筋力/防御、ImmolationのACK後の実炎と火免疫時の非燃焼、Vulnerability2倍、Respirationのcaustic100ticks6被害差、DampeningのBloat死亡時爆発50被害差、Reflection+50/0/NEVER_REFLECTSを検査する。混乱/麻痺/腐敗ガス、lichen毒、全強化値、非melee例外、自然生成の完了とは呼ばない。plain first-hit controlは同variant/準備/RNGで比較し、血DF後の末尾RNG同一は要求しない。controlページはbrowser証拠、native比較はprimary全件。
+
+`BROGUE_ARMOR_RUNICS` は完全case IDのCSV。`node brogue-nihon/tests/armor-runics.mjs` を実行し、原作比較は結果 `brogue-nihon/.local/feature-verification/armor-runics/results.json`、`BROGUE_COMPARE_NAME=armor-runics`、`BROGUE_COMPARE_DOMAINS=none` を指定する。item armorRaw・monster combat defenseは直接読取のみで通常配布へ含めない。
+
+防具Multiplicity発動後は実際のremove/item選択で鎧を外し、再発動を止めてから元の像のAI・寿命を追う。観測やfixtureで装備を直接変更しない。
+
+既配置GAS_EXPLOSIONへの東移動は、環境更新で消滅して爆発へ未到達だったため受入証拠にしない。DampeningはHP1の元Explosive Bloatを実素手攻撃で倒し、原作death DFの即時爆発を検査する。Multiplicityは元のdamage/accuracy/speed・性別以外のflagsとability継承、元床非占有を確認し、実remove後の生存TTL1→次rest消滅と公開文を追う。

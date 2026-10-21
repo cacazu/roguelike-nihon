@@ -81,6 +81,8 @@ static void featureItem(item *it) {
     featureAppend("],\"netEnchant\":");
     if (it->category & (WEAPON | ARMOR)) featureAppend("%lld", netEnchant(it));
     else featureAppend("null");
+    featureAppend(",\"armorRaw\":");
+    if (it->category & ARMOR) featureAppend("%d", it->armor); else featureAppend("null");
     featureAppend("}");
 }
 
@@ -199,8 +201,8 @@ const char *brogue_check_features(void) {
                monst->movementSpeed, monst->attackSpeed, monst->newPowerCount, monst->totalPowerCount,
                monst->creatureMode, monst->mutationIndex, featureLeaderIndex(monst->leader));
         if (monst->carriedItem) featureItem(monst->carriedItem); else featureAppend("null");
-        featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d}}",
-               monst->info.damage.lowerBound, monst->info.damage.upperBound, monst->info.accuracy);
+        featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d,\"defense\":%d}}",
+               monst->info.damage.lowerBound, monst->info.damage.upperBound, monst->info.accuracy, monst->info.defense);
     }
     featureAppend("],\"cells\":[");
     count = 0;
@@ -659,6 +661,56 @@ static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     updateEncumbrance();
 }
 
+/* Separate melee, gas, explosion and native caster initial conditions. */
+static void fixtureArmorRunic(int kind, boolean plain, int condition) {
+    fixtureSafeWorld();
+    item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+    armor->flags |= ITEM_EQUIPPED;
+    if (!plain) armor->flags |= ITEM_RUNIC;
+    armor->flags &= ~(ITEM_RUNIC_IDENTIFIED | ITEM_RUNIC_HINTED);
+    armor->enchant1 = kind == A_MULTIPLICITY ? 3 : kind == A_REPRISAL ? 20
+        : kind == A_ABSORPTION ? 1 : kind == A_REFLECTION && condition != 1 ? 50 : 0;
+    armor->enchant2 = kind;
+    armor->armor = 30;
+    armor->strengthRequired = rogue.strength;
+    armor->vorpalEnemy = condition == 1 ? 2 : 3; /* Animal vs Goblin class. */
+    rogue.armor = armor;
+    fixtureStatus(STATUS_DONNING, 0);
+    if (kind == A_RESPIRATION) {
+        for (int x = 39; x <= 41; x++) for (int y = 13; y <= 15; y++) {
+            pmap[x][y].layers[GAS] = POISON_GAS;
+            pmap[x][y].volume = 1000;
+        }
+    } else if (kind == A_DAMPENING) {
+        /* A pre-existing GAS_EXPLOSION vanishes in updateEnvironment before
+         * entry effects. A real kill must produce the native death DF instead. */
+        creature *bloat = fixtureFrozenTarget(MK_EXPLOSIVE_BLOAT, 41, 14);
+        bloat->currentHP = 1;
+        fixtureStatus(STATUS_STUCK, 0);
+        fixtureStatus(STATUS_IMMUNE_TO_FIRE, 100);
+    } else if (kind == A_REFLECTION) {
+        if (condition == 2) {
+            fixtureStatus(STATUS_STUCK, 0);
+            fixtureTarget(MK_SPIDER, 44, 14)->ticksUntilTurn = 1;
+        } else fixtureTarget(MK_SPARK_TURRET, 44, 14)->ticksUntilTurn = 1;
+    } else {
+        pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
+        fixtureStatus(STATUS_STUCK, 50);
+        const short attackerKind = kind == A_IMMUNITY ? MK_GOBLIN
+            : condition == 1 && (kind == A_MULTIPLICITY || kind == A_REPRISAL) ? MK_SPECTRAL_BLADE : MK_KOBOLD;
+        creature *attacker = fixtureTarget(attackerKind, 41, 14);
+        attacker->ticksUntilTurn = 1;
+        attacker->turnsUntilRegen = 100000;
+        attacker->regenPerTurn = 0;
+        if (kind == A_MUTUALITY) {
+            creature *other = fixtureFrozenTarget(MK_KOBOLD, condition == 1 ? 43 : 39, 14);
+            other->info.maxHP = other->currentHP = 100;
+        }
+        if (kind == A_IMMOLATION && condition == 1) fixtureStatus(STATUS_IMMUNE_TO_FIRE, 100);
+    }
+    updateEncumbrance();
+}
+
 static void fixtureContracts(int scene) {
     fixtureSafeWorld();
     if (scene == CHECK_SLAYING_MATCH || scene == CHECK_SLAYING_OTHER) {
@@ -834,10 +886,19 @@ int brogue_check_fixture(int scene) {
                 || (group == CHECK_WEAPON_INANIMATE && kind == W_SLAYING)) return -1;
             category = WEAPON;
         }
+        else if (group == CHECK_ARMOR_RUNIC || group == CHECK_ARMOR_PLAIN || group == CHECK_ARMOR_CONDITION) {
+            if (group == CHECK_ARMOR_CONDITION) { condition = kind / 100; kind %= 100; }
+            if (kind < 0 || kind >= NUMBER_ARMOR_ENCHANT_KINDS
+                || (group == CHECK_ARMOR_CONDITION && !(condition == 1
+                    && (kind == A_MULTIPLICITY || kind == A_MUTUALITY || kind == A_REPRISAL || kind == A_IMMUNITY
+                        || kind == A_REFLECTION || kind == A_IMMOLATION))
+                    && !(condition == 2 && kind == A_REFLECTION))) return -1;
+            category = ARMOR;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
-        if (category != WEAPON && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
+        if (category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
     } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
     if (scene == CHECK_NATIVE_LEVELS) {
         pos destination;
@@ -851,6 +912,7 @@ int brogue_check_fixture(int scene) {
     else if (category == SCROLL) fixtureScroll(kind, group == CHECK_SCROLL_KNOWN);
     else if (category == STAFF || category == WAND) fixtureBolt(category, kind, condition);
     else if (category == WEAPON) fixtureWeaponRunic(kind, group == CHECK_WEAPON_PLAIN, group == CHECK_WEAPON_INANIMATE);
+    else if (category == ARMOR) fixtureArmorRunic(kind, group == CHECK_ARMOR_PLAIN, condition);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

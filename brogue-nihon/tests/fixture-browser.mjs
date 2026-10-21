@@ -154,7 +154,9 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
             sceneGroups.STAFF_READY+startup.kindCounts.staff,sceneGroups.WAND_READY+startup.kindCounts.wand,
             sceneGroups.STAFF_READY+500,sceneGroups.STAFF_READY+900,
             sceneGroups.WAND_READY+500,sceneGroups.WAND_READY+505,sceneGroups.WAND_READY+900,
-            sceneGroups.WEAPON_RUNIC+10,sceneGroups.WEAPON_PLAIN+1,sceneGroups.WEAPON_INANIMATE+7,sceneGroups.WEAPON_INANIMATE+10]){
+            sceneGroups.WEAPON_RUNIC+10,sceneGroups.WEAPON_PLAIN+1,sceneGroups.WEAPON_INANIMATE+7,sceneGroups.WEAPON_INANIMATE+10,
+            sceneGroups.ARMOR_RUNIC+11,sceneGroups.ARMOR_PLAIN+11,sceneGroups.ARMOR_CONDITION,
+            sceneGroups.ARMOR_CONDITION+102,sceneGroups.ARMOR_CONDITION+204,sceneGroups.ARMOR_CONDITION+305]){
             assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),rejected),-1,'Unknown/unsupported kind must reject');
             assert.deepEqual(await d.state(),startup,'Rejected kind changed preparation/RNG');
           }
