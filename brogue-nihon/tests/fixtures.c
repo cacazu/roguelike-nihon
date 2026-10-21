@@ -824,6 +824,18 @@ static void fixtureMonsterEnter(int scene) {
     enteredSubject->ticksUntilTurn = 1;
 }
 
+/* Native hidden/negation traits only; real potion use and real wand input
+ * must reveal/negate later. The long clock isolates traits from active AI. */
+static void fixtureMonsterNegation(int scene) {
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    item *wand = give(WAND, WAND_NEGATION, 'a', true);
+    wand->charges = 4; /* Common natural charge-range intersection across variants. */
+    if (scene == CHECK_NEGATE_PHANTOM) give(POTION, POTION_TELEPATHY, 'b', true);
+    creature *subject = fixtureTarget(scene == CHECK_NEGATE_PHANTOM ? MK_PHANTOM : MK_PHYLACTERY, 42, 14);
+    subject->ticksUntilTurn = 10000;
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1601,7 +1613,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_ENTER_PHOENIX) return -1;
+    } else if (scene < 1 || scene > CHECK_NEGATE_PHYLACTERY) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1641,6 +1653,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_BURN_UNPROTECTED && scene <= CHECK_BURN_EXPIRY) fixtureMonsterBurn(scene);
     else if (scene >= CHECK_WHIP_RANGE4 && scene <= CHECK_WHIP_OGRE) fixtureMonsterWhip(scene);
     else if (scene >= CHECK_ENTER_SUMMONS && scene <= CHECK_ENTER_PHOENIX) fixtureMonsterEnter(scene);
+    else if (scene == CHECK_NEGATE_PHANTOM || scene == CHECK_NEGATE_PHYLACTERY) fixtureMonsterNegation(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

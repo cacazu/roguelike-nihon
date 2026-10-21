@@ -71,8 +71,8 @@ export class FixturePage {
   async input(key){
     const before=await this.wait();assert.equal(before.waiting,true,'Original C is not awaiting an event');
     if(this.entry.input_path==='touch'){
-      const code=({Space:32,ArrowRight:108,ArrowLeft:104,ArrowUp:107,ArrowDown:106})[key]??key.codePointAt(0);
-      const selector=key==='Escape'?'#cancel':key==='Enter'?'#submit':`#commands button[data-key="${code}"],#choices button[data-key="${code}"],#directions button[data-key="${code}"]`;
+      const code=({Space:32,Tab:9,ArrowRight:108,ArrowLeft:104,ArrowUp:107,ArrowDown:106})[key]??key.codePointAt(0);
+      const selector=key==='Escape'?'#cancel':key==='Enter'?'#submit':key==='Tab'?'#tab-action':`#commands button[data-key="${code}"],#choices button[data-key="${code}"],#directions button[data-key="${code}"]`;
       await this.page.locator(selector).filter({visible:true}).first().tap();
     }else await this.page.keyboard.press(key);
     await this.page.waitForFunction(serial=>(__brogueFixture.waiting&&__brogueFixture.serial>serial)||document.querySelector('#game').dataset.waitKind==='title',before.serial,{timeout:60000});
