@@ -33,4 +33,22 @@ for(const [reason,createCases,diagnostic]of failures)test('fresh failure replace
   assert.deepEqual(current.cases,[]);
   assert.ok(current.fatal?.message,'The failed setup must leave its diagnostic, not only a failed exit code.');
   assert.match(current.fatal.message,diagnostic);
+  const progress=JSON.parse(await readFile(path.join(directory,'progress.json'),'utf8'));
+  assert.equal(progress.run_id,current.run_id);assert.equal(progress.state,'failed');
+  assert.equal(progress.completed,0);assert.equal(progress.passed,0);assert.equal(progress.failed,0);assert.equal(progress.active_case,null);
+});
+
+// A locked/unwritable progress target must leave an explicit failed result,
+// including when the terminal progress write itself fails.
+test('terminal progress failure is retained in the result diagnostic',async t=>{
+  const name='fixture-harness-selfcheck-'+randomUUID(),parent=path.join(root,'.local/feature-verification'),directory=path.join(parent,name);
+  await mkdir(directory,{recursive:true});
+  t.after(async()=>{const actual=await realpath(directory);assert.equal(path.dirname(actual),await realpath(parent));assert.equal(path.basename(actual),name);await rm(actual,{recursive:true,force:true});});
+  t.mock.method(console,'error',()=>{});
+  await assert.rejects(runFixtureSuite({name,createCases:async()=>{
+    const target=path.join(directory,'progress.json');assert.equal(path.dirname(target),directory);await rm(target);await mkdir(target);return [];
+  }}));
+  const result=JSON.parse(await readFile(path.join(directory,'results.json'),'utf8'));
+  assert.equal(result.result,'fail');assert.ok(result.progress_error?.message,'Terminal progress failure must be saved before the final result is persisted');
+  assert.match(result.fatal.message,/nonempty/i);
 });

@@ -96,11 +96,13 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
   const run_id=new Date().toISOString(),runFolder='run-'+run_id.replaceAll(/[:.]/g,'-');
   const result={run_id,result:'fail',mode:'CHECK initial scenes; not a normal playthrough',cases:[],notSelected:[],artifacts:[],native_comparison_excluded_fields:['ready'],native_control_comparison:'control_runs are browser evidence; native comparator covers primary runs only'};
   const selected=filter?.split(',').filter(Boolean);
+  const progress={run_id,state:'running',selected_cases:null,completed:0,passed:0,failed:0,active_case:null};
+  const saveProgress=async()=>{progress.updated_at=new Date().toISOString();await writeFile(path.join(output,'progress.json'),JSON.stringify(progress,null,2)+'\n');};
   let browser,server,temporary,oldTemp,base,checkModule,host;
   try{
     await mkdir(path.join(output,runFolder),{recursive:true});
     try{const old=await readFile(path.join(output,'results.json'));const prior=JSON.parse(old);await mkdir(path.join(output,'history'),{recursive:true});await writeFile(path.join(output,'history',(prior.run_id||'legacy').replaceAll(/[:.]/g,'-')+'-'+hash(old).slice(0,8)+'.json'),old);}catch(error){if(error.code!=='ENOENT')throw error;}
-    await writeFile(path.join(output,'results.json'),JSON.stringify(result,null,2)+'\n');
+    await writeFile(path.join(output,'results.json'),JSON.stringify(result,null,2)+'\n');await saveProgress();
     if(sceneGroupError)throw sceneGroupError;
     assert.equal(typeof createCases,'function','A case factory is required');
     const cases=await createCases();
@@ -108,6 +110,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
     assert.equal(new Set(cases.map(test=>test.id)).size,cases.length,'Case IDs must be unique');
     for(const test of cases)assert.ok(Number.isSafeInteger(test.fixture_id)&&test.fixture_id>0,'Invalid or unavailable fixture ID for '+test.id);
     if(selected)assert.ok(cases.some(test=>selected.includes(test.id)),'No known fixture cases selected');
+    progress.selected_cases=cases.filter(test=>!selected||selected.includes(test.id)).length;await saveProgress();
     const {chromium}=require(process.env.BROGUE_PLAYWRIGHT||'playwright');
     const manifestBytes=await readFile(path.join(root,'build/build-manifest-check.json'));
     const manifest=JSON.parse(manifestBytes),production=JSON.parse(await readFile(path.join(root,'build/build-manifest.json'),'utf8'));
@@ -129,18 +132,22 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
     browser=await chromium.launch({headless:true,...(process.env.BROGUE_BROWSER?{executablePath:process.env.BROGUE_BROWSER}:{})});
     for(const test of cases){
       if(selected&&!selected.includes(test.id)){result.notSelected.push(test.id);continue;}
+      progress.active_case=test.id;await saveProgress();
       const entry={...test,execute:undefined,method:'fixture_browser',fixture:true,coverage:'partial',mode:'normal',seed:'42',scene:test.fixture_id,directory:path.join(output,runFolder,test.id),steps:[],screenshots:[],errors:[],effect_reached:false};
       await mkdir(entry.directory,{recursive:true});let context,driver;
       try{
         context=await browser.newContext({viewport:test.input_path==='touch'?{width:390,height:844}:{width:1240,height:900},hasTouch:true});
         await context.route('**/build/game.js',route=>route.fulfill({body:checkModule,contentType:'text/javascript'}));
-        await context.route('**/web/host.js',route=>route.fulfill({body:host.replace(marker,adapter+marker),contentType:'text/javascript'}));
+        // Variant is a native launch option; the production URL supports lang/seed/load.
+        // Keep this CHECK-only launch configuration explicit rather than assuming an ignored URL query.
+        const launch="  game.callMain([...Array.from(arguments_), ..."+JSON.stringify(test.variant==='brogue'?[]:['--variant',test.variant])+"]);";
+        await context.route('**/web/host.js',route=>route.fulfill({body:host.replace(marker,adapter+launch),contentType:'text/javascript'}));
         const makePage=async(scene,prefix='')=>{
           const page=await context.newPage();page.on('pageerror',error=>entry.errors.push(error.message));page.on('console',message=>{if(message.type()==='error')entry.errors.push(message.text());});
-          await page.goto(base+'?seed=42&lang=en&variant='+test.variant);
+          await page.goto(base+'?seed=42&lang=en');
           await page.waitForFunction(()=>globalThis.__brogueFixture?.waiting&&document.querySelector('#game').dataset.waitKind==='command',null,{timeout:60000});
           const d=new FixturePage(page,entry,prefix),startup=await d.state(),wait=await d.wait();
-          assert.equal(await page.evaluate(()=>__brogueFixture.prestartFeaturesError),'CHECK game has not started');assert.equal(await page.evaluate(()=>__brogueFixture.prestartReject),-1);assert.equal(startup.fixture,0);assert.equal(startup.seed,'42');assert.equal(startup.turn,0);assert.equal(startup.ready,1);assert.equal(wait.serial,1);
+          assert.equal(await page.evaluate(()=>__brogueFixture.prestartFeaturesError),'CHECK game has not started');assert.equal(await page.evaluate(()=>__brogueFixture.prestartReject),-1);assert.equal(startup.fixture,0);assert.equal(startup.variant,({brogue:'brogue',rapid_brogue:'rapidBrogue',bullet_brogue:'bulletBrogue'})[test.variant],'Native launch variant mismatch');assert.equal(startup.seed,'42');assert.equal(startup.turn,0);assert.equal(startup.ready,1);assert.equal(wait.serial,1);
           for(const rejected of[-1,99999,Math.max(...Object.values(sceneGroups).filter(id=>id<1000))+1,
             sceneGroups.POTION_UNKNOWN+startup.kindCounts.potion,sceneGroups.CHARM_READY+startup.kindCounts.charm,
             sceneGroups.SCROLL_UNKNOWN+startup.kindCounts.scroll,sceneGroups.SCROLL_KNOWN+startup.kindCounts.scroll,
@@ -176,6 +183,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
         entry.targets=(entry.targets||[]).map(target=>({...target,effect_asserted:!!entry.effect_asserted_attempted}));
         entry.evidence=entry.screenshots.map(file=>runFolder+'/'+test.id+'/'+file).concat(runFolder+'/'+test.id+'/steps.json');
         const saved={...entry,directory:undefined};await writeFile(path.join(entry.directory,'steps.json'),JSON.stringify(saved,null,2)+'\n');result.cases.push({...saved,steps:undefined,observations:undefined,captures:undefined});
+        progress.completed++;progress[entry.status==='pass'?'passed':'failed']++;progress.last_completed_case=entry.id;progress.active_case=null;await saveProgress();
       }
     }
     assert.ok(result.cases.length>0);result.result=result.cases.every(entry=>entry.status==='pass')?'pass':'fail';
@@ -187,6 +195,8 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
     for(const[key,value]of Object.entries(oldTemp||{}))if(value===undefined)delete process.env[key];else process.env[key]=value;
     try{if(temporary){assert.equal(path.dirname(await realpath(temporary)),await realpath(output));assert.ok(path.basename(temporary).startsWith('runtime-'));await rm(temporary,{recursive:true,force:true,maxRetries:10,retryDelay:100});}}catch(error){cleanupErrors.push(error.message);}
     if(cleanupErrors.length){result.result='fail';result.cleanup_errors=cleanupErrors;}
+    progress.state=result.result==='pass'?'completed':'failed';progress.active_case=null;
+    try{await saveProgress();}catch(error){result.result='fail';result.progress_error={message:error.message,stack:error.stack};}
     await mkdir(output,{recursive:true});await writeFile(path.join(output,'results.json'),JSON.stringify(result,null,2)+'\n');
   }
   if(result.result!=='pass')throw Error(name+' verification failed: '+path.join(output,'results.json'));

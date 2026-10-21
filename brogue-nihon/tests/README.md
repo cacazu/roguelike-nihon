@@ -17,6 +17,7 @@ node tests/bolts.mjs
 node tests/projectiles.mjs
 node tests/knowledge-feats.mjs
 node tests/world-contracts.mjs
+node tests/world-variants.mjs
 node tests/persistence.mjs
 ```
 
@@ -79,8 +80,12 @@ node --test tests/artifacts.test.mjs
 
 `world-contracts.mjs` は、CHECKの準備だけを `fixtures.c` に置き、以降はPCキー／公開されたタッチ候補から原作を操作する。Slayingの一致／別種、Vulnerabilityと通常鎧の同じ待機中の実AI被害、Spiderの開通／壁遮断、捕虜のNo／Yes／実追随、レバーの機構別連動／遮断器、鍵のmachine一致と使い捨て／再利用／深度違い／別機構、水中と浮遊時の光半径、迂回での地形発見と視界外の記憶を検査する。`BROGUE_WORLD_CONTRACTS` でcaseを絞り込める。別初期条件の対照はharnessの `control(callback, fixture_id)` で独立ページを開き、準備状態・消費入力・最終状態を保存する。省略時は主caseと同じ初期条件を使う。
 
-人工的なHP100・回復停止・STUCKによる必中・元のAI情報・階段退避を事前条件として記録する。Slayingの必中特性、他のルーン、全AI能力・自然な群れ／変異、機構blueprint生成、鍵の座標一致による成功、未訪問階の生成は今回の代表分岐とは別に残す。Vulnerabilityは同じ待機中の総近接被害の対照であり、敵が1回だけ攻撃したとは仮定しない。CHECK観測にはrunic／鍵の照合情報、機構番号、水中と戦闘数値を追加し、鍵配列は終端後も含む固定上限を確認する。これらの読取export・準備sceneはproductionにはリンクしない。
+人工的なHP100・回復停止・STUCKによる必中・元のAI情報・階段退避を事前条件として記録する。Slayingの必中特性、他のルーン、全AI能力・自然な群れ／変異、機構blueprint生成、鍵の座標一致による成功、未訪問階の生成は今回の代表分岐とは別に残す。Vulnerabilityは敵の初期ticksを1、敵attackSpeedとplayer movementSpeedを100にし、同じ待機中の実攻撃を1回に分離する。通常モード・無盾・毒／燃焼なし・栄養あり・回復停止を確認し、同一初期状態と乱数からの被害を厳密に2倍比較する。原作の血DFは被害量によって拡散と後続乱数消費を変えるため、末尾の対照間乱数同一を仮定しない。各primaryの全観測値は原作へ照合し、別controlページはブラウザー対照として扱う。CHECK観測にはrunic／鍵の照合情報、機構番号、水中と戦闘数値を追加し、鍵配列は終端後も含む固定上限を確認する。これらの読取export・準備sceneはproductionにはリンクしない。
 
 CHECKを拡張した後の比較は新しいmanifestと生成物で再実行する。旧版の全回帰は `.local/phase-evidence/` の版別証拠として維持し、新版の合格へ自動で移さない。検証表のcurrentとhistoricalはこの版の一致を区別して読む。
 
 共通fixture harnessのタッチ地図撮影は、command待ちで既存の＠ボタンを実タップし、プレイヤーをviewport内へ戻す。全観測状態・入力serial・消費入力記録が変わらないことと画面内座標を保存する。modal画面はこの再配置を適用せず、各検査の表示範囲を確認する。
+
+`world-variants.mjs` はworldのcase factoryをRapid／Bulletの原作設定で実行する。CASEのvariant名と実際の `gameConst->variantName` は綴りが異なるため、各ページの準備前と効果前に実値を確認する。CHECKの起動設定として原作 `--variant` を渡し、未実装のURL queryに依存しない。productionのURLは `lang/seed/load` の既存範囲を保ち、タイトルのvariant選択は別の操作経路である。IDとPC／タッチ比較キャッシュはvariantごとに分ける。CEの絶対半径・ダメージ・位置列を他variantへ流用しない。
+
+共通fixture suiteの `progress.json` はrun ID、選択case数、完了／合格／失敗数、実行中case、更新時刻を各caseの前後に保存する。終端の進捗保存失敗もFAILと診断へ反映してから `results.json` を確定し、処理終了と古い成功結果を混同しない。進捗のsuccessと準備失敗・進捗書込失敗はharness回帰検査で確認する。

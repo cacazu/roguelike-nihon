@@ -94,7 +94,8 @@ try{
   assert.equal(new Set(cases.map(row=>row.id)).size,cases.length,'Duplicate fixture case IDs');
   for(const row of cases){
     assert.ok(typeof row.id==='string'&&row.id.length<=180&&/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(row.id),'Unsafe comparison case ID');
-    const item={id:row.id+'-upstream',feature_ids:row.feature_ids,status:'fail',variant:row.variant,
+    const variantFeature=({brogue:'variant.brogue',rapid_brogue:'variant.rapid',bullet_brogue:'variant.bullet'})[row.variant];
+    const item={id:row.id+'-upstream',feature_ids:[...new Set([...(row.feature_ids||[]),...(variantFeature?[variantFeature]:[])])],status:'fail',variant:row.variant,
       method:'native_comparison',input_path:row.input_path,fixture:true,coverage:'partial',
       assertions:['The exact same initial fixture and every observed input-wait semantic field agree with the pinned original after the same consumed events.'],
       evidence:[row.id+'-trace.json'],fixture_id:row.fixture_id};

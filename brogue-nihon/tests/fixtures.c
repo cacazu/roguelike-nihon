@@ -621,7 +621,8 @@ static void fixtureContracts(int scene) {
         rogue.armor = armor;
         pmapAt(player.loc)->layers[SURFACE] = SPIDERWEB;
         fixtureStatus(STATUS_STUCK, 50);
-        fixtureTarget(MK_KOBOLD, 41, 14)->ticksUntilTurn = 0;
+        /* One attack strictly inside the player turn, avoiding the t=0/t=100 double boundary. */
+        fixtureTarget(MK_KOBOLD, 41, 14)->ticksUntilTurn = 1;
     } else if (scene == CHECK_SPIDER_OPEN || scene == CHECK_SPIDER_BLOCKED) {
         if (scene == CHECK_SPIDER_BLOCKED) for (int y = 10; y <= 18; y++) pmap[42][y].layers[DUNGEON] = WALL;
         fixtureTarget(MK_SPIDER, 44, 14)->ticksUntilTurn = 0;
