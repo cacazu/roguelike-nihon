@@ -364,7 +364,7 @@ const char *brogue_check_features(void) {
             featureCorridorObservation(monst);
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
-        if (preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_TURRET_FIRE_SENTINEL_BLOCKED) {
+        if (preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_SENTINEL_REPAIR_BLOCKED) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
@@ -1061,6 +1061,25 @@ static void fixtureTurretFire(int scene) {
     if (code % 2) pmap[42][14].layers[DUNGEON] = PORTCULLIS_CLOSED;
     creature *subject = fixtureTarget(actors[code / 2], 44, 14);
     subject->ticksUntilTurn = 1;
+}
+
+/* Native inanimate repair team data only; damage/heal/AI are not run here. */
+static void fixtureSentinelRepair(int scene) {
+    const int code = scene - CHECK_SENTINEL_REPAIR;
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    pmap[44][14].layers[DUNGEON] = WALL;
+    pmap[44][16].layers[DUNGEON] = WALL;
+    pmap[42][14].layers[DUNGEON] = PORTCULLIS_CLOSED;
+    if (code == 3) pmap[44][15].layers[DUNGEON] = PORTCULLIS_CLOSED;
+    creature *caster = fixtureTarget(MK_SENTINEL, 44, 14);
+    caster->ticksUntilTurn = 1;
+    caster->bookkeepingFlags |= MB_LEADER;
+    creature *recipient = fixtureTarget(MK_SENTINEL, 44, 16);
+    recipient->currentHP = code == 1 ? 40 : code == 2 ? 50 : 10;
+    recipient->ticksUntilTurn = 10000;
+    recipient->bookkeepingFlags |= MB_FOLLOWER;
+    recipient->leader = caster;
 }
 
 /* Native runic preparation only. Combat and proc RNG are never called here. */
@@ -1840,7 +1859,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_TURRET_FIRE_SENTINEL_BLOCKED) return -1;
+    } else if (scene < 1 || scene > CHECK_SENTINEL_REPAIR_BLOCKED) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1889,6 +1908,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_PORTAL_VALID && scene <= CHECK_PORTAL_BREAKER) fixturePortal(scene);
     else if (scene >= CHECK_EMBEDDED_ARROW && scene <= CHECK_EMBEDDED_KOBOLD) fixtureEmbeddedTunnel(scene);
     else if (scene >= CHECK_TURRET_FIRE_ARROW && scene <= CHECK_TURRET_FIRE_SENTINEL_BLOCKED) fixtureTurretFire(scene);
+    else if (scene >= CHECK_SENTINEL_REPAIR && scene <= CHECK_SENTINEL_REPAIR_BLOCKED) fixtureSentinelRepair(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
