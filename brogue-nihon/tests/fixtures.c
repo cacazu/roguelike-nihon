@@ -1486,7 +1486,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
+    } else if (scene < 1 || scene > CHECK_ORIGINAL_SYMBOL_COLORS) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1579,6 +1579,18 @@ int brogue_check_fixture(int scene) {
     updateVision(false);
     displayLevel();
     refreshSideBar(-1, -1, false);
+    if (scene == CHECK_ORIGINAL_SYMBOL_COLORS) {
+        /* UI palette probe only: public C glyph/RGB -> production Rust canvas.
+         * These literal colors are not a terrain/healing/visibility fixture. */
+        const color background = {10, 20, 30, 0, 0, 0, 0, false};
+        const color foreground[] = {{25, 100, 25, 0, 0, 0, 0, false},
+            {30, 5, 40, 0, 0, 0, 0, false}, {2, 5, 2, 0, 0, 0, 0, false}};
+        const enum displayGlyph glyph[] = {G_FOLIAGE, G_BLOODWORT_STALK, G_FOLIAGE};
+        for (short y = 13; y <= 15; y++) for (short x = 58; x <= 64; x++)
+            plotCharWithColor(' ', (windowpos){x, y}, &background, &background);
+        for (short i = 0; i < 3; i++)
+            plotCharWithColor(glyph[i], (windowpos){59 + 2 * i, 14}, &foreground[i], &background);
+    }
 #if defined(BROGUE_BROWSER)
     *initialCommandDisplay = saveDisplayBuffer();
 #endif

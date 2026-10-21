@@ -7,6 +7,8 @@ pub const ROWS: usize = 34;
 pub const STRIDE: usize = 10;
 pub const FIRST_TILE: i32 = 130;
 pub const LAST_TILE: i32 = 258;
+const ARIES_CODEPOINT: i32 = 0x2648;
+const ARIES_FONT_INDEX: u32 = 0x84;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mode {
@@ -160,6 +162,7 @@ pub struct Presentation {
     pub cell_width: u32,
     pub cell_height: u32,
     dot: BTreeMap<i32, Image>,
+    original_aries: Image,
     illustrations: BTreeMap<i32, Image>,
 }
 impl Presentation {
@@ -181,6 +184,14 @@ impl Presentation {
                 sheet.crop(index % 16 * 128, index / 16 * 232, 128, 232)?,
             );
         }
+        // Original SDL fontIndex(U_ARIES)=0x84, in the atlas font half.
+        // Its monochrome coverage retains C colors; the emoji font does not.
+        let original_aries = sheet.crop(
+            ARIES_FONT_INDEX % 16 * 128,
+            ARIES_FONT_INDEX / 16 * 232,
+            128,
+            232,
+        )?;
         drop(sheet);
         let sheet = Image::decode_png(art)?;
         let mut illustrations = BTreeMap::new();
@@ -201,6 +212,7 @@ impl Presentation {
             cell_width: 14,
             cell_height: 22,
             dot: sprites,
+            original_aries,
             illustrations,
         })
     }
@@ -231,6 +243,7 @@ impl Presentation {
     pub fn render(&mut self) -> Result<(), String> {
         let mut commands = Vec::<Value>::with_capacity(COLS * ROWS * 2);
         let mut tinted = BTreeMap::new();
+        let mut original_mask: Option<Image> = None;
         let (cw, ch) = (self.cell_width, self.cell_height);
         // Paint all cell backgrounds before any foreground. A Japanese glyph
         // covers two cells and its continuation background must not erase it.
@@ -243,6 +256,25 @@ impl Presentation {
             let (x, y) = ((index % COLS) as u32 * cw, (index / COLS) as u32 * ch);
             let rect = json!({"x":x,"y":y,"w":cw,"h":ch});
             if cell[0] == 0x110000 || cell[1] <= 32 {
+                continue;
+            }
+            if self.mode == Mode::Original
+                && cell[1] == ARIES_CODEPOINT
+                && (FIRST_TILE..LAST_TILE).contains(&cell[0])
+            {
+                let key = format!("original:aries:{}:{}:{}", cell[2], cell[3], cell[4]);
+                if !tinted.contains_key(&key) {
+                    if original_mask.is_none() {
+                        original_mask = Some(scale_font_mask(&self.original_aries, cw, ch)?);
+                    }
+                    tinted.insert(
+                        key.clone(),
+                        tint_font_mask(original_mask.as_ref().unwrap(), &cell[2..5])?,
+                    );
+                }
+                commands.push(
+                    json!({"op":"image","set":"brogue","image":key,"rect":rect,"pixelArt":false}),
+                );
                 continue;
             }
             let sprites = match self.mode {
@@ -300,6 +332,43 @@ fn rgb(channels: &[i32]) -> String {
 }
 fn channel(value: i32) -> u8 {
     ((value.clamp(0, 100) * 255 + 50) / 100) as u8
+}
+// The original font sheet has opaque black backing, not an alpha channel.
+// Average grayscale coverage before downsampling so thin strokes survive.
+fn scale_font_mask(source: &Image, width: u32, height: u32) -> Result<Image, String> {
+    let mut rgba = Vec::with_capacity((width * height * 4) as usize);
+    for y in 0..height {
+        let top = y * source.height() / height;
+        let bottom = ((y + 1) * source.height() / height)
+            .max(top + 1)
+            .min(source.height());
+        for x in 0..width {
+            let left = x * source.width() / width;
+            let right = ((x + 1) * source.width() / width)
+                .max(left + 1)
+                .min(source.width());
+            let mut sum = 0u64;
+            let mut count = 0u64;
+            for sy in top..bottom {
+                for sx in left..right {
+                    let p = &source.rgba()[((sy * source.width() + sx) * 4) as usize..][..4];
+                    let grey = *p[..3].iter().max().unwrap() as u64;
+                    sum += (grey * u64::from(p[3]) + 127) / 255;
+                    count += 1;
+                }
+            }
+            rgba.extend_from_slice(&[255, 255, 255, ((sum + count / 2) / count) as u8]);
+        }
+    }
+    Image::from_rgba(width, height, rgba)
+}
+fn tint_font_mask(mask: &Image, color: &[i32]) -> Result<Image, String> {
+    let foreground = [channel(color[0]), channel(color[1]), channel(color[2])];
+    let mut rgba = Vec::with_capacity(mask.rgba().len());
+    for p in mask.rgba().chunks_exact(4) {
+        rgba.extend_from_slice(&[foreground[0], foreground[1], foreground[2], p[3]]);
+    }
+    Image::from_rgba(mask.width(), mask.height(), rgba)
 }
 fn scale_tinted(
     source: &Image,
@@ -417,5 +486,144 @@ mod tests {
         assert_eq!(Mode::parse("dot"), Ok(Mode::Dot));
         assert!(Mode::parse("hybrid").is_err());
         assert_eq!(rgb(&[-1, 50, 200]), "#0080ff");
+    }
+    #[test]
+    fn original_aries_keeps_c_foreground_background_and_cell_bounds() {
+        let assets = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../web/assets");
+        let mut view = Presentation::new(
+            std::fs::read(assets.join("fonts/NotoSansJP.ttf")).unwrap(),
+            std::fs::read(assets.join("fonts/NotoColorEmoji.ttf")).unwrap(),
+            &std::fs::read(assets.join("dot-tiles.png")).unwrap(),
+            &std::fs::read(assets.join("illustrations.png")).unwrap(),
+        )
+        .unwrap();
+        let header = include_str!("../../src/brogue/Rogue.h");
+        let block = header
+            .split_once("enum displayGlyph {")
+            .unwrap()
+            .1
+            .split_once("};")
+            .unwrap()
+            .0;
+        let names: Vec<_> = block
+            .lines()
+            .map(str::trim)
+            .filter(|line| line.starts_with("G_"))
+            .collect();
+        let id = |name: &str| {
+            128 + names
+                .iter()
+                .position(|line| line.trim_end_matches(',') == name)
+                .unwrap() as i32
+        };
+        let samples = [
+            (id("G_FOLIAGE"), [25, 100, 25]),
+            (id("G_BLOODWORT_STALK"), [30, 5, 40]),
+            (id("G_FOLIAGE"), [2, 5, 2]),
+        ];
+        let background = [26u8, 51, 77, 255]; // C percentages 10/20/30, non-black.
+        for cell in view.cells.chunks_exact_mut(STRIDE) {
+            cell[5..8].copy_from_slice(&[10, 20, 30]);
+        }
+        for (i, (glyph, color)) in samples.iter().enumerate() {
+            let at = (10 * COLS + 25 + 2 * i) * STRIDE;
+            view.cells[at..at + STRIDE].copy_from_slice(&[
+                *glyph, 0x2648, color[0], color[1], color[2], 10, 20, 30, 0, 0,
+            ]);
+        }
+        for (cw, ch) in [(3, 4), (12, 18), (14, 22), (24, 36)] {
+            view.cell_width = cw;
+            view.cell_height = ch;
+            view.mode = Mode::Original;
+            view.render().unwrap();
+            let width = view.size().0 as usize;
+            let pixel = |x: usize, y: usize| &view.renderer.rgba()[(y * width + x) * 4..][..4];
+            for (i, (_, color)) in samples.iter().enumerate() {
+                let foreground = [channel(color[0]), channel(color[1]), channel(color[2])];
+                let mut ink = 0;
+                let mut clear = 0;
+                let mut maximum_coverage = 0.0_f64;
+                let reference = (0..3)
+                    .max_by_key(|&c| (i16::from(foreground[c]) - i16::from(background[c])).abs())
+                    .unwrap();
+                for y in 10 * ch as usize..11 * ch as usize {
+                    for x in (25 + 2 * i) * cw as usize..(26 + 2 * i) * cw as usize {
+                        let p = pixel(x, y);
+                        assert_eq!(p[3], 255);
+                        if p == background {
+                            clear += 1;
+                        } else {
+                            ink += 1;
+                            let coverage = (f64::from(p[reference])
+                                - f64::from(background[reference]))
+                                / (f64::from(foreground[reference])
+                                    - f64::from(background[reference]));
+                            maximum_coverage = maximum_coverage.max(coverage);
+                            assert!((-0.01..=1.01).contains(&coverage));
+                            for c in 0..3 {
+                                let expected = f64::from(background[c])
+                                    + coverage
+                                        * (f64::from(foreground[c]) - f64::from(background[c]));
+                                assert!(
+                                    (f64::from(p[c]) - expected).abs() <= 2.0,
+                                    "RGB channels must share alpha for {color:?}: pixel {p:?}"
+                                );
+                                let low = foreground[c].min(background[c]).saturating_sub(1);
+                                let high = foreground[c].max(background[c]).saturating_add(1);
+                                assert!(
+                                    (low..=high).contains(&p[c]),
+                                    "Original symbol ignored C foreground {color:?}: pixel {p:?}"
+                                );
+                            }
+                        }
+                    }
+                }
+                assert!(ink > 0, "Original Aries must have visible ink at {cw}x{ch}");
+                assert!(
+                    maximum_coverage > 0.1,
+                    "Original symbol must respond to C foreground at {cw}x{ch}: {color:?}, coverage {maximum_coverage}"
+                );
+                assert!(
+                    clear > 0,
+                    "Font background must stay transparent at {cw}x{ch}"
+                );
+            }
+            for column in [24, 26, 28, 30] {
+                for y in 9 * ch as usize..12 * ch as usize {
+                    for x in column * cw as usize..(column + 1) * cw as usize {
+                        assert_eq!(
+                            pixel(x, y),
+                            background,
+                            "Symbol escaped its cell at {cw}x{ch}"
+                        );
+                    }
+                }
+            }
+            for column in [25, 27, 29] {
+                for row in [9, 11] {
+                    for y in row * ch as usize..(row + 1) * ch as usize {
+                        for x in column * cw as usize..(column + 1) * cw as usize {
+                            assert_eq!(
+                                pixel(x, y),
+                                background,
+                                "Symbol escaped vertically at {cw}x{ch}"
+                            );
+                        }
+                    }
+                }
+            }
+            let original = view.renderer.rgba().to_vec();
+            let cells = view.cells.clone();
+            for mode in [Mode::Dot, Mode::Illustration, Mode::Original] {
+                view.mode = mode;
+                view.render().unwrap();
+                assert_eq!(view.cells, cells);
+            }
+            assert_eq!(
+                view.renderer.rgba(),
+                original,
+                "Display cycling changed the original frame"
+            );
+        }
     }
 }

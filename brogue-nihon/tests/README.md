@@ -189,3 +189,8 @@ CHECKの`nativeAIProbe`は未準備・turn0だけで適格NPCの数値ID/index�
 臭跡fixtureに限り、元生成地形で必要な安全経路を選ぶため42以外の明示seedを受け付ける。他のfixtureは42限定を維持する。ブラウザ証拠のseedと初期状態を一致させ、原作比較も同じuint64 seedで起動する。`BROGUE_SCENT_SEED`は候補診断用の上書きで、実際のseedは各caseに保存される。候補不成立の診断も保持する。
 
 現在の既定受入対象はCEの形成/未形成とRapid/Bulletの未形成、PC/タッチの計8例。Rapid/Bulletの形成追跡4例は、元seed42で安全な遮蔽退路が不成立、seed43で実移動後のfresh遮蔽witness未到達（Bulletの一候補は接触被害guardも失敗）として診断を保存し、既定の成功対象に含めない。明示IDで診断できるが、未到達を成功や原作欠落の証明にしない。CE42・Rapid43・Bullet43の明示生成seedを記録し、正常な原作生成地形での代表条件だけを確認する。全AI/全seedを完了扱いしない。
+
+
+### Original植物記号の色（CHECK専用）
+
+`node brogue-nihon/tests/original-symbol-colors.mjs` は3variant×PC/タッチエミュレーション6件。Cの公開フレームにFOLIAGE/BLOODWORT_STALKのU+2648と緑・紫・暗い緑、非黒背景を明示するUI専用fixtureを使う。実際のRust canvasで前景色の同一alpha合成・十分な色応答・透明な背景・上下左右のセル境界を検査し、fit/14/24倍率でOriginal→Dot→Illustration→OriginalをDOM操作する。各操作後にC状態・RNG・入力待ちserial・消費入力数の不変を検査する。最後の実入力restのみがCのturnを進める。自然な地形配置・治癒・照明・全記号・実機Safariの合格には使わない。`BROGUE_ORIGINAL_SYMBOL_COLORS` は完全case IDのCSV。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/original-symbol-colors/results.json`、`BROGUE_COMPARE_NAME=original-symbol-colors`、`BROGUE_COMPARE_DOMAINS=none` を指定し `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。原作比較はC状態と入力の一致で、canvas色はブラウザpixel検査の証拠を使う。
