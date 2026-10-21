@@ -136,8 +136,6 @@ static void featureCarriedMonster(creature *monst) {
                   monst->info.accuracy, monst->info.defense);
 }
 
-/* Pure shape/scent/FOV evidence for the corridor scenes; never ask the AI
- * to choose a direction. The prepared pointers are compared, not dereferenced. */
 /* Bounded pure native-info observation; no safety map/pathfinding/AI call. */
 static void featureDistanceObservation(creature *monst) {
     featureAppend(",\"fieldOfView\":%d,\"publicVisible\":%d,\"nativeBolts\":[",
@@ -146,6 +144,8 @@ static void featureDistanceObservation(creature *monst) {
     featureAppend("]");
 }
 
+/* Pure shape/scent/FOV evidence for the corridor scenes; never ask the AI
+ * to choose a direction. The prepared pointers are compared, not dereferenced. */
 static void featureCorridorObservation(creature *monst) {
     featureAppend(",\"corridorSubject\":%d,\"corridorCompanion\":%d,\"passableArcs\":%d,"
                   "\"scent\":%d,\"fieldOfView\":%d,\"publicVisible\":%d,\"adjacent\":[",
@@ -903,6 +903,15 @@ static void fixtureMonsterDistance(int scene) {
     creature *subject = fixtureTarget(scene == CHECK_DISTANCE_KOBOLD ? MK_KOBOLD : MK_GOBLIN_MYSTIC,
                                       scene == CHECK_DISTANCE_BOUNDARY ? 43 : 42, 14);
     subject->ticksUntilTurn = 1;
+}
+
+/* Artificial current nutrition/quantity only; native max2150 and food table
+ * remain. The real apply/eat command must perform all effects and costs. */
+static void fixtureFruit(int scene) {
+    fixtureSafeWorld();
+    player.status[STATUS_NUTRITION] = scene == CHECK_FRUIT_STACK ? 300 : scene == CHECK_FRUIT_BOUNDARY ? 600 : 601;
+    item *fruit = give(FOOD, FRUIT, 'a', true);
+    fruit->quantity = scene == CHECK_FRUIT_STACK ? 2 : 1;
 }
 
 /* Native runic preparation only. Combat and proc RNG are never called here. */
@@ -1682,7 +1691,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_DISTANCE_KOBOLD) return -1;
+    } else if (scene < 1 || scene > CHECK_FRUIT_OVERFLOW) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1725,6 +1734,7 @@ int brogue_check_fixture(int scene) {
     else if (scene == CHECK_NEGATE_PHANTOM || scene == CHECK_NEGATE_PHYLACTERY) fixtureMonsterNegation(scene);
     else if (scene >= CHECK_CORRIDOR_GROUP && scene <= CHECK_CORRIDOR_WIDE) fixtureMonsterCorridor(scene);
     else if (scene >= CHECK_DISTANCE_CLOSE && scene <= CHECK_DISTANCE_KOBOLD) fixtureMonsterDistance(scene);
+    else if (scene >= CHECK_FRUIT_STACK && scene <= CHECK_FRUIT_OVERFLOW) fixtureFruit(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
