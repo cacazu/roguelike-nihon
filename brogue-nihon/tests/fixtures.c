@@ -78,7 +78,10 @@ static void featureItem(item *it) {
                i ? "," : "", it->keyLoc[i].loc.x, it->keyLoc[i].loc.y, it->keyLoc[i].machine,
                it->keyLoc[i].disposableHere);
     }
-    featureAppend("]}");
+    featureAppend("],\"netEnchant\":");
+    if (it->category & (WEAPON | ARMOR)) featureAppend("%lld", netEnchant(it));
+    else featureAppend("null");
+    featureAppend("}");
 }
 
 static void featureStatuses(const short *statuses) {
@@ -156,8 +159,8 @@ const char *brogue_check_features(void) {
         }
     }
     featureAppend("],");
-    featureAppend("\"inWater\":%d,\"playerCombat\":{\"defense\":%d,\"damageMin\":%d,\"damageMax\":%d},",
-           rogue.inWater, player.info.defense, player.info.damage.lowerBound, player.info.damage.upperBound);
+    featureAppend("\"inWater\":%d,\"playerCombat\":{\"defense\":%d,\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d},",
+           rogue.inWater, player.info.defense, player.info.damage.lowerBound, player.info.damage.upperBound, player.info.accuracy);
     featureAppend("\"status\":{\"nutrition\":%d,\"burning\":%d,\"poisoned\":%d,\"slowed\":%d,"
            "\"hasted\":%d,\"invisible\":%d,\"levitating\":%d,\"telepathic\":%d,\"fireImmune\":%d},\"pack\":[",
            player.status[STATUS_NUTRITION], player.status[STATUS_BURNING], player.status[STATUS_POISONED],
@@ -196,7 +199,8 @@ const char *brogue_check_features(void) {
                monst->movementSpeed, monst->attackSpeed, monst->newPowerCount, monst->totalPowerCount,
                monst->creatureMode, monst->mutationIndex, featureLeaderIndex(monst->leader));
         if (monst->carriedItem) featureItem(monst->carriedItem); else featureAppend("null");
-        featureAppend("}");
+        featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d}}",
+               monst->info.damage.lowerBound, monst->info.damage.upperBound, monst->info.accuracy);
     }
     featureAppend("],\"cells\":[");
     count = 0;
@@ -634,6 +638,27 @@ static void fixtureSafeWorld(void) {
     player.regenPerTurn = 0;
 }
 
+/* Native runic preparation only. Combat and proc RNG are never called here. */
+static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
+    fixtureSafeWorld();
+    item *weapon = give(WEAPON, DAGGER, 'a', true);
+    weapon->flags |= ITEM_EQUIPPED;
+    if (!plain) weapon->flags |= ITEM_RUNIC;
+    weapon->flags &= ~(ITEM_RUNIC_IDENTIFIED | ITEM_RUNIC_HINTED);
+    weapon->enchant1 = 9;
+    weapon->enchant2 = kind;
+    weapon->strengthRequired = rogue.strength;
+    weapon->vorpalEnemy = 4; /* Original ogre class; only slaying consults it. */
+    rogue.weapon = weapon;
+    creature *target = fixtureFrozenTarget(inanimate ? MK_ARROW_TURRET : MK_OGRE, 41, 14);
+    target->info.maxHP = 1000;
+    target->currentHP = 400;
+    target->status[STATUS_STUCK] = target->maxStatus[STATUS_STUCK] = 50;
+    pmapAt(target->loc)->layers[SURFACE] = SPIDERWEB;
+    if (!plain && kind == W_FORCE) pmap[44][14].layers[DUNGEON] = WALL;
+    updateEncumbrance();
+}
+
 static void fixtureContracts(int scene) {
     fixtureSafeWorld();
     if (scene == CHECK_SLAYING_MATCH || scene == CHECK_SLAYING_OTHER) {
@@ -803,10 +828,16 @@ int brogue_check_fixture(int scene) {
             kind %= 100;
             if (condition > 4 && !(category == WAND && condition == 5 && kind == WAND_DOMINATION)) return -1;
         }
+        else if (group == CHECK_WEAPON_RUNIC || group == CHECK_WEAPON_PLAIN || group == CHECK_WEAPON_INANIMATE) {
+            if (kind < 0 || kind >= NUMBER_WEAPON_RUNIC_KINDS
+                || (group == CHECK_WEAPON_PLAIN && kind != 0)
+                || (group == CHECK_WEAPON_INANIMATE && kind == W_SLAYING)) return -1;
+            category = WEAPON;
+        }
         else return -1;
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
-        if (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0)) return -1;
+        if (category != WEAPON && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
     } else if (scene < 1 || scene > CHECK_NATIVE_LEVELS) return -1;
     if (scene == CHECK_NATIVE_LEVELS) {
         pos destination;
@@ -819,6 +850,7 @@ int brogue_check_fixture(int scene) {
     if (category == POTION || category == CHARM) fixtureConsumable(category, kind, group == CHECK_POTION_KNOWN || category == CHARM, group == CHECK_CHARM_COOLDOWN);
     else if (category == SCROLL) fixtureScroll(kind, group == CHECK_SCROLL_KNOWN);
     else if (category == STAFF || category == WAND) fixtureBolt(category, kind, condition);
+    else if (category == WEAPON) fixtureWeaponRunic(kind, group == CHECK_WEAPON_PLAIN, group == CHECK_WEAPON_INANIMATE);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

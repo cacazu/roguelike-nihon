@@ -109,3 +109,9 @@ node brogue-nihon/tests/compare-fixtures.mjs
 `overlay-messages.mjs` は製品のC／Rust描画を使い、Fと発見一覧の表示中に原作の半透明本文を上部メッセージ欄へ混入させない回帰6件を実行する。Cの表示ownerが保持scopeを開始／復元し、フレームと一緒にboolをRustへ渡す。入力待ちdescriptorから推測せず、セルと保持状態のどちらの変更でも再描画する。観測ラッパーも`frame(cells, ...metadata)`で追加情報を落とさず転送する。
 
 最初の保持frameがAnyKey到達前であること、全保持frameのDOM不変、3表示・拡縮・タッチpanの非消費、終了後の実Strength Potionによる新メッセージ更新と再表示を確認する。Item／Text／Help ACKは別の非保持対照。pan後は慣性スクロールの停止を待ってから次のボタンへ触れる。Fの原作Canvasには暗い下地glyphが残るため、公開文字を読む際は既存の輝度判定を使う。真の入れ子・metadataだけの変更は別途ソースを確認し、致命例外の復旧や全modal対応まで実証したとは扱わない。原作比較は他の追加契約と同じく`overlay-messages`の合格結果と`BROGUE_COMPARE_DOMAINS=none`を指定する。
+
+`weapon-runics.mjs` はCE/Rapid/Bulletの実variantとPC/touchで武器10runicの代表発動、通常武器、Slaying以外の原作INANIMATE gateを検証する。+9既知dagger、HP400/max1000・回復停止・ticks10000・web/STUCKの対象は人工的な準備条件。procは実攻撃の乱数でのみ起き、初発動で攻撃停止、30hit上限で未発動なら失敗とする。自然生成率・全武器種・負の強化・奇襲・死亡相手への例外は残る。
+
+麻痺・減速・混乱は適用と実restによる自然解除、Multiplicityはplayer leader・元武器damage/accuracy・自律攻撃・寿命消滅、Forceは衝突前の実frameと末尾HPから衝突被害を分離する。Mercyはdefender回復、Plentyは親と同HPの敵cloneを検査する。凍結対象の状態適用を麻痺/混乱AI経路の網羅と呼ばない。各variant/PCtouch状態を照合し、各primaryを独立原作traceへ比較する。`BROGUE_WEAPON_RUNICS` は完全case IDのCSV。原作比較は `BROGUE_FIXTURE_RESULTS` を `brogue-nihon/.local/feature-verification/weapon-runics/results.json`、`BROGUE_COMPARE_NAME=weapon-runics`、`BROGUE_COMPARE_DOMAINS=none` とする。読取専用observerに装備netEnchant（16bit固定小数点）・player accuracy・monster damage/accuracyを追加し、効果は変更しない。
+
+`weapon-runic-edges.mjs` は武器suiteからPlenty/Multiplicityの3variant・PCtouch12件とPCを選ばないtouch単独1件を抽出する。新個体の種類、生成前の床/非占有、player/親/他個体との非重複を実検査し、touch単独はPC同値未比較と結果へ明記する。通常120件では60組のPC/touch同値を維持する。初回120件実行後に追加した配置assertionはこの13件でも検証し、全件を理由なく繰り返さない。native比較名/結果は`weapon-runic-edges`へ替え、domain=noneを維持する。
