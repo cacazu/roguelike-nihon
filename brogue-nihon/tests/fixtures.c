@@ -767,6 +767,20 @@ static void fixtureMonsterBurn(int scene) {
     }
 }
 
+/* Native whip-range/AI controls: pure initial coordinates and one optional wall. */
+static void fixtureMonsterWhip(int scene) {
+    const short actorX[] = {42, 43, 44, 43, 42};
+    fixtureSafeWorld();
+    player.info.defense = 0; /* Explicit artificial initial defense. */
+    pmapAt(player.loc)->flags &= ~HAS_PLAYER;
+    player.loc = (pos) {38, 14};
+    pmapAt(player.loc)->flags |= HAS_PLAYER;
+    creature *subject = fixtureTarget(scene == CHECK_WHIP_OGRE ? MK_OGRE : MK_SALAMANDER,
+                                     actorX[scene - CHECK_WHIP_RANGE4], 14);
+    subject->ticksUntilTurn = 1;
+    if (scene == CHECK_WHIP_OPAQUE) pmap[40][14].layers[DUNGEON] = WALL;
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1544,7 +1558,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_BURN_EXPIRY) return -1;
+    } else if (scene < 1 || scene > CHECK_WHIP_OGRE) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1582,6 +1596,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_REFLECT_GUARDIAN && scene <= CHECK_REFLECT_GOLEM) fixtureMonsterReflection(scene);
     else if (scene >= CHECK_KAMIKAZE_BLOAT && scene <= CHECK_KAMIKAZE_RAT) fixtureMonsterKamikaze(scene);
     else if (scene >= CHECK_BURN_UNPROTECTED && scene <= CHECK_BURN_EXPIRY) fixtureMonsterBurn(scene);
+    else if (scene >= CHECK_WHIP_RANGE4 && scene <= CHECK_WHIP_OGRE) fixtureMonsterWhip(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
