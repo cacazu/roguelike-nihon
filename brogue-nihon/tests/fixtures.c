@@ -718,7 +718,9 @@ static void fixtureAdvanced(int scene) {
         fixtureFloorItem(GOLD, 0, 41, 14)->quantity = 1;
     } else if (scene == CHECK_FEAT_SPECIALIST_READY || scene == CHECK_FEAT_SPECIALIST_BELOW) {
         give(SCROLL, SCROLL_ENCHANTING, 'a', true)->quantity = 2;
-        give(WEAPON, DAGGER, 'b', true)->enchant1 = scene == CHECK_FEAT_SPECIALIST_READY ? 15 : 14;
+        /* Keep the same +16/+15 outcome boundary for each variant's real power. */
+        give(WEAPON, DAGGER, 'b', true)->enchant1 =
+            (scene == CHECK_FEAT_SPECIALIST_READY ? 16 : 15) - scrollTable[SCROLL_ENCHANTING].power;
     } else if (scene == CHECK_JELLY_OPEN || scene == CHECK_JELLY_BLOCKED) {
         fixtureEquippedDagger();
         creature *target = fixtureFrozenTarget(MK_PINK_JELLY, 41, 14);

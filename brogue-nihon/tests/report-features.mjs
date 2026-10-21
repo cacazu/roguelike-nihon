@@ -292,7 +292,7 @@ export async function main(args=process.argv.slice(2)){
   }
   const inventory=await readJSON(inventoryPath);
   if(!inventory)throw new Error(`Missing inventory: ${inventoryPath}. Generate the source inventory first.`);
-  const defaultEvidence=['input','menus','commands','scenarios','consumables','scrolls','bolts','projectiles','knowledge-feats','world-contracts','world-variants','advanced-contracts','persistence','original-compare','fixture-compare','fixture-compare-scrolls','fixture-compare-bolts','fixture-compare-knowledge-feats','fixture-compare-world-contracts','fixture-compare-world-variants','fixture-compare-advanced-contracts'].map(name=>path.join(gameRoot,'.local/feature-verification',name,'results.json'));
+  const defaultEvidence=['input','menus','commands','scenarios','consumables','scrolls','bolts','projectiles','knowledge-feats','world-contracts','world-variants','advanced-contracts','advanced-variants','persistence','original-compare','fixture-compare','fixture-compare-scrolls','fixture-compare-bolts','fixture-compare-knowledge-feats','fixture-compare-world-contracts','fixture-compare-world-variants','fixture-compare-advanced-contracts','fixture-compare-advanced-variants'].map(name=>path.join(gameRoot,'.local/feature-verification',name,'results.json'));
   for(const file of ['baseline-results.json','intermediate-results.json','pending-loss-baseline-results.json'])defaultEvidence.push(path.join(gameRoot,'.local/feature-verification/input',file));
   defaultEvidence.push(path.join(gameRoot,'.local/feature-verification/menus/unpaused-file-baseline-results.json'));
   defaultEvidence.push(path.join(repository,'.local/feature-verification/normal-play/results.json'),path.join(gameRoot,'.local/browser-verification/results.json'));

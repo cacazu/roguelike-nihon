@@ -103,3 +103,5 @@ $env:BROGUE_COMPARE_NAME='advanced-contracts'
 $env:BROGUE_COMPARE_DOMAINS='none'
 node brogue-nihon/tests/compare-fixtures.mjs
 ```
+
+`advanced-variants.mjs` は上記17条件をRapid/Bulletの実variantでPC／タッチ各34件、計68件実行する。Specialistの準備は原作のEnchanting powerを読んで`16-power`／`15-power`とし、実使用後の+16／+15を正負対照にする。期待する強化幅は独立にCE1、Rapid/Bullet2として検査する。怪物の基本catalogは共通でも、生成・地形・光量・RNGの同一をvariant間で要求しない。自然階層は各variant自身の生成後の階段とseedを再訪時に比較する。原作比較は`BROGUE_FIXTURE_RESULTS`と`BROGUE_COMPARE_NAME`を`advanced-variants`へ切り替える。これはタイトルUIからのvariant選択とは別のCHECK起動経路である。
