@@ -290,3 +290,8 @@ jelly-armor.mjs はnative Acidic Jellyの通常攻撃を、保護なし／保護
 `imp-blink.mjs` は native Imp による実攻撃・盗みから逃走、AIの瞬間移動までを、開放／7壁の条件と3 variant、PC／touchの12候補ケースを定義する。既定実行は10ケースで、CEの開放2ケースは盗み後に43,18で待機し、12rest内の瞬間移動が未到達だったため除外する。両ケースは完全IDを明示すれば同じ厳密条件で実行できる。未到達の初回12件記録はローカルの診断証拠として保持し、CEでの瞬間移動を合格扱いしない。プレイヤーHP100・防御0・未装備のdart5本と位置36,14は検証専用の初期状態。Impの能力・命中225・被害4〜9・HP35・再生・boltを保持し、最初の実restで3本を盗ませる。開放では追加12rest以内の同一入力での2セル以上の跳躍と新しい公開メッセージを要求し、未到達を合格にしない。7壁では追加8restのすべてで実被害を要求し、動かないだけの検証を避ける。原作のidle時計33と瞬間移動中の一時的な占有解除を許容し、厳密な所持数・占有・状態は入力待ちの境界で判定する。原作の30%確率分布、自然配置、盗品の回収、全AI、実機Safariの確認とは区別する。
 
 作品フォルダーから `node tests/imp-blink.mjs` を実行する。絞り込みは `BROGUE_IMP_BLINK` に完全case IDをCSV指定する。同じ作品フォルダーで `BROGUE_FIXTURE_RESULTS=.local/feature-verification/imp-blink/results.json`、`BROGUE_COMPARE_NAME=imp-blink`、`BROGUE_COMPARE_DOMAINS=none` を指定し、`node tests/compare-fixtures.mjs` で原作比較する。固定原作ソースとコンパイラーは既存設定を使う。
+
+
+`zombie-gas.mjs` はnative Zombieの環境DFが実生成するROT_GASによる吐き気と、同じgasを受けるRespirationを、3variant・PC/touchの12条件で検査する。初期gasは0。10壁の2セル室、HP100のplayerと既知のnative革鎧、Zombieの時計10000は検証専用初期状態である。原作のDFChance100・puff量15・2回拡散を保持し、実period休憩1回で両セルのgas量5〜8、通常鎧の吐き気20／Respirationの吐き気0と実ルーン鑑定、公開メッセージ・表示を確認する。ROT_GASに直接HP被害はなく、初回NPCの吐き気も0。発生直後の量15は自然に描画された場合だけ記録し、結果の濃度から途中描画を推定しない。血由来DF、Zombieの攻撃・活動AI・嘔吐・自然配置・全gas・実機Safariの確認には含めない。
+
+作品フォルダーから `node tests/zombie-gas.mjs` を実行する。絞り込みは `BROGUE_ZOMBIE_GAS` に完全case IDをCSV指定する。原作比較は `BROGUE_FIXTURE_RESULTS=.local/feature-verification/zombie-gas/results.json`、`BROGUE_COMPARE_NAME=zombie-gas`、`BROGUE_COMPARE_DOMAINS=none` を指定して `node tests/compare-fixtures.mjs` を実行する。固定原作ソースとコンパイラーは既存設定を使う。
