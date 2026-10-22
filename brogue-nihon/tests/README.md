@@ -328,3 +328,23 @@ node tests/kraken-interactions.mjs は3版×PC/touch×水中/岸の12ケース�
 固定した隣接4セルの同一セルで、火からSURFACEの黒曜石へ自然に変わることと、実viewport内の原作glyph・C公開色・PNGを確認する。火U+22CFは原典SDL fontIndex0x83の独立coverageと実canvas全RGBAを比較し、欠字のinkや同色の別形状を拒否する。8休息で未到達なら失敗とし、seed・確率・状態を変更しない。原作の血DF、昇格途中の一時NOTHING、描画によるflag変化はsource順に検査し、疑似frameや強制flushを使わない。実際に要求されたACKだけを別集計し、全消費イベントを原作比較へ渡す。能動AI・bolt・近接着火・全伝播・自然生成・実機Safari・全機能の確認には含めない。
 
 選択は `BROGUE_FLAMEDANCER_CORONA` の完全ID CSV。原作比較は作品フォルダーで `BROGUE_FIXTURE_RESULTS=.local/feature-verification/flamedancer-corona/results.json`、`BROGUE_COMPARE_NAME=flamedancer-corona`、`BROGUE_COMPARE_DOMAINS=none` を指定して `node tests/compare-fixtures.mjs` を実行する。
+
+### Eldritch Totemの機械起動・召喚とleader死亡
+
+`node tests/eldritch-totem.mjs` は3版×PC/touch×初期HP1/原作HP80の12条件を検査する。安全室、player HP100と回復停止、既知+0 DAGGER、初期足元(40,14)の可視`GAS_TRAP_PARALYSIS`とmachine7の配線は人工初期条件である。板はDUNGEON層、初期depressed/poweredは0、旧lever位置(41,14)はmachine外のFLOORにする。Totemは(40,13)で原作生成のstate・能力・速度・時計100・status/max・spawnDepthを保持し、破壊条件だけ初期currentHPを1にする。子・cohort・leader roleは準備しない。
+
+最初の実入力`.`で圧力板を作動させ、確定状態に子がいない場合だけ`h`で退避して環境更新により再armし、`l`で戻って再作動する。上限は8press、最初の自然な完全cohortで再作動を止め、通常検索`s`と単体攻撃`k`を各1回だけ続ける。最大17ゲーム行動に加え、実際に提示された確認descriptor3への`y`は最大7回、真正のACK descriptor6へのSpaceは既存上限内で実要求分だけ送る。送信数・消費数・不発をすべて残し、8回とも不発ならUNREACHED/FAILであり、`s`や`k`によってgoalを作らない。原作`boolean=char`への能力bit切詰めによる初回の50%抽選、自然なBlade4〜7体またはFury2〜3体の選択を保持する。seed42・確率・horde・AI・原作Cを変更せず、事前抽選・再起動・入力後の状態復元で救済しない。
+
+成功pressの出生は子時計101・栄養1000・stationary0で、その区間の子AIは0回である。`s`は同じcohort・位置・原作fullHP・leader関係を保持して時計1・栄養999へ進め、子AIはまだ0回とする。検索statusはcurrent1/max5になり、`k`冒頭でcurrent0/max5保持となる。検索後のcached stealth下限3と、初期7slotおよび最後の100tickで可能な全位置のFOV/知覚距離を結合し、この新しい有限経路だけでTRACKINGを要求する。旧配置のWANDERING証拠を、この初期条件の保証へ置き換えない。
+
+HP80対照の`k`中は、全cohortを共有する原作の時間順・list順・占有の同一潜在経路で、成功move50・attack100・全passive候補が地形/斜め阻害/生存占有に阻まれたfailed16を分離する。moveはstationaryを0へ戻し、failed16は位置を変えずstationaryを増やす。最大2成功移動・7失敗試行・各子1攻撃という上限と実被害を結合し、player HPは最低67を保つ。HP1への最後の攻撃はleader死亡→demote→BOUNDかつleader不在の子の除去を次のAIより前に要求し、HP80対照ではTotem76/77と同じcohortが生存する。血・RUBBLE・原作乱数を保持し、HP1で切られた被害1から未観測の3/4rollを断定しない。`k`後の追加休息は行わない。
+
+準備・実fresh・event.before・確定状態を別streamで検査する。scene限定の受動観測は板/退避セル、player/環境時計、検索フラグとbonus、現在のlive actorセルのscent値を読み、原作AI・RNG・効果helperや強制publishを呼ばない。fadeInMonster/flashMonsterの描画予約と、本物のflare pause・入力取得時のpending flash解除を区別し、ALREADY_SEEN0・可視履歴・原作native flagを保持する。確認`y`とACKを含む全実消費入力の全待機点を原作と比較し、除外はreadyだけとする。共通driverの既定観測形式・重複排除・flushは変更しない。
+
+Totem・圧力板・少なくとも1体の自然な子と、破壊後の元の公開セル/生存対照を、Originalの原作glyph・C公開色・実canvas pixel・viewport内のPNGで確認する。Totemは原典SDL atlas0x8aの独立coverageによる全RGBA形状比較も行う。必要なメッセージは現在公開されているCの3行と実画面を結合する。PCはfit倍率の実canvas文字、touchは製品mobile mirrorの現在のnode/match/UTF16に束縛した文字・単語Rangeを確認する。非空白の全bounding/client rectはstrict clipと実hitを要求する。例外は、clip外のU+0020が1個だけで、それが内部の未切断単語に挟まれ、装飾なしのpre-wrapで下行へsoft-wrapし、その実rectとoutside whole fragmentが4辺完全一致し、全外端を説明できる場合だけである。EPS・clip拡大・merged fragmentの推定分解・欠測範囲の救済は行わない。これはadvance geometryの限定判定で、一般のink境界やRTL/縦書きの保証ではない。
+
+倍率変更・受動計測・message paneの既存scroll前後でfull Cstate/RNG・入力serial・実消費件数の不変を要求する。不発、実確認、真正ACKと必要な全PNGを保持し、必要な召喚・公開文・視覚証拠が未到達ならFAILとする。子数だけで全個体の物理的可視やsidebarを主張せず、NOT_LISTED_IN_SIDEBARのBladeにsidebar項目を要求しない。
+
+同条件PC/touchの初期・最終full observed state/RNGと実行動・確認・ACK列を比較する。HP対照間の初期正規化はfixture/ready/currentTotemHPだけで、後続RNGは異条件間で一致要求しない。新しい代表partial候補は`MK_ELDRITCH_TOTEM`と`HORDE_DIES_ON_LEADER_DEATH`の2件だけで、full加点は0。子種・板・blood・既存flags・自然machine生成・全AI・全機能の加点には使わない。touchはChromium emulationで、実機/Safariは未確認である。
+
+選択は`BROGUE_ELDRITCH_TOTEM`の完全ID CSV。全12件ではfilter環境変数を未設定へ削除し、空文字列を渡さない。全条件の成功後、原作比較は作品フォルダーで`BROGUE_FIXTURE_RESULTS=.local/feature-verification/eldritch-totem/results.json`、`BROGUE_COMPARE_NAME=eldritch-totem`、`BROGUE_COMPARE_DOMAINS=none`を指定して`node tests/compare-fixtures.mjs`を実行する。独立source reviewのPASS前にbuildやゲーム入力を開始しない。

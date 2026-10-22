@@ -19,6 +19,7 @@ extern void brogue_check_publish(void);
 static int preparedScene;
 static creature *nativeAISubject;
 static creature *enteredSubject;
+static creature *eldritchTotemSubject;
 static creature *corridorSubject;
 static creature *corridorCompanion;
 static pos nativeAIRoute[9];
@@ -89,6 +90,9 @@ static void featureItem(item *it) {
     else featureAppend("null");
     featureAppend(",\"armorRaw\":");
     if (it->category & ARMOR) featureAppend("%d", it->armor); else featureAppend("null");
+    if (preparedScene >= CHECK_ELDRITCH_TOTEM_LETHAL && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES)
+        featureAppend(",\"damageMin\":%d,\"damageMax\":%d,\"damageClump\":%d",
+                      it->damage.lowerBound, it->damage.upperBound, it->damage.clumpFactor);
     featureAppend("}");
 }
 
@@ -228,6 +232,23 @@ static void featureNativeWorld(void) {
     featureAppend("{\"terrainHash\":\"%016llx\",\"waypointHash\":\"%016llx\",\"scentHash\":\"%016llx\",\"wpCount\":%d,\"scentTurnNumber\":%u}", terrain, waypoints, scent, rogue.wpCount, rogue.scentTurnNumber);
 }
 static void featureNativeAI(void) {
+    /* Scene-only passive player timing/flash data; keep the shared fresh
+     * projection and every existing native-AI scene unchanged. */
+    if (preparedScene >= CHECK_ELDRITCH_TOTEM_LETHAL && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES
+        && rogue.gameInProgress) {
+        featureAppend("{\"eldritchTotem\":{\"playerBookkeepingFlags\":%lu,"
+                      "\"playerTurnsUntilRegen\":%ld,\"playerRegenPerTurn\":%d,"
+                      "\"playerTicksUntilTurn\":%d,\"ticksTillUpdateEnvironment\":%d,"
+                      "\"scentTurnNumber\":%u,\"justRested\":%d,\"justSearched\":%d,"
+                      "\"stealthBonus\":%d,\"awarenessBonus\":%d,\"plateCell\":",
+                      player.bookkeepingFlags, player.turnsUntilRegen, player.regenPerTurn,
+                      player.ticksUntilTurn, rogue.ticksTillUpdateEnvironment,
+                      rogue.scentTurnNumber, rogue.justRested, rogue.justSearched,
+                      rogue.stealthBonus, rogue.awarenessBonus);
+        featureCell((pos){40,14});
+        featureAppend(",\"retreatCell\":"); featureCell((pos){39,14}); featureAppend("}}");
+        return;
+    }
     creature *subject = NULL; int index = 0, subjectIndex = -1;
     if ((preparedScene / 1000 * 1000 == CHECK_NATIVE_AI
         || preparedScene / 1000 * 1000 == CHECK_NATIVE_SCENT) && rogue.gameInProgress && monsters) {
@@ -355,6 +376,15 @@ const char *brogue_check_features(void) {
         if (monst->carriedItem) featureItem(monst->carriedItem); else featureAppend("null");
         featureAppend(",\"combat\":{\"damageMin\":%d,\"damageMax\":%d,\"accuracy\":%d,\"defense\":%d}",
                monst->info.damage.lowerBound, monst->info.damage.upperBound, monst->info.accuracy, monst->info.defense);
+        /* The prepared identity can outlive the actor. Compare pointers only;
+         * all dereferenced data below belongs to the live iterator member. */
+        if (preparedScene >= CHECK_ELDRITCH_TOTEM_LETHAL && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES) {
+            featureAppend(",\"preparedSubject\":%d,\"leaderIsPreparedSubject\":%d,"
+                          "\"machineHome\":%d,\"spawnDepth\":%d,\"scentAtCell\":%d,\"carriedMonster\":",
+                          monst == eldritchTotemSubject, monst->leader == eldritchTotemSubject,
+                          monst->machineHome, monst->spawnDepth, scentMap[monst->loc.x][monst->loc.y]);
+            featureCarriedMonster(monst->carriedMonster);
+        }
         if (preparedScene >= CHECK_ENTER_SUMMONS && preparedScene <= CHECK_ENTER_PHOENIX) {
             featureAppend(",\"preparedSubject\":%d,\"carriedMonster\":", monst == enteredSubject);
             featureCarriedMonster(monst->carriedMonster);
@@ -365,24 +395,24 @@ const char *brogue_check_features(void) {
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
         if ((preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE)) {
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES)) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
 
         if ((preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES))
             featureAppend(",\"nativeDFType\":%d,\"nativeDFChance\":%d", monst->info.DFType, monst->info.DFChance);
 
         if ((preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES))
             featureAppend(",\"nativeMovementSpeed\":%d,\"nativeAttackSpeed\":%d", monst->info.movementSpeed, monst->info.attackSpeed);
 
         if ((preparedScene >= CHECK_BOG_WET_MOVEMENT && preparedScene <= CHECK_BOG_DEEP_GRIP)
-            || (preparedScene >= CHECK_KRAKEN_WET && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE))
+            || (preparedScene >= CHECK_KRAKEN_WET && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES))
             featureAppend(",\"turnsSpentStationary\":%d", monst->turnsSpentStationary);
 
-        if (preparedScene >= CHECK_FLAMEDANCER_CORONA && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE)
+        if (preparedScene >= CHECK_FLAMEDANCER_CORONA && preparedScene <= CHECK_ELDRITCH_TOTEM_SURVIVES)
             featureAppend(",\"nativeDamageClump\":%d,\"nativeTurnsBetweenRegen\":%ld,"
                           "\"nativeIntrinsicLightType\":%d,\"nativeIsLarge\":%d",
                           monst->info.damage.clumpFactor, monst->info.turnsBetweenRegen,
@@ -471,7 +501,7 @@ static void fixtureInventory(void) {
 }
 
 static void fixtureRoom(void) {
-    enteredSubject = NULL;
+    enteredSubject = eldritchTotemSubject = NULL;
     corridorSubject = corridorCompanion = NULL;
     freeCreatureList(monsters);
     freeCreatureList(dormantMonsters);
@@ -1326,6 +1356,33 @@ static void fixtureFlamedancerCorona(int scene) {
         fixtureStatus(STATUS_IMMUNE_TO_FIRE, 1000);
 }
 
+/* Native Eldritch Totem and initial underfoot reusable pressure wiring only.
+ * Actual period, bounded h/l re-entry, search and k execute native rules.
+ * SafeWorld leaves the former lever (41,14) plain FLOOR with no machine;
+ * its zeroed flags also leave the underfoot plate undepressed/unpowered.
+ * Keep generated flags, state, clocks, status maxima and spawnDepth intact. */
+static void fixtureEldritchTotem(int scene) {
+    fixtureSafeWorld();
+    rogue.strength = 12;
+    player.info.accuracy = 100;
+    player.info.defense = 0;
+    player.weaknessAmount = 0;
+    item *weapon = give(WEAPON, DAGGER, 'a', true);
+    weapon->flags |= ITEM_EQUIPPED;
+    rogue.weapon = weapon;
+    pmap[40][14].layers[DUNGEON] = GAS_TRAP_PARALYSIS;
+    pmap[40][14].machineNumber = 7;
+    pmap[40][14].flags |= IS_IN_ROOM_MACHINE;
+    creature *subject = generateMonster(MK_ELDRITCH_TOTEM, false, false);
+    subject->loc = (pos){40, 13};
+    subject->machineHome = 7;
+    pmapAt(subject->loc)->flags |= HAS_MONSTER | IS_IN_ROOM_MACHINE;
+    pmapAt(subject->loc)->machineNumber = 7;
+    if (scene == CHECK_ELDRITCH_TOTEM_LETHAL) subject->currentHP = 1;
+    eldritchTotemSubject = subject;
+    updateEncumbrance();
+}
+
 /* Initial native melee actors and optional player protection only.
  * Actual rest input must perform the native attack and independent shield decay. */
 static void fixtureNativeMelee(int scene) {
@@ -2116,7 +2173,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_FLAMEDANCER_CORONA_IMMUNE) return -1;
+    } else if (scene < 1 || scene > CHECK_ELDRITCH_TOTEM_SURVIVES) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -2179,6 +2236,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_UNDERWORM_MELEE && scene <= CHECK_HORROR_SHIELDED) fixtureNativeMelee(scene);
     else if (scene >= CHECK_KRAKEN_WET && scene <= CHECK_KRAKEN_DRY) fixtureKrakenInteraction(scene);
     else if (scene >= CHECK_FLAMEDANCER_CORONA && scene <= CHECK_FLAMEDANCER_CORONA_IMMUNE) fixtureFlamedancerCorona(scene);
+    else if (scene >= CHECK_ELDRITCH_TOTEM_LETHAL && scene <= CHECK_ELDRITCH_TOTEM_SURVIVES) fixtureEldritchTotem(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

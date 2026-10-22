@@ -185,4 +185,9 @@
 #define CHECK_FLAMEDANCER_CORONA 149
 #define CHECK_FLAMEDANCER_CORONA_IMMUNE 150
 
+/* Initial underfoot pressure wiring; native summon/maintenance/leader death.
+ * LETHAL changes only Totem HP to 1; SURVIVES retains its native HP 80. */
+#define CHECK_ELDRITCH_TOTEM_LETHAL 151
+#define CHECK_ELDRITCH_TOTEM_SURVIVES 152
+
 #endif
