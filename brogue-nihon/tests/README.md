@@ -307,3 +307,7 @@ node tests/ogre-totem.mjs は3種×PC/touch×負傷/満HPの12ケース。両方
 ### Centaurの原作の矢と透明な射線遮断
 
 node tests/centaur-arrow.mjs は3種×PC/touch×開放/透明PORTの12ケース。原作の全HP35・移動速度50・攻撃速度100・性別・能力・30%判定を保持する。人工のCHASM8セルは自身の移動を制限するだけで、AI・矢・命中・被害を直接呼ばない。最大40実休息で実際の矢と4〜8の被害、隣接する公開frameのHP変化を要求し、未到達は失敗。防御0に対する命中率は100%なので発射のみを空振りとして通さない。透明PORTは8休息で無発射と13,9,5,1のclock周期を要求する。全観測でTRACKING・FOV・距離4でstealth range 4以上（休息で影の7が4になる原作処理を含む）、PC/touchと初期対照の状態・RNG、実画面のCと色を検査する。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=centaur-arrow、BROGUE_COMPARE_DOMAINS=noneでcompare-fixtures.mjs。BROGUE_CENTAUR_ARROWは完全IDのCSV。自然生成・逃走・自由移動・確率分布・CHASM回避の汎用機能・実機Safari・全機能の証拠にはしない。
+
+### Underworm・Tentacle Horrorの近接攻撃と防護
+
+node tests/native-melee.mjs は3種×PC/touch×2種族×防護有無の24ケース。原作の全HP・能力・速度・再生timerを保持した隣接NPCが、1実休息で実際に攻撃する。防御0で命中100%、Underworm18〜22/Tentacle Horror25〜35の被害と自然な隣接公開frameを要求する。防護は初期値1000/max1000の人工状態で、攻撃分D×10と時間経過50を区別し、HP100・残量950−D×10・native clock101/1を検査する。準備前observerはこのsuiteだけopt-inし、本物host.frameの準備観測を受動記録する。疑似frameの挿入・強制flushは行わず、既存signatureの重複排除は維持する。血は実Dに基づき広がり半径を求め、再生・不眠・確率分布・自然生成・実機Safari・全機能には合格を加えない。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=native-melee、BROGUE_COMPARE_DOMAINS=noneでcompare-fixtures.mjs。BROGUE_NATIVE_MELEEは完全IDのCSV。

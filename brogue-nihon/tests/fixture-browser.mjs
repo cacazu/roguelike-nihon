@@ -164,6 +164,9 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
             assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),rejected),-1,'Unknown/unsupported kind must reject');
             assert.deepEqual(await d.state(),startup,'Rejected kind changed preparation/RNG');
           }
+           // Opt in only after native startup/rejection checks: record genuine preparation publishes.
+           // No synthetic observation or forced C flush; the normal frame wrapper keeps signature dedup.
+           if(test.observe_preparation_frames===true){await page.evaluate(()=>{__brogueFixture.active=true;});if(!prefix)entry.observe_preparation_frames=true;}
           assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),scene),scene,'Fixture not accepted');
           d.startup=startup;d.origin={x:startup.x,y:startup.y,depth:startup.depth};
           const prepared=await d.state();assert.equal(prepared.turn,0);assert.equal(prepared.fixture,scene);
