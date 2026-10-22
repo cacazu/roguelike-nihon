@@ -311,3 +311,8 @@ node tests/centaur-arrow.mjs は3種×PC/touch×開放/透明PORTの12ケース�
 ### Underworm・Tentacle Horrorの近接攻撃と防護
 
 node tests/native-melee.mjs は3種×PC/touch×2種族×防護有無の24ケース。原作の全HP・能力・速度・再生timerを保持した隣接NPCが、1実休息で実際に攻撃する。防御0で命中100%、Underworm18〜22/Tentacle Horror25〜35の被害と自然な隣接公開frameを要求する。防護は初期値1000/max1000の人工状態で、攻撃分D×10と時間経過50を区別し、HP100・残量950−D×10・native clock101/1を検査する。準備前observerはこのsuiteだけopt-inし、本物host.frameの準備観測を受動記録する。疑似frameの挿入・強制flushは行わず、既存signatureの重複排除は維持する。血は実Dに基づき広がり半径を求め、再生・不眠・確率分布・自然生成・実機Safari・全機能には合格を加えない。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=native-melee、BROGUE_COMPARE_DOMAINS=noneでcompare-fixtures.mjs。BROGUE_NATIVE_MELEEは完全IDのCSV。
+
+
+### Krakenの自然潜水・拘束・追撃と岸の対照
+
+node tests/kraken-interactions.mjs は3版×PC/touch×水中/岸の12ケース。人工の7壁とKraken41,14、player40,14の水中/床だけを初期対照とし、原作の全HP120・移動50・攻撃100・FLITS・MA_SEIZESを保持する。初期clock3001で30回の実休息と原作20%潜水更新を観測し、初回AIは31回目のHP不変の拘束、32回目の実15〜20追撃を要求する。岸側は追加8休息で時計13,9,5,1を2周期、評価回数に対応するstationary値と無攻撃を確認する。helper・RNG・潜水/拘束flagの強制は行わない。初期inWater0から水中の最初の実休息で変化する光・描画・乱数も原作どおり保持し、異なる水中/岸の後続RNG一致は要求しない。BROGUE_KRAKEN_INTERACTIONSは完全IDのCSV選択。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=kraken-interactions、BROGUE_COMPARE_DOMAINS=noneを指定してcompare-fixtures.mjs。自然生成・全FLITS・再生/逃走の境界・実機Safari・全機能の証拠にはしない。
