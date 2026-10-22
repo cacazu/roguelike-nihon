@@ -20,7 +20,7 @@ function table(source,name){
  const masked=maskC(source,true),match=new RegExp('\\b'+name+'\\s*\\[[^\\]]*\\]\\s*=\\s*\\{').exec(masked);assert.ok(match,'Missing original '+name);
  const start=match.index+match[0].length;let depth=1,end=start;while(depth&&end<masked.length){if(masked[end]==='{')depth++;if(masked[end]==='}')depth--;end++;}assert.equal(depth,0);return fields(source.slice(start,end-1)).map(row=>{assert.ok(row.startsWith('{')&&row.endsWith('}'));return fields(row.slice(1,-1));});
 }
-function catalogs(inv,variant){
+export function readOriginalHordeCatalogs(inv,variant){
  const known=new Map(Object.values(inv.definitions).flatMap(d=>d.entries.map(e=>[e.symbol,e.value]))),num=s=>{
   if(s===undefined)return 0;const clean=maskC(s).replace(/[()\s]/g,'');if(/^-?\d+$/.test(clean))return Number(clean);
   const minus=/^([A-Z_]\w*)-(\d+)$/.exec(clean);if(minus&&known.has(minus[1]))return known.get(minus[1])-Number(minus[2]);
@@ -31,17 +31,18 @@ function catalogs(inv,variant){
   const glyphEnum=/enum displayGlyph\s*\{([\s\S]*?)\};/.exec(header);assert.ok(glyphEnum);let glyphValue=-1;for(const entry of fields(glyphEnum[1])){const m=/^(G_\w+)(?:\s*=\s*(\d+))?$/.exec(entry.trim());assert.ok(m,'Unsupported displayGlyph entry '+entry);glyphValue=m[2]===undefined?glyphValue+1:Number(m[2]);known.set(m[1],glyphValue);}
   for(const m of vs.matchAll(/^#define\s+([A-Z_]\w*)\s+(\d+)/gm))known.set(m[1],Number(m[2]));
   const monsters=table(global,'monsterCatalog').map((f,index)=>({index,name:JSON.parse(f[1]),nativeGlyph:num(f[2]),maxHP:num(f[4]),defense:num(f[5]),accuracy:num(f[6]),damage:list(f[7]),nativeMovementSpeed:num(f[9]),nativeAttackSpeed:num(f[10]),nativeBloodType:num(f[11]),nativeDFChance:num(f[14]),nativeDFType:num(f[15]),nativeBolts:[...list(f[16]),...Array(20).fill(0)].slice(0,20),flags:num(f[17]),abilityFlags:num(f[18])}));
-  const mutations=table(global,'mutationCatalog').map((f,index)=>({index,title:JSON.parse(f[0]),health:num(f[2]),move:num(f[3]),attack:num(f[4]),defense:num(f[5]),damage:num(f[6]),DFChance:num(f[7]),DFType:num(f[8]),flags:num(f[10]),abilityFlags:num(f[11]),forbiddenFlags:num(f[12]),forbiddenAbilities:num(f[13])}));
+  const mutations=table(global,'mutationCatalog').map((f,index)=>({index,title:JSON.parse(f[0]),description:JSON.parse(f[14]),health:num(f[2]),move:num(f[3]),attack:num(f[4]),defense:num(f[5]),damage:num(f[6]),DFChance:num(f[7]),DFType:num(f[8]),flags:num(f[10]),abilityFlags:num(f[11]),forbiddenFlags:num(f[12]),forbiddenAbilities:num(f[13])}));
   const hordes=table(vs,'hordeCatalog_'+suffix).map((f,index)=>({index,leader:num(f[0]),members:list(f[2]).slice(0,num(f[1])),counts:fields(f[3].slice(1,-1)).slice(0,num(f[1])).map(list),min:num(f[4]),max:num(f[5]),frequency:num(f[6]),spawnsIn:num(f[7]),machine:num(f[8]),flags:num(f[9])}));
   return {monsters,mutations,hordes};
  };
  const original=parse(pinned);assert.deepEqual(parse(root),original,'Current catalog differs from pinned source numeric oracle');assert.equal(original.mutations.length,8);assert.equal(original.monsters.length,68);return {...original,source_sha256:hashes};
 }
-export function createHordeMutationCases({variants=['brogue','rapid_brogue','bullet_brogue']}={}){
+export function createHordeMutationCases({variants=['brogue','rapid_brogue','bullet_brogue'],maxReads=3}={}){
+ assert.ok(Number.isSafeInteger(maxReads)&&maxReads>=1&&maxReads<=3,'Read budget must be 1..3');
  const inv=generateDataInventory({gitMetadata:false});validateDataSnapshot(inv);
  const V=(d,n)=>{const e=inv.definitions[d].entries.find(e=>e.symbol===n);assert.ok(e,d+':'+n);return e.value;},B=n=>V('monsterBookkeepingFlags','MB_'+n),F=n=>V('monsterBehaviorFlags','MONST_'+n),A=n=>V('monsterAbilityFlags','MA_'+n),H=n=>V('hordeFlags','HORDE_'+n),T=n=>V('tileType',n),status=n=>V('statusEffects','STATUS_'+n),gender=(F('MALE')|F('FEMALE'))>>>0,pc=new Map(),cases=[];
  for(const variant of variants){
-  const catalog=catalogs(inv,variant),threshold={brogue:10,rapid_brogue:3,bullet_brogue:2}[variant],amulet={brogue:26,rapid_brogue:6,bullet_brogue:3}[variant],accel={brogue:1,rapid_brogue:4,bullet_brogue:8}[variant],forbidden=H('LEADER_CAPTIVE')|H('NO_PERIODIC_SPAWN')|H('IS_SUMMONED')|H('MACHINE_ONLY');
+  const catalog=readOriginalHordeCatalogs(inv,variant),threshold={brogue:10,rapid_brogue:3,bullet_brogue:2}[variant],amulet={brogue:26,rapid_brogue:6,bullet_brogue:3}[variant],accel={brogue:1,rapid_brogue:4,bullet_brogue:8}[variant],forbidden=H('LEADER_CAPTIVE')|H('NO_PERIODIC_SPAWN')|H('IS_SUMMONED')|H('MACHINE_ONLY');
   const admissible=(row,depth)=>{
    if(row.frequency<=0||(row.flags&forbidden))return false;
    if(row.min<=depth&&row.max>=depth)return true;
@@ -88,7 +89,7 @@ export function createHordeMutationCases({variants=['brogue','rapid_brogue','bul
      const state=await d.state();assert.equal(state.statuses[status('HALLUCINATING')],0,'Hallucinated display is ineligible');const lines=await sidebarEvidence(),rows=[];for(const m of subjects){assert.equal(m.publicVisible,1);const cell=await d.publicCell(m.x+21,m.y+3),species=catalog.monsters[m.kind].name.toLowerCase(),expectedGlyph=catalog.monsters[m.kind].nativeGlyph;assert.equal(cell[0],expectedGlyph,'Selected location must show the pinned native species glyph, not terrain/another NPC');assert.ok(Math.max(...cell.slice(2,5))>=20);assert.ok(Math.max(...cell.slice(2,5).map((v,j)=>Math.abs(v-cell[j+5])))>0);const sidebar=findSidebar(lines,species,mutationTitle);assert.ok(sidebar,'Species and mutation title must belong to the same public sidebar item');rows.push({kind:m.kind,species,x:m.x,y:m.y,expected_glyph:expectedGlyph,cell,sidebar});}return {actors:rows,mutation_title:mutationTitle,sidebar_lines:lines};
     };
     const tr0=await d.trace(),es0=tr0.native_trace.length;let a=b;
-    for(let read=1;read<=(blocked?1:3)&&!d.entry.actual_witness;read++){
+    for(let read=1;read<=(blocked?1:maxReads)&&!d.entry.actual_witness;read++){
      settled(a);assert.ok(stock(a)>0,'No remaining scroll; bounded witness unreached');if(read>1){assert.ok(a.monsters.length<=6,'Existing roster limit; witness unreached');assert.ok(a.nearbyCells.some(c=>!(c.terrainFlags&V('terrainFlagCatalog','T_OBSTRUCTS_PASSABILITY'))&&!(c.flags&V('tileFlags','HAS_MONSTER'))),'No adjacent spawn location; witness unreached');}
      const before=a,prior=await d.trace(),os=prior.observations.length,es=prior.native_trace.length;await d.apply();assert.equal((await d.wait()).kind,'confirm');const consumeObservationStart=(await d.trace()).observations.length;await d.input('y');await d.settle();a=await d.state();const tr=await d.trace(),fresh=tr.observations.slice(os),events=tr.native_trace.slice(es),effectFresh=tr.observations.slice(consumeObservationStart),text=words([await publicText(d),...effectFresh.map(o=>o.messageRows.join(' '))].join(' '));for(const o of fresh)baseGuard(o);for(const e of events)baseGuard(e.before,false);settled(a);assert.equal(a.turn,before.turn+1);assert.ok(a.absoluteTurnNumber>=before.absoluteTurnNumber+1);assert.deepEqual(events.filter(e=>e.event[1]!==32).map(e=>e.event.slice(0,2)),[[0,97],[0,97],[0,121]]);for(const e of events.filter(e=>e.event[1]===32)){assert.equal(e.event[0],0);assert.equal(e.descriptor[0],6);}
      const delta=stock(before)-stock(a);assert.ok(delta>=1&&delta<=stock(before));const carriedTheft=[a,...fresh,...events.map(e=>e.before)].flatMap(s=>s.monsters).filter(m=>m.carriedItem?.category===V('itemCategory','SCROLL')&&m.carriedItem?.kind===V('scrollKind','SCROLL_SUMMON_MONSTER'));if(delta>1)assert.ok(carriedTheft.length&&/steals|stole|snatches/.test(text),'Extra stock loss needs actual native theft evidence');
