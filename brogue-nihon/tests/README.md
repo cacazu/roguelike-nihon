@@ -295,3 +295,7 @@ jelly-armor.mjs はnative Acidic Jellyの通常攻撃を、保護なし／保護
 `zombie-gas.mjs` はnative Zombieの環境DFが実生成するROT_GASによる吐き気と、同じgasを受けるRespirationを、3variant・PC/touchの12条件で検査する。初期gasは0。10壁の2セル室、HP100のplayerと既知のnative革鎧、Zombieの時計10000は検証専用初期状態である。原作のDFChance100・puff量15・2回拡散を保持し、実period休憩1回で両セルのgas量5〜8、通常鎧の吐き気20／Respirationの吐き気0と実ルーン鑑定、公開メッセージ・表示を確認する。ROT_GASに直接HP被害はなく、初回NPCの吐き気も0。発生直後の量15は自然に描画された場合だけ記録し、結果の濃度から途中描画を推定しない。血由来DF、Zombieの攻撃・活動AI・嘔吐・自然配置・全gas・実機Safariの確認には含めない。
 
 作品フォルダーから `node tests/zombie-gas.mjs` を実行する。絞り込みは `BROGUE_ZOMBIE_GAS` に完全case IDをCSV指定する。原作比較は `BROGUE_FIXTURE_RESULTS=.local/feature-verification/zombie-gas/results.json`、`BROGUE_COMPARE_NAME=zombie-gas`、`BROGUE_COMPARE_DOMAINS=none` を指定して `node tests/compare-fixtures.mjs` を実行する。固定原作ソースとコンパイラーは既存設定を使う。
+
+### Goblin TotemのHASTE対象状態
+
+node tests/goblin-totem.mjs は3種×PC/touch×TRACKING/WANDERINGの12ケース。初期PORTでプレイヤーへのSPARKだけを遮り、原作の同隊対象条件・30%抽選・300tick周期でHASTEを確認する。TRACKINGは最大40実休息で実詠唱とHASTED10/速度50を要求し、未到達は失敗。WANDERINGは8実休息の否定対照。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=goblin-totem、BROGUE_COMPARE_DOMAINS=noneを指定してcompare-fixtures.mjs。BROGUE_GOBLIN_TOTEMは完全ケースIDのCSV絞り込み。人工の初期隊列・NPCclock10000は自然生成や対象自身のAIを示さず、移動不能flagの効果・Ogre Totem・SPARK・実機Safari・全機能の合格は扱わない。
