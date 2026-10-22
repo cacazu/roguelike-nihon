@@ -299,3 +299,7 @@ jelly-armor.mjs はnative Acidic Jellyの通常攻撃を、保護なし／保護
 ### Goblin TotemのHASTE対象状態
 
 node tests/goblin-totem.mjs は3種×PC/touch×TRACKING/WANDERINGの12ケース。初期PORTでプレイヤーへのSPARKだけを遮り、原作の同隊対象条件・30%抽選・300tick周期でHASTEを確認する。TRACKINGは最大40実休息で実詠唱とHASTED10/速度50を要求し、未到達は失敗。WANDERINGは8実休息の否定対照。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=goblin-totem、BROGUE_COMPARE_DOMAINS=noneを指定してcompare-fixtures.mjs。BROGUE_GOBLIN_TOTEMは完全ケースIDのCSV絞り込み。人工の初期隊列・NPCclock10000は自然生成や対象自身のAIを示さず、移動不能flagの効果・Ogre Totem・SPARK・実機Safari・全機能の合格は扱わない。
+
+### Ogre Totemの徘徊中の味方への回復
+
+node tests/ogre-totem.mjs は3種×PC/touch×負傷/満HPの12ケース。両方の味方OgreはWANDERING、原作の性別選択・自然回復20・clockを保持する。実詠唱と隣接画面の+27を最大40実休息で要求し、20休息ごとの自然回復+1は魔法と数えない。400tickの詠唱機会は1,5,...37の10回、未到達は失敗。満HP55は8休息の否定対照。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=ogre-totem、BROGUE_COMPARE_DOMAINS=noneでcompare-fixtures.mjs。BROGUE_OGRE_TOTEMは完全IDのCSV絞り込み。人工の負傷・隊列・遅延clock・PORTは自然生成/実際の負傷/自身のAIの証拠にせず、SLOW・移動不能flag・自然回復の未観測境界・実機Safari・全機能を合格扱いしない。
