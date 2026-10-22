@@ -365,17 +365,17 @@ const char *brogue_check_features(void) {
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
         if ((preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_BLACK_JELLY_BLOCKED)) {
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ACID_JELLY_ARMOR_PROTECTED)) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
 
         if ((preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_BLACK_JELLY_BLOCKED))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ACID_JELLY_ARMOR_PROTECTED))
             featureAppend(",\"nativeDFType\":%d,\"nativeDFChance\":%d", monst->info.DFType, monst->info.DFChance);
 
         if ((preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_BLACK_JELLY_BLOCKED))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ACID_JELLY_ARMOR_PROTECTED))
             featureAppend(",\"nativeMovementSpeed\":%d,\"nativeAttackSpeed\":%d", monst->info.movementSpeed, monst->info.attackSpeed);
 
         if (preparedScene >= CHECK_BOG_WET_MOVEMENT && preparedScene <= CHECK_BOG_DEEP_GRIP)
@@ -1179,6 +1179,22 @@ static void fixtureNativeJelly(int scene) {
     updateEncumbrance();
 }
 
+/* Native leather/Jelly initial data only. First actual incoming attack must
+ * supply hit/miss, damage, corrosion and native re-equip after real rests. */
+static void fixtureNativeJellyArmor(int scene) {
+    fixtureSafeWorld();
+    rogue.strength = 12;
+    player.weaknessAmount = 0;
+    item *armor = give(ARMOR, LEATHER_ARMOR, 'a', true);
+    armor->flags &= ~ITEM_PROTECTED;
+    armor->flags |= ITEM_EQUIPPED;
+    if (scene == CHECK_ACID_JELLY_ARMOR_PROTECTED) armor->flags |= ITEM_PROTECTED;
+    rogue.armor = armor;
+    fixtureStatus(STATUS_DONNING, 0);
+    fixtureTarget(MK_ACID_JELLY, 41, 14)->ticksUntilTurn = 1;
+    updateEncumbrance();
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1956,7 +1972,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_BLACK_JELLY_BLOCKED) return -1;
+    } else if (scene < 1 || scene > CHECK_ACID_JELLY_ARMOR_PROTECTED) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -2010,6 +2026,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_BOG_WET_MOVEMENT && scene <= CHECK_BOG_DEEP_GRIP) fixtureBogInteraction(scene);
     else if (scene >= CHECK_HORDE_THRESHOLD && scene <= CHECK_HORDE_BLOCKED) fixtureHordeMutation(scene);
     else if (scene >= CHECK_ACID_JELLY_OPEN && scene <= CHECK_BLACK_JELLY_BLOCKED) fixtureNativeJelly(scene);
+    else if (scene == CHECK_ACID_JELLY_ARMOR || scene == CHECK_ACID_JELLY_ARMOR_PROTECTED) fixtureNativeJellyArmor(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

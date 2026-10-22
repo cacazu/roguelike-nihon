@@ -280,3 +280,8 @@ node tests/monster-distance.mjs はnative Goblin Mysticの距離維持を、距�
 
 
 Brogueの文字描画は通常1セル・全角日本語2セルの範囲に収める。Rust単体検査 glyph_changes_stay_inside_their_owned_cells は、PC・タッチ・拡大の4寸法と3表示で記号を空白にした前後の所有セル外RGBA不変、後続の文字描画、全角の継続セルを確認する。native-jellies.mjs は実際の隣接Jセルの全画素をCの前景・背景色の範囲へ照合し、隣の白いプレイヤー記号のはみ出しを可視性の証拠へ混ぜない。
+
+
+jelly-armor.mjs はnative Acidic Jellyの通常攻撃を、保護なし／保護された既知の皮鎧に対して3variant×PC/touchの12条件で実行する。皮鎧の原作raw30・必要筋力10・生成chargeを保持し、player筋力12の防御35から開始する。実際のperiod休止を20回以内で送り、最初の2〜6被害で即停止する。保護なしは鎧−1・防御25、保護ありは実被弾して鎧0・防御35を要求し、空振りだけの保護例を合格にしない。HP更新とspecialHitの間の描画は区別し、厳密な鎧結果は入力待ちの完了時に判定する。血は被害側playerのRED_BLOODのみ。装着コマンド、他防具の固有効果、自然配置、全AIの確認とは別である。
+
+実行は作品フォルダーから node tests/jelly-armor.mjs。絞り込みは BROGUE_JELLY_ARMOR に完全case IDのCSVを指定する。同じ作品フォルダーから原作比較を行う場合は BROGUE_FIXTURE_RESULTS=.local/feature-verification/jelly-armor/results.json、BROGUE_COMPARE_NAME=jelly-armor、BROGUE_COMPARE_DOMAINS=none を指定して node tests/compare-fixtures.mjs を実行する。原作固定ソースとコンパイラーは既存の設定を使う。
