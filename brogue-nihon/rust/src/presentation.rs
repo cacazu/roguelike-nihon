@@ -300,15 +300,25 @@ impl Presentation {
                 let glyph = char::from_u32(ui_codepoint(cell[0], cell[1] as u32))
                     .ok_or_else(|| format!("Invalid public Unicode glyph {}", cell[1]))?;
                 let wide = cell[0] > 0x110000;
-                let size = if wide {
+                let mut size = if wide {
                     f64::from(cw * 2).min(f64::from(ch))
                 } else {
                     f64::from(ch) * 0.84
                 };
                 let text = glyph.to_string();
-                let measured = self.renderer.measure(&text, size, false, false).width;
                 let advance = f64::from(cw) * if wide { 2. } else { 1. };
+                let mut measured = self.renderer.measure(&text, size, false, false).width;
+                if measured > advance {
+                    size *= advance / measured;
+                    measured = self.renderer.measure(&text, size, false, false).width;
+                }
+                // The original atlas confines each symbol to its destination
+                // cell. Font advance fitting preserves the glyph; clipping also
+                // contains bearings and antialiasing. Shared clip pushes its
+                // own scope, so one restore closes it without a separate save.
+                commands.push(json!({"op":"clip","rect":{"x":x,"y":y,"w":advance,"h":ch}}));
                 commands.push(json!({"op":"text","text":text,"x":f64::from(x)+(advance-measured)/2.,"y":f64::from(y)+(f64::from(ch)-size)/2.,"size":size,"color":rgb(&cell[2..5])}));
+                commands.push(json!({"op":"restore"}));
             }
         }
         let mut sets = BTreeMap::from([("brogue".into(), ImageSet::new(tinted))]);
@@ -480,6 +490,98 @@ mod tests {
             cell_pixels(1),
             "The flyout triangle must not render as a missing glyph"
         );
+    }
+    #[test]
+    fn glyph_changes_stay_inside_their_owned_cells() {
+        let assets = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../web/assets");
+        let mut view = Presentation::new(
+            std::fs::read(assets.join("fonts/NotoSansJP.ttf")).unwrap(),
+            std::fs::read(assets.join("fonts/NotoColorEmoji.ttf")).unwrap(),
+            &std::fs::read(assets.join("dot-tiles.png")).unwrap(),
+            &std::fs::read(assets.join("illustrations.png")).unwrap(),
+        )
+        .unwrap();
+        let (column, row) = (50, 10);
+        let at = (row * COLS + column) * STRIDE;
+        // Include the actual touch size first: the player's white @ used to
+        // paint into a dark Jelly on either side. Also cover public zoom sizes.
+        for (cw, ch) in [(14, 22), (12, 18), (10, 15), (24, 37)] {
+            view.cell_width = cw;
+            view.cell_height = ch;
+            for mode in [Mode::Original, Mode::Dot, Mode::Illustration] {
+                view.mode = mode;
+                for (raw, unicode, columns) in [
+                    (152, '@' as i32, 1),
+                    ('W' as i32, 'W' as i32, 1),
+                    (0x110000 + '\u{65e5}' as i32, '\u{65e5}' as i32, 2),
+                ] {
+                    view.cells.fill(0);
+                    for cell in view.cells.chunks_exact_mut(STRIDE) {
+                        cell[5..8].copy_from_slice(&[10, 20, 30]);
+                    }
+                    // Later foregrounds must survive restoration of the clip.
+                    for (x, y) in [(49, 10), (52, 10), (50, 9), (50, 11)] {
+                        let neighbor = (y * COLS + x) * STRIDE;
+                        view.cells[neighbor..neighbor + STRIDE]
+                            .copy_from_slice(&[74, 74, 34, 34, 34, 10, 20, 30, 0, 0]);
+                    }
+                    view.cells[at..at + STRIDE]
+                        .copy_from_slice(&[raw, unicode, 100, 100, 100, 10, 20, 30, 0, 0]);
+                    if columns == 2 {
+                        view.cells[at + STRIDE] = 0x110000;
+                    }
+                    let cells = view.cells.clone();
+                    view.render().unwrap();
+                    assert_eq!(view.cells, cells, "Rendering must not change public cells");
+                    let ink = view.renderer.rgba().to_vec();
+                    view.cells[at] = 0;
+                    view.cells[at + 1] = 32;
+                    view.render().unwrap();
+                    let blank = view.renderer.rgba();
+                    let width = view.size().0 as usize;
+                    let (left, top) = (column * cw as usize, row * ch as usize);
+                    let right = left + columns * cw as usize;
+                    let bottom = top + ch as usize;
+                    let mut own_ink = 0;
+                    let mut continuation_ink = 0;
+                    for (i, (actual, expected)) in
+                        ink.chunks_exact(4).zip(blank.chunks_exact(4)).enumerate()
+                    {
+                        let (x, y) = (i % width, i / width);
+                        if x >= left && x < right && y >= top && y < bottom {
+                            if actual != expected {
+                                own_ink += 1;
+                                if x >= left + cw as usize {
+                                    continuation_ink += 1;
+                                }
+                            }
+                        } else {
+                            assert_eq!(
+                                actual, expected,
+                                "Glyph {unicode} escaped its {columns} cell(s) at {cw}x{ch}, pixel {x},{y}"
+                            );
+                        }
+                    }
+                    assert!(own_ink > 0, "Glyph {unicode} must remain visible at {cw}x{ch}");
+                    for (nx, ny) in [(52, 10), (50, 11)] {
+                        assert!(
+                            (ny * ch as usize..(ny + 1) * ch as usize).any(|y| {
+                                (nx * cw as usize..(nx + 1) * cw as usize).any(|x| {
+                                    ink[(y * width + x) * 4..][..4] != [26, 51, 77, 255]
+                                })
+                            }),
+                            "Closing a glyph clip must retain later neighbor ink"
+                        );
+                    }
+                    if columns == 2 {
+                        assert!(
+                            continuation_ink > 0,
+                            "Wide Japanese glyph must retain ink in its continuation cell"
+                        );
+                    }
+                }
+            }
+        }
     }
     #[test]
     fn mode_and_color_settings_are_validated() {

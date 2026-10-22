@@ -272,3 +272,11 @@ node tests/monster-distance.mjs はnative Goblin Mysticの距離維持を、距�
 各本文文字とsidebar文字は10px以上のセル幅を保ち、実viewport内容領域とwindow内へ完全に入った座標・viewport PNGを保存する。touchは実panで順番に読む。信頼されたpointercancelまたは12px超のdrag、C入力0、wait/state不変を確認し、DOMのscroll値・styleやゲーム状態を書き換えない。mini HUDの上10行という範囲は変更せず、既定画面で全文が同時に見えるという検証にはしない。選択中はcursor/readyとIS_IN_PATHだけを区別し、turn/絶対時間/HP/所持品/NPC/地形/実質乱数抽選counterを比較する。Esc後は本文の消失とready以外の全観測状態の復帰を確認し、touchのsidebar閲覧後は公開の中心ボタンで元のplayer表示位置へ戻す。人工深度34/8/4、Chromiumタッチエミュレーションによる部分確認であり、自然生成全体・全変異効果・実機Safariは対象外。
 
 選択は `BROGUE_MONSTER_INSPECTION` の完全ID CSV。原作比較は `BROGUE_FIXTURE_RESULTS=.local/feature-verification/monster-inspection/results.json BROGUE_COMPARE_NAME=monster-inspection BROGUE_COMPARE_DOMAINS=none node tests/compare-fixtures.mjs`。原作へのイベント再生とCSS viewportの可読性は別の証拠として扱う。
+
+
+`node tests/native-jellies.mjs` はAcidic Jellyの同一接触による分裂＋武器腐食、保護武器でも起こる分裂、Black Jellyの通常分裂／6壁での不発を、4条件×3variant×PC/touchの24件で検査する。scene127..130の人工安全室にnative対象を41,14へ置き、info/HP60または120/status/regenを保ち初期clock10000だけを遅延させる。playerはHP100/STR12/accuracy100と既知の通常Dagger+0（必要STR12・damage3..4）を持つ。native防御0により通常命中100%となり、STUCKや命中・分裂・腐食・乱数helperを準備で呼ばない。通常の生成乱数消費を保持し、入力後に状態を戻さない。実lから無保護AcidだけConfirm→yを送り、1turnのHP半減・clone位置・実leader/follower関係・weapon0→-1を要求する。保護Acidはweapon0のまま分裂し、Blackの無保護weaponも0を保つ。閉鎖Blackはcardinal6辺だけを壁にし、実damage3..4を受けてHP116/117、cloneなしを要求する。分裂後HP28/29または58/59から未観測の正確なdamage rollを一意復元したとはしない。
+
+公開Jの論理セルと実canvas画素を独立に読み、10px以上のcellが実viewport/window内に完全に入った画像・座標・色差を保存する。Blackの原作色は変更せず、前景20以上を一律要求しない。touchの種名はlogical C sidebar証拠と明記し、mini HUDの物理可視性へ広げない。全fresh・確定状態と12組のPC/touchを照合し、原作比較は同じ実入力待ちが対象。自然horde、能動AI、酸の鎧腐食、致死／遠隔の分裂、学習能力剥離、変異継承、100clone境界、実機Safariは未確認。選択 `BROGUE_NATIVE_JELLIES`、原作比較 `BROGUE_FIXTURE_RESULTS=.local/feature-verification/native-jellies/results.json BROGUE_COMPARE_NAME=native-jellies BROGUE_COMPARE_DOMAINS=none node tests/compare-fixtures.mjs`。
+
+
+Brogueの文字描画は通常1セル・全角日本語2セルの範囲に収める。Rust単体検査 glyph_changes_stay_inside_their_owned_cells は、PC・タッチ・拡大の4寸法と3表示で記号を空白にした前後の所有セル外RGBA不変、後続の文字描画、全角の継続セルを確認する。native-jellies.mjs は実際の隣接Jセルの全画素をCの前景・背景色の範囲へ照合し、隣の白いプレイヤー記号のはみ出しを可視性の証拠へ混ぜない。

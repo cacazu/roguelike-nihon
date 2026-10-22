@@ -68,7 +68,7 @@
     },
     {
       "file": "rust/src/presentation.rs",
-      "sha256": "a793d26fe90aa67c7da64959995f86769e7cb7bf078a210ceba92c971ff24cc6"
+      "sha256": "e66cc58b225f626b7cce631e6c46396adf4ef0f854558b5b60201319cefd4502"
     },
     {
       "file": "src/brogue/Architect.c",
@@ -379,8 +379,8 @@
     },
     {
       "file": "browser-ui.wasm",
-      "bytes": 2537493,
-      "sha256": "3245e9e0929344185b0271be02120e6538492d38d48096be13f157b16b96faad"
+      "bytes": 2540280,
+      "sha256": "0f2f765c02257bf9424a3f34bc4f81290573a3ac1bbfa57d1665755b2a9e2604"
     }
   ]
 }
