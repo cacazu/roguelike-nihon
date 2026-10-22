@@ -364,13 +364,16 @@ const char *brogue_check_features(void) {
             featureCorridorObservation(monst);
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
-        if (preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_BOG_DEEP_GRIP) {
+        if (preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_HORDE_BLOCKED) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
 
-        if (preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_BOG_DEEP_GRIP)
+        if (preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_HORDE_BLOCKED)
             featureAppend(",\"nativeDFType\":%d,\"nativeDFChance\":%d", monst->info.DFType, monst->info.DFChance);
+
+        if (preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED)
+            featureAppend(",\"nativeMovementSpeed\":%d,\"nativeAttackSpeed\":%d", monst->info.movementSpeed, monst->info.attackSpeed);
 
         if (preparedScene >= CHECK_BOG_WET_MOVEMENT && preparedScene <= CHECK_BOG_DEEP_GRIP)
             featureAppend(",\"turnsSpentStationary\":%d", monst->turnsSpentStationary);
@@ -396,6 +399,17 @@ const char *brogue_check_features(void) {
     }
     featureAppend("],\"playerCell\":");
     if (rogue.gameInProgress && isPosInMap(player.loc)) featureCell(player.loc); else featureAppend("null");
+    if (preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED) {
+        featureAppend(",\"nearbyCells\":[");
+        int nearCount = 0;
+        if (rogue.gameInProgress) for (int dir = 0; dir < DIRECTION_COUNT; dir++) {
+            pos loc = {player.loc.x + nbDirs[dir][0], player.loc.y + nbDirs[dir][1]};
+            if (!isPosInMap(loc)) continue;
+            if (nearCount++) featureAppend(",");
+            featureCell(loc);
+        }
+        featureAppend("]");
+    }
     featureAppend(",\"spawnCell\":");
     if (rogue.gameInProgress) featureCell((pos){40, 14}); else featureAppend("null");
     unsigned discovered = 0, visible = 0, fieldOfView = 0, mapped = 0;
@@ -1120,6 +1134,24 @@ static void fixtureBogInteraction(int scene) {
     for (int i = 0; i < 7; i++) pmapAt(walls[i])->layers[DUNGEON] = WALL;
     creature *subject = fixtureTarget(MK_BOG_MONSTER, subjectX, 14);
     subject->ticksUntilTurn = grip ? 3001 : 1;
+}
+
+/* Empty artificial room/depth and survival-only player data. Native scroll
+ * input alone must select/generate hordes, mutate and run every monster's AI. */
+static void fixtureHordeMutation(int scene) {
+    rogue.depthLevel = scene == CHECK_HORDE_MUTATION ? gameConst->amuletLevel + 8 / gameConst->depthAccelerator
+                                                   : gameConst->mutationsOccurAboveLevel;
+    fixtureSafeWorld();
+    for (int y = 6; y <= 22; y++) for (int x = 32; x <= 48; x++)
+        if (!posEq((pos){x,y}, rogue.upLoc) && !posEq((pos){x,y}, rogue.downLoc))
+            pmap[x][y].layers[DUNGEON] = FLOOR;
+    player.info.maxHP = player.currentHP = 30000;
+    player.info.defense = 0;
+    fixtureStatus(STATUS_LEVITATING, 1000);
+    fixtureStatus(STATUS_IMMUNE_TO_FIRE, 1000);
+    give(SCROLL, SCROLL_SUMMON_MONSTER, 'a', true)->quantity = 3;
+    if (scene == CHECK_HORDE_BLOCKED) for (int dir = 0; dir < DIRECTION_COUNT; dir++)
+        pmap[player.loc.x + nbDirs[dir][0]][player.loc.y + nbDirs[dir][1]].layers[DUNGEON] = WALL;
 }
 
 /* Native runic preparation only. Combat and proc RNG are never called here. */
@@ -1899,7 +1931,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_BOG_DEEP_GRIP) return -1;
+    } else if (scene < 1 || scene > CHECK_HORDE_BLOCKED) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -1951,6 +1983,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_SENTINEL_REPAIR && scene <= CHECK_SENTINEL_REPAIR_BLOCKED) fixtureSentinelRepair(scene);
     else if (scene == CHECK_PIT_BLOAT_THROW || scene == CHECK_RAT_THROW) fixturePitBloatThrow(scene);
     else if (scene >= CHECK_BOG_WET_MOVEMENT && scene <= CHECK_BOG_DEEP_GRIP) fixtureBogInteraction(scene);
+    else if (scene >= CHECK_HORDE_THRESHOLD && scene <= CHECK_HORDE_BLOCKED) fixtureHordeMutation(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
