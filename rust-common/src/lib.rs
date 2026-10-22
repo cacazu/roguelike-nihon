@@ -3,6 +3,13 @@ mod fonts;
 mod images;
 pub use images::{Image, ImageSet};
 
+#[cfg(test)]
+fn test_font_directory() -> std::path::PathBuf {
+    std::env::var_os("ROGUELIKE_TEST_FONTS")
+        .map(std::path::PathBuf::from)
+        .expect("Set ROGUELIKE_TEST_FONTS to the directory containing NotoSansJP.ttf and NotoColorEmoji.ttf")
+}
+
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, VecDeque},
@@ -539,8 +546,7 @@ mod tests {
     use super::*;
     use serde_json::json;
     fn renderer() -> Renderer {
-        let assets =
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../web/assets/fonts");
+        let assets = crate::test_font_directory();
         Renderer::new(
             std::fs::read(assets.join("NotoSansJP.ttf")).unwrap(),
             std::fs::read(assets.join("NotoColorEmoji.ttf")).unwrap(),

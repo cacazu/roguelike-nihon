@@ -25,6 +25,7 @@
 #include <time.h>
 
 #include "Rogue.h"
+#include "BrowserIO.h"
 #include "GlobalsBase.h"
 #include "Globals.h"
 
@@ -361,7 +362,6 @@ static short actionMenu(short x, boolean playingBack) {
         buttons[buttonCount].flags &= ~B_ENABLED;
         buttonCount++;
 
-        if (!serverMode) {
             if (playingBack) {
                  if (KEYBOARD_LABELS) {
                     sprintf(buttons[buttonCount].text, "  %sO: %sOpen saved game  ",        yellowColorEscape, whiteColorEscape);
@@ -386,7 +386,6 @@ static short actionMenu(short x, boolean playingBack) {
                 buttons[buttonCount].hotkey[0] = SAVE_GAME_KEY;
                 buttonCount++;
             }
-        }
         if (KEYBOARD_LABELS) {
             sprintf(buttons[buttonCount].text, "  %sQ: %sQuit %s  ",    yellowColorEscape, whiteColorEscape, (playingBack ? "to title screen" : "and abandon game"));
         } else {
@@ -695,7 +694,11 @@ void mainInputLoop() {
 
             // Get the input!
             rogue.playbackMode = playingBack;
+            BrowserWait previousWait = playingBack ? browserWaitPlayback()
+                : browserWaitBegin(isPosInMap(rogue.cursorLoc) ? BROWSER_CURSOR : BROWSER_COMMAND,
+                                   0, isPosInMap(rogue.cursorLoc));
             doEvent = moveCursor(&targetConfirmed, &canceled, &tabKey, &rogue.cursorLoc, &theEvent, &state, !textDisplayed, rogue.cursorMode, true);
+            browserWaitRestore(previousWait);
             rogue.playbackMode = false;
 
             if (state.buttonChosen == 3) { // Actions menu button.
@@ -2410,6 +2413,7 @@ void nextBrogueEvent(rogueEvent *returnEvent, boolean textInput, boolean colorsD
     returnEvent->eventType = EVENT_ERROR;
 
     if (rogue.playbackMode && !realInputEvenInPlayback) {
+        BrowserWait previousWait = browserWaitPlayback();
         do {
             repeatAgain = false;
             if ((!rogue.playbackFastForward && rogue.playbackBetweenTurns)
@@ -2426,6 +2430,7 @@ void nextBrogueEvent(rogueEvent *returnEvent, boolean textInput, boolean colorsD
         } while ((repeatAgain || rogue.playbackOOS) && !rogue.gameHasEnded);
         rogue.playbackDelayThisTurn = rogue.playbackDelayPerTurn;
         recallEvent(returnEvent);
+        browserWaitRestore(previousWait);
     } else {
         commitDraws();
         if (rogue.creaturesWillFlashThisTurn) {
@@ -2646,7 +2651,7 @@ void executeKeystroke(signed long keystroke, boolean controlKey, boolean shiftKe
             }
             break;
         case SAVE_GAME_KEY:
-            if (rogue.playbackMode || serverMode) {
+            if (rogue.playbackMode) {
                 return;
             }
             if (confirm("Save this game and exit?", false)) {
@@ -2714,7 +2719,11 @@ void executeKeystroke(signed long keystroke, boolean controlKey, boolean shiftKe
             break;
         case PRINTSCREEN_KEY:
             if (takeScreenshot()) {
+#ifdef BROGUE_BROWSER
+                flashTemporaryAlert(" PNG download started ", 2000);
+#else
                 flashTemporaryAlert(" Screenshot saved in save directory ", 2000);
+#endif
             }
             break;
         default:
@@ -2785,6 +2794,9 @@ boolean getInputTextString(char *inputText,
 
     maxLength = min(maxLength, COLS - x);
 
+    BrowserWait previousWait = browserWaitBegin(BROWSER_TEXT, maxLength - promptSuffixLen, true);
+    for (int key = textEntryBounds[textEntryType][0]; key <= textEntryBounds[textEntryType][1]; key++) browserWaitKey(key);
+
 
     if (inputText != defaultEntry) {
         strcpy(inputText, defaultEntry);
@@ -2853,6 +2865,8 @@ boolean getInputTextString(char *inputText,
     }
 
     inputText[charNum] = '\0';
+
+    browserWaitRestore(previousWait);
 
     if (keystroke == ESCAPE_KEY) {
         return false;
@@ -2940,6 +2954,9 @@ void waitForAcknowledgment() {
         return;
     }
 
+    BrowserWait previousWait = browserWaitBegin(BROWSER_ACK, 0, true);
+    browserWaitKey(ACKNOWLEDGE_KEY);
+    browserWaitKey(ESCAPE_KEY);
     do {
         nextBrogueEvent(&theEvent, false, false, false);
         if (theEvent.eventType == KEYSTROKE && theEvent.param1 != ACKNOWLEDGE_KEY && theEvent.param1 != ESCAPE_KEY) {
@@ -2947,13 +2964,19 @@ void waitForAcknowledgment() {
         }
     } while (!(theEvent.eventType == KEYSTROKE && (theEvent.param1 == ACKNOWLEDGE_KEY || theEvent.param1 == ESCAPE_KEY)
                || theEvent.eventType == MOUSE_UP));
+    browserWaitRestore(previousWait);
 }
 
 void waitForKeystrokeOrMouseClick() {
     rogueEvent theEvent;
+    BrowserWait previousWait = browserWaitBegin(BROWSER_ANY_KEY, 0, true);
+    browserWaitKey(ACKNOWLEDGE_KEY);
+    browserWaitKey(RETURN_KEY);
+    browserWaitKey(ESCAPE_KEY);
     do {
         nextBrogueEvent(&theEvent, false, false, false);
     } while (theEvent.eventType != KEYSTROKE && theEvent.eventType != MOUSE_UP);
+    browserWaitRestore(previousWait);
 }
 
 boolean confirm(char *prompt, boolean alsoDuringPlayback) {
@@ -2986,7 +3009,9 @@ boolean confirm(char *prompt, boolean alsoDuringPlayback) {
     buttons[1].flags |= (B_WIDE_CLICK_AREA | B_KEYPRESS_HIGHLIGHT);
 
     const SavedDisplayBuffer rbuf = saveDisplayBuffer();
+    BrowserWait previousWait = browserWaitBegin(BROWSER_CONFIRM, 0, true);
     retVal = printTextBox(prompt, COLS/3, ROWS/3, COLS/3, &white, &interfaceBoxColor, buttons, 2);
+    browserWaitRestore(previousWait);
     restoreDisplayBuffer(&rbuf);
 
     if (retVal == -1 || retVal == 1) { // If they canceled or pressed no.
@@ -3327,6 +3352,10 @@ static short scrollMessageArchive(char messages[MESSAGE_ARCHIVE_LINES][COLS*2], 
     const SavedDisplayBuffer rbuf = saveDisplayBuffer();
 
     exit = false;
+    BrowserWait previousWait = browserWaitBegin(BROWSER_MENU, 0, true);
+    const int archiveKeys[] = {UP_KEY, DOWN_KEY, 'K', 'J', UP_ARROW, DOWN_ARROW,
+                               NUMPAD_8, NUMPAD_2, ACKNOWLEDGE_KEY, ESCAPE_KEY};
+    for (int index = 0; index < (int)(sizeof archiveKeys / sizeof *archiveKeys); index++) browserWaitKey(archiveKeys[index]);
     do {
         if (offset != lastOffset) {
             restoreDisplayBuffer(&rbuf);
@@ -3378,6 +3407,7 @@ static short scrollMessageArchive(char messages[MESSAGE_ARCHIVE_LINES][COLS*2], 
         offset = max(height, min(offset, length));
     } while (!exit);
 
+    browserWaitRestore(previousWait);
     restoreDisplayBuffer(&rbuf);
     return offset;
 }
@@ -4265,9 +4295,11 @@ void displayFeatsScreen() {
         }
     }
     const SavedDisplayBuffer rbuf = saveDisplayBuffer();
+    int previousMessageMirror = browserMessageMirrorHold();
     overlayDisplayBuffer(&dbuf);
     waitForKeystrokeOrMouseClick();
     restoreDisplayBuffer(&rbuf);
+    browserMessageMirrorRestore(previousMessageMirror);
 }
 
 void printDiscoveriesScreen() {
@@ -4301,11 +4333,13 @@ void printDiscoveriesScreen() {
             dbuf.cells[i][j].opacity = (i < STAT_BAR_WIDTH ? 0 : INTERFACE_OPACITY);
         }
     }
+    int previousMessageMirror = browserMessageMirrorHold();
     overlayDisplayBuffer(&dbuf);
 
     waitForKeystrokeOrMouseClick();
 
     restoreDisplayBuffer(&rbuf);
+    browserMessageMirrorRestore(previousMessageMirror);
 }
 
 void printHighScores(boolean hiliteMostRecent) {

@@ -11,8 +11,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 391,
-          "end_line": 391,
+          "line": 390,
+          "end_line": 390,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -22,8 +22,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 393,
-          "end_line": 393,
+          "line": 392,
+          "end_line": 392,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -40,8 +40,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 265,
-          "end_line": 265,
+          "line": 266,
+          "end_line": 266,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -58,8 +58,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 314,
-          "end_line": 314,
+          "line": 315,
+          "end_line": 315,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -82,8 +82,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 343,
-          "end_line": 343,
+          "line": 344,
+          "end_line": 344,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -100,8 +100,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 335,
-          "end_line": 335,
+          "line": 336,
+          "end_line": 336,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -118,8 +118,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 282,
-          "end_line": 282,
+          "line": 283,
+          "end_line": 283,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -136,8 +136,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 232,
-          "end_line": 232,
+          "line": 233,
+          "end_line": 233,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -154,8 +154,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 210,
-          "end_line": 210,
+          "line": 211,
+          "end_line": 211,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -172,8 +172,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 328,
-          "end_line": 328,
+          "line": 329,
+          "end_line": 329,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -190,8 +190,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 246,
-          "end_line": 246,
+          "line": 247,
+          "end_line": 247,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -226,8 +226,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 198,
-          "end_line": 198,
+          "line": 199,
+          "end_line": 199,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -244,8 +244,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 239,
-          "end_line": 239,
+          "line": 240,
+          "end_line": 240,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -262,8 +262,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 393,
-          "end_line": 393,
+          "line": 392,
+          "end_line": 392,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -286,8 +286,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 273,
-          "end_line": 273,
+          "line": 274,
+          "end_line": 274,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -304,8 +304,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 257,
-          "end_line": 257,
+          "line": 258,
+          "end_line": 258,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -322,8 +322,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 230,
-          "end_line": 230,
+          "line": 231,
+          "end_line": 231,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -347,8 +347,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 296,
-          "end_line": 296,
+          "line": 297,
+          "end_line": 297,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -371,8 +371,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 244,
-          "end_line": 244,
+          "line": 245,
+          "end_line": 245,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -396,8 +396,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 237,
-          "end_line": 237,
+          "line": 238,
+          "end_line": 238,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -421,8 +421,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 302,
-          "end_line": 302,
+          "line": 303,
+          "end_line": 303,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -447,8 +447,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 294,
-          "end_line": 294,
+          "line": 295,
+          "end_line": 295,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -473,8 +473,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 280,
-          "end_line": 280,
+          "line": 281,
+          "end_line": 281,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -498,8 +498,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 356,
-          "end_line": 356,
+          "line": 357,
+          "end_line": 357,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -523,8 +523,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 304,
-          "end_line": 304,
+          "line": 305,
+          "end_line": 305,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -547,8 +547,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 349,
-          "end_line": 349,
+          "line": 350,
+          "end_line": 350,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -572,8 +572,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 263,
-          "end_line": 263,
+          "line": 264,
+          "end_line": 264,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -615,8 +615,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 341,
-          "end_line": 341,
+          "line": 342,
+          "end_line": 342,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -640,8 +640,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 333,
-          "end_line": 333,
+          "line": 334,
+          "end_line": 334,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -665,8 +665,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 326,
-          "end_line": 326,
+          "line": 327,
+          "end_line": 327,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -690,8 +690,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 312,
-          "end_line": 312,
+          "line": 313,
+          "end_line": 313,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -716,8 +716,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 217,
-          "end_line": 217,
+          "line": 218,
+          "end_line": 218,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -741,8 +741,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 208,
-          "end_line": 208,
+          "line": 209,
+          "end_line": 209,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -766,8 +766,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 219,
-          "end_line": 219,
+          "line": 220,
+          "end_line": 220,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -809,8 +809,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 196,
-          "end_line": 196,
+          "line": 197,
+          "end_line": 197,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -834,8 +834,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 391,
-          "end_line": 391,
+          "line": 390,
+          "end_line": 390,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -885,8 +885,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 271,
-          "end_line": 271,
+          "line": 272,
+          "end_line": 272,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -935,8 +935,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 255,
-          "end_line": 255,
+          "line": 256,
+          "end_line": 256,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -960,8 +960,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 391,
-          "end_line": 391,
+          "line": 390,
+          "end_line": 390,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -971,8 +971,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 393,
-          "end_line": 393,
+          "line": 392,
+          "end_line": 392,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -989,8 +989,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 351,
-          "end_line": 351,
+          "line": 352,
+          "end_line": 352,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1025,8 +1025,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 312,
-          "end_line": 312,
+          "line": 313,
+          "end_line": 313,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1036,8 +1036,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 314,
-          "end_line": 314,
+          "line": 315,
+          "end_line": 315,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1054,8 +1054,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 294,
-          "end_line": 294,
+          "line": 295,
+          "end_line": 295,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1065,8 +1065,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 296,
-          "end_line": 296,
+          "line": 297,
+          "end_line": 297,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1076,8 +1076,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 302,
-          "end_line": 302,
+          "line": 303,
+          "end_line": 303,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1087,8 +1087,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 304,
-          "end_line": 304,
+          "line": 305,
+          "end_line": 305,
           "symbol": "actionMenu",
           "function": "actionMenu",
           "scope": "function",
@@ -1105,8 +1105,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2981,
-          "end_line": 2981,
+          "line": 3004,
+          "end_line": 3004,
           "symbol": "confirm",
           "function": "confirm",
           "scope": "function",
@@ -1130,8 +1130,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2974,
-          "end_line": 2974,
+          "line": 2997,
+          "end_line": 2997,
           "symbol": "confirm",
           "function": "confirm",
           "scope": "function",
@@ -1155,8 +1155,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2300,
-          "end_line": 2300,
+          "line": 2303,
+          "end_line": 2303,
           "symbol": "displayChokeMap",
           "function": "displayChokeMap",
           "scope": "function",
@@ -1173,8 +1173,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4231,
-          "end_line": 4231,
+          "line": 4261,
+          "end_line": 4261,
           "symbol": "displayFeatsScreen",
           "function": "displayFeatsScreen",
           "scope": "function",
@@ -1191,8 +1191,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4253,
-          "end_line": 4253,
+          "line": 4283,
+          "end_line": 4283,
           "symbol": "displayFeatsScreen",
           "function": "displayFeatsScreen",
           "scope": "function",
@@ -1209,8 +1209,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4258,
-          "end_line": 4258,
+          "line": 4288,
+          "end_line": 4288,
           "symbol": "displayFeatsScreen",
           "function": "displayFeatsScreen",
           "scope": "function",
@@ -1227,8 +1227,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4255,
-          "end_line": 4255,
+          "line": 4285,
+          "end_line": 4285,
           "symbol": "displayFeatsScreen",
           "function": "displayFeatsScreen",
           "scope": "function",
@@ -1252,8 +1252,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4258,
-          "end_line": 4258,
+          "line": 4288,
+          "end_line": 4288,
           "symbol": "displayFeatsScreen",
           "function": "displayFeatsScreen",
           "scope": "function",
@@ -1270,8 +1270,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2324,
-          "end_line": 2324,
+          "line": 2327,
+          "end_line": 2327,
           "symbol": "displayLoops",
           "function": "displayLoops",
           "scope": "function",
@@ -1288,8 +1288,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2272,
-          "end_line": 2272,
+          "line": 2275,
+          "end_line": 2275,
           "symbol": "displayMachines",
           "function": "displayMachines",
           "scope": "function",
@@ -1306,8 +1306,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 3562,
-          "end_line": 3562,
+          "line": 3592,
+          "end_line": 3592,
           "symbol": "displayMoreSign",
           "function": "displayMoreSign",
           "scope": "function",
@@ -1317,8 +1317,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 3566,
-          "end_line": 3566,
+          "line": 3596,
+          "end_line": 3596,
           "symbol": "displayMoreSign",
           "function": "displayMoreSign",
           "scope": "function",
@@ -1335,8 +1335,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 3548,
-          "end_line": 3548,
+          "line": 3578,
+          "end_line": 3578,
           "symbol": "displayMoreSignWithoutWaitingForAcknowledgment",
           "function": "displayMoreSignWithoutWaitingForAcknowledgment",
           "scope": "function",
@@ -1346,8 +1346,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 3550,
-          "end_line": 3550,
+          "line": 3580,
+          "end_line": 3580,
           "symbol": "displayMoreSignWithoutWaitingForAcknowledgment",
           "function": "displayMoreSignWithoutWaitingForAcknowledgment",
           "scope": "function",
@@ -1364,8 +1364,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2237,
-          "end_line": 2237,
+          "line": 2240,
+          "end_line": 2240,
           "symbol": "displayWaypoints",
           "function": "displayWaypoints",
           "scope": "function",
@@ -1382,8 +1382,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2600,
-          "end_line": 2600,
+          "line": 2605,
+          "end_line": 2605,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1400,8 +1400,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2600,
-          "end_line": 2600,
+          "line": 2605,
+          "end_line": 2605,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1418,8 +1418,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2603,
-          "end_line": 2603,
+          "line": 2608,
+          "end_line": 2608,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1436,8 +1436,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2603,
-          "end_line": 2603,
+          "line": 2608,
+          "end_line": 2608,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1454,8 +1454,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2657,
-          "end_line": 2657,
+          "line": 2662,
+          "end_line": 2662,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1472,8 +1472,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2523,
-          "end_line": 2523,
+          "line": 2528,
+          "end_line": 2528,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1490,13 +1490,31 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2532,
-          "end_line": 2532,
+          "line": 2537,
+          "end_line": 2537,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
           "call": "proposeOrConfirmLocation",
           "argument_index": 1,
+          "literal_count": 1
+        }
+      ]
+    },
+    "io.executekeystroke.png_download_started.a3684ad72641": {
+      "text": " PNG download started ",
+      "translatable": true,
+      "kind": "display_text",
+      "sources": [
+        {
+          "file": "src/brogue/IO.c",
+          "line": 2723,
+          "end_line": 2723,
+          "symbol": "executeKeystroke",
+          "function": "executeKeystroke",
+          "scope": "function",
+          "call": "flashTemporaryAlert",
+          "argument_index": 0,
           "literal_count": 1
         }
       ]
@@ -1508,8 +1526,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2663,
-          "end_line": 2663,
+          "line": 2668,
+          "end_line": 2668,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1526,8 +1544,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2652,
-          "end_line": 2652,
+          "line": 2657,
+          "end_line": 2657,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1544,8 +1562,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2717,
-          "end_line": 2717,
+          "line": 2725,
+          "end_line": 2725,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1562,8 +1580,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2612,
-          "end_line": 2612,
+          "line": 2617,
+          "end_line": 2617,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1580,8 +1598,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2612,
-          "end_line": 2612,
+          "line": 2617,
+          "end_line": 2617,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1598,8 +1616,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2615,
-          "end_line": 2615,
+          "line": 2620,
+          "end_line": 2620,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1616,8 +1634,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2615,
-          "end_line": 2615,
+          "line": 2620,
+          "end_line": 2620,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1634,8 +1652,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2681,
-          "end_line": 2681,
+          "line": 2686,
+          "end_line": 2686,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1652,8 +1670,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2680,
-          "end_line": 2680,
+          "line": 2685,
+          "end_line": 2685,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1670,8 +1688,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2686,
-          "end_line": 2686,
+          "line": 2691,
+          "end_line": 2691,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1688,8 +1706,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2685,
-          "end_line": 2685,
+          "line": 2690,
+          "end_line": 2690,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1706,8 +1724,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2676,
-          "end_line": 2676,
+          "line": 2681,
+          "end_line": 2681,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1724,8 +1742,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2675,
-          "end_line": 2675,
+          "line": 2680,
+          "end_line": 2680,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1742,8 +1760,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2627,
-          "end_line": 2627,
+          "line": 2632,
+          "end_line": 2632,
           "symbol": "executeKeystroke",
           "function": "executeKeystroke",
           "scope": "function",
@@ -1760,8 +1778,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2374,
-          "end_line": 2374,
+          "line": 2377,
+          "end_line": 2377,
           "symbol": "exploreKey",
           "function": "exploreKey",
           "scope": "function",
@@ -1771,8 +1789,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 2375,
-          "end_line": 2375,
+          "line": 2378,
+          "end_line": 2378,
           "symbol": "exploreKey",
           "function": "exploreKey",
           "scope": "function",
@@ -1789,8 +1807,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2372,
-          "end_line": 2372,
+          "line": 2375,
+          "end_line": 2375,
           "symbol": "exploreKey",
           "function": "exploreKey",
           "scope": "function",
@@ -1807,8 +1825,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 491,
-          "end_line": 491,
+          "line": 490,
+          "end_line": 490,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1832,8 +1850,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 512,
-          "end_line": 512,
+          "line": 511,
+          "end_line": 511,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1850,8 +1868,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 488,
-          "end_line": 488,
+          "line": 487,
+          "end_line": 487,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1868,8 +1886,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 482,
-          "end_line": 482,
+          "line": 481,
+          "end_line": 481,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1886,8 +1904,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 480,
-          "end_line": 480,
+          "line": 479,
+          "end_line": 479,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1911,8 +1929,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 474,
-          "end_line": 474,
+          "line": 473,
+          "end_line": 473,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1929,8 +1947,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 472,
-          "end_line": 472,
+          "line": 471,
+          "end_line": 471,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1954,8 +1972,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 499,
-          "end_line": 499,
+          "line": 498,
+          "end_line": 498,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1972,8 +1990,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 497,
-          "end_line": 497,
+          "line": 496,
+          "end_line": 496,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -1997,8 +2015,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 507,
-          "end_line": 507,
+          "line": 506,
+          "end_line": 506,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -2015,8 +2033,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 505,
-          "end_line": 505,
+          "line": 504,
+          "end_line": 504,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -2040,8 +2058,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 516,
-          "end_line": 516,
+          "line": 515,
+          "end_line": 515,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -2065,8 +2083,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 466,
-          "end_line": 466,
+          "line": 465,
+          "end_line": 465,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -2083,8 +2101,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 464,
-          "end_line": 464,
+          "line": 463,
+          "end_line": 463,
           "symbol": "initializeMenuButtons",
           "function": "initializeMenuButtons",
           "scope": "function",
@@ -2108,8 +2126,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 584,
-          "end_line": 584,
+          "line": 583,
+          "end_line": 583,
           "symbol": "mainInputLoop",
           "function": "mainInputLoop",
           "scope": "function",
@@ -2126,8 +2144,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2442,
-          "end_line": 2442,
+          "line": 2447,
+          "end_line": 2447,
           "symbol": "nextBrogueEvent",
           "function": "nextBrogueEvent",
           "scope": "function",
@@ -2144,8 +2162,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4287,
-          "end_line": 4287,
+          "line": 4317,
+          "end_line": 4317,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2162,8 +2180,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4296,
-          "end_line": 4296,
+          "line": 4326,
+          "end_line": 4326,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2180,8 +2198,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4284,
-          "end_line": 4284,
+          "line": 4314,
+          "end_line": 4314,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2198,8 +2216,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4281,
-          "end_line": 4281,
+          "line": 4311,
+          "end_line": 4311,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2216,8 +2234,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4290,
-          "end_line": 4290,
+          "line": 4320,
+          "end_line": 4320,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2234,8 +2252,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4296,
-          "end_line": 4296,
+          "line": 4326,
+          "end_line": 4326,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2252,8 +2270,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4293,
-          "end_line": 4293,
+          "line": 4323,
+          "end_line": 4323,
           "symbol": "printDiscoveriesScreen",
           "function": "printDiscoveriesScreen",
           "scope": "function",
@@ -2270,8 +2288,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4335,
-          "end_line": 4335,
+          "line": 4365,
+          "end_line": 4365,
           "symbol": "printHighScores",
           "function": "printHighScores",
           "scope": "function",
@@ -2288,8 +2306,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4364,
-          "end_line": 4364,
+          "line": 4394,
+          "end_line": 4394,
           "symbol": "printHighScores",
           "function": "printHighScores",
           "scope": "function",
@@ -2299,8 +2317,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 4365,
-          "end_line": 4365,
+          "line": 4395,
+          "end_line": 4395,
           "symbol": "printHighScores",
           "function": "printHighScores",
           "scope": "function",
@@ -2317,8 +2335,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 4364,
-          "end_line": 4364,
+          "line": 4394,
+          "end_line": 4394,
           "symbol": "printHighScores",
           "function": "printHighScores",
           "scope": "function",
@@ -2328,8 +2346,8 @@
         },
         {
           "file": "src/brogue/IO.c",
-          "line": 4365,
-          "end_line": 4365,
+          "line": 4395,
+          "end_line": 4395,
           "symbol": "printHighScores",
           "function": "printHighScores",
           "scope": "function",
@@ -2346,8 +2364,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 3370,
-          "end_line": 3370,
+          "line": 3399,
+          "end_line": 3399,
           "symbol": "scrollMessageArchive",
           "function": "scrollMessageArchive",
           "scope": "function",
@@ -2364,8 +2382,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 2946,
-          "end_line": 2946,
+          "line": 2963,
+          "end_line": 2963,
           "symbol": "waitForAcknowledgment",
           "function": "waitForAcknowledgment",
           "scope": "function",
@@ -2382,8 +2400,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1399,
-          "end_line": 1399,
+          "line": 1400,
+          "end_line": 1400,
           "symbol": "call",
           "function": "call",
           "scope": "function",
@@ -2400,8 +2418,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1347,
-          "end_line": 1347,
+          "line": 1348,
+          "end_line": 1348,
           "symbol": "call",
           "function": "call",
           "scope": "function",
@@ -2418,8 +2436,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1347,
-          "end_line": 1347,
+          "line": 1348,
+          "end_line": 1348,
           "symbol": "call",
           "function": "call",
           "scope": "function",
@@ -2436,8 +2454,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1382,
-          "end_line": 1382,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "call",
           "function": "call",
           "scope": "function",
@@ -2454,8 +2472,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1368,
-          "end_line": 1368,
+          "line": 1369,
+          "end_line": 1369,
           "symbol": "call",
           "function": "call",
           "scope": "function",
@@ -2465,8 +2483,8 @@
         },
         {
           "file": "src/brogue/Items.c",
-          "line": 1416,
-          "end_line": 1416,
+          "line": 1417,
+          "end_line": 1417,
           "symbol": "call",
           "function": "call",
           "scope": "function",
@@ -2483,8 +2501,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2922,
-          "end_line": 2922,
+          "line": 2923,
+          "end_line": 2923,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2494,8 +2512,8 @@
         },
         {
           "file": "src/brogue/Items.c",
-          "line": 2933,
-          "end_line": 2933,
+          "line": 2934,
+          "end_line": 2934,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2512,8 +2530,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2948,
-          "end_line": 2948,
+          "line": 2949,
+          "end_line": 2949,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2530,8 +2548,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2960,
-          "end_line": 2960,
+          "line": 2961,
+          "end_line": 2961,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2548,8 +2566,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2970,
-          "end_line": 2970,
+          "line": 2971,
+          "end_line": 2971,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2573,8 +2591,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2970,
-          "end_line": 2970,
+          "line": 2971,
+          "end_line": 2971,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2598,8 +2616,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2956,
-          "end_line": 2956,
+          "line": 2957,
+          "end_line": 2957,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2625,8 +2643,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2962,
-          "end_line": 2962,
+          "line": 2963,
+          "end_line": 2963,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2650,8 +2668,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2922,
-          "end_line": 2922,
+          "line": 2923,
+          "end_line": 2923,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2661,8 +2679,8 @@
         },
         {
           "file": "src/brogue/Items.c",
-          "line": 2933,
-          "end_line": 2933,
+          "line": 2934,
+          "end_line": 2934,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2679,8 +2697,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 2821,
-          "end_line": 2821,
+          "line": 2822,
+          "end_line": 2822,
           "symbol": "displayInventory",
           "function": "displayInventory",
           "scope": "function",
@@ -2697,8 +2715,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1300,
-          "end_line": 1300,
+          "line": 1301,
+          "end_line": 1301,
           "symbol": "inscribeItem",
           "function": "inscribeItem",
           "scope": "function",
@@ -2721,8 +2739,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1305,
-          "end_line": 1305,
+          "line": 1306,
+          "end_line": 1306,
           "symbol": "inscribeItem",
           "function": "inscribeItem",
           "scope": "function",
@@ -2739,8 +2757,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 1305,
-          "end_line": 1305,
+          "line": 1306,
+          "end_line": 1306,
           "symbol": "inscribeItem",
           "function": "inscribeItem",
           "scope": "function",
@@ -2757,8 +2775,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6525,
-          "end_line": 6525,
+          "line": 6554,
+          "end_line": 6554,
           "symbol": "playerCancelsBlinking",
           "function": "playerCancelsBlinking",
           "scope": "function",
@@ -2775,8 +2793,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 770,
-          "end_line": 770,
+          "line": 771,
+          "end_line": 771,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -2793,8 +2811,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 786,
-          "end_line": 786,
+          "line": 787,
+          "end_line": 787,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -2811,8 +2829,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 662,
-          "end_line": 662,
+          "line": 663,
+          "end_line": 663,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -2829,8 +2847,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7610,
-          "end_line": 7610,
+          "line": 7639,
+          "end_line": 7639,
           "symbol": "promptForItemOfType",
           "function": "promptForItemOfType",
           "scope": "function",
@@ -2847,8 +2865,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 7618,
-          "end_line": 7618,
+          "line": 7647,
+          "end_line": 7647,
           "symbol": "promptForItemOfType",
           "function": "promptForItemOfType",
           "scope": "function",
@@ -2865,8 +2883,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6432,
-          "end_line": 6432,
+          "line": 6461,
+          "end_line": 6461,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2883,8 +2901,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6432,
-          "end_line": 6432,
+          "line": 6461,
+          "end_line": 6461,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2901,8 +2919,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6400,
-          "end_line": 6400,
+          "line": 6426,
+          "end_line": 6426,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2919,8 +2937,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6426,
-          "end_line": 6426,
+          "line": 6455,
+          "end_line": 6455,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2937,8 +2955,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6426,
-          "end_line": 6426,
+          "line": 6455,
+          "end_line": 6455,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2955,8 +2973,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6395,
-          "end_line": 6395,
+          "line": 6421,
+          "end_line": 6421,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2973,8 +2991,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6395,
-          "end_line": 6395,
+          "line": 6421,
+          "end_line": 6421,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -2991,8 +3009,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6421,
-          "end_line": 6421,
+          "line": 6450,
+          "end_line": 6450,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3016,8 +3034,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6430,
-          "end_line": 6430,
+          "line": 6459,
+          "end_line": 6459,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3042,8 +3060,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6426,
-          "end_line": 6426,
+          "line": 6455,
+          "end_line": 6455,
           "symbol": "relabel",
           "function": "relabel",
           "scope": "function",
@@ -3068,8 +3086,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6321,
-          "end_line": 6321,
+          "line": 6347,
+          "end_line": 6347,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3092,8 +3110,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6335,
-          "end_line": 6335,
+          "line": 6361,
+          "end_line": 6361,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3117,8 +3135,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6298,
-          "end_line": 6298,
+          "line": 6324,
+          "end_line": 6324,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3135,8 +3153,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6298,
-          "end_line": 6298,
+          "line": 6324,
+          "end_line": 6324,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3153,8 +3171,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6326,
-          "end_line": 6326,
+          "line": 6352,
+          "end_line": 6352,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3177,8 +3195,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6336,
-          "end_line": 6336,
+          "line": 6362,
+          "end_line": 6362,
           "symbol": "throwCommand",
           "function": "throwCommand",
           "scope": "function",
@@ -3195,8 +3213,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 6557,
-          "end_line": 6557,
+          "line": 6586,
+          "end_line": 6586,
           "symbol": "useStaffOrWand",
           "function": "useStaffOrWand",
           "scope": "function",
@@ -3213,8 +3231,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 455,
-          "end_line": 457,
+          "line": 456,
+          "end_line": 458,
           "symbol": "chooseGameMode",
           "function": "chooseGameMode",
           "scope": "function",
@@ -3231,8 +3249,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 446,
-          "end_line": 446,
+          "line": 447,
+          "end_line": 447,
           "symbol": "chooseGameMode",
           "function": "chooseGameMode",
           "scope": "function",
@@ -3244,56 +3262,6 @@
     },
     "mainmenu.choosegamemode.se_sasy.ae5f04d3be08": {
       "text": "       %sE%sasy        ",
-      "translatable": true,
-      "kind": "display_text",
-      "sources": [
-        {
-          "file": "src/brogue/MainMenu.c",
-          "line": 461,
-          "end_line": 461,
-          "symbol": "chooseGameMode",
-          "function": "chooseGameMode",
-          "scope": "function",
-          "call": "initializeMainMenuButton",
-          "argument_index": 1,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [
-          "%s",
-          "%s"
-        ],
-        "brogue_tokens": []
-      }
-    },
-    "mainmenu.choosegamemode.seasy_mode_s.943707cf78f9": {
-      "text": "%sEasy Mode%s\n",
-      "translatable": true,
-      "kind": "menu_text",
-      "sources": [
-        {
-          "file": "src/brogue/MainMenu.c",
-          "line": 448,
-          "end_line": 448,
-          "symbol": "chooseGameMode",
-          "function": "chooseGameMode",
-          "scope": "function",
-          "call": "snprintf",
-          "argument_index": 2,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [
-          "%s",
-          "%s"
-        ],
-        "brogue_tokens": []
-      }
-    },
-    "mainmenu.choosegamemode.sn_sormal.329eb66a6fff": {
-      "text": "      %sN%sormal       ",
       "translatable": true,
       "kind": "display_text",
       "sources": [
@@ -3317,6 +3285,56 @@
         "brogue_tokens": []
       }
     },
+    "mainmenu.choosegamemode.seasy_mode_s.943707cf78f9": {
+      "text": "%sEasy Mode%s\n",
+      "translatable": true,
+      "kind": "menu_text",
+      "sources": [
+        {
+          "file": "src/brogue/MainMenu.c",
+          "line": 449,
+          "end_line": 449,
+          "symbol": "chooseGameMode",
+          "function": "chooseGameMode",
+          "scope": "function",
+          "call": "snprintf",
+          "argument_index": 2,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [
+          "%s",
+          "%s"
+        ],
+        "brogue_tokens": []
+      }
+    },
+    "mainmenu.choosegamemode.sn_sormal.329eb66a6fff": {
+      "text": "      %sN%sormal       ",
+      "translatable": true,
+      "kind": "display_text",
+      "sources": [
+        {
+          "file": "src/brogue/MainMenu.c",
+          "line": 463,
+          "end_line": 463,
+          "symbol": "chooseGameMode",
+          "function": "chooseGameMode",
+          "scope": "function",
+          "call": "initializeMainMenuButton",
+          "argument_index": 1,
+          "literal_count": 1
+        }
+      ],
+      "placeholders": {
+        "c_format": [
+          "%s",
+          "%s"
+        ],
+        "brogue_tokens": []
+      }
+    },
     "mainmenu.choosegamemode.snormal_mode_s.c763a794c729": {
       "text": "%sNormal Mode%s\n",
       "translatable": true,
@@ -3324,8 +3342,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 445,
-          "end_line": 445,
+          "line": 446,
+          "end_line": 446,
           "symbol": "chooseGameMode",
           "function": "chooseGameMode",
           "scope": "function",
@@ -3349,8 +3367,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 450,
-          "end_line": 451,
+          "line": 451,
+          "end_line": 452,
           "symbol": "chooseGameMode",
           "function": "chooseGameMode",
           "scope": "function",
@@ -3374,8 +3392,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 460,
-          "end_line": 460,
+          "line": 461,
+          "end_line": 461,
           "symbol": "chooseGameMode",
           "function": "chooseGameMode",
           "scope": "function",
@@ -3399,8 +3417,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 453,
-          "end_line": 453,
+          "line": 454,
+          "end_line": 454,
           "symbol": "chooseGameMode",
           "function": "chooseGameMode",
           "scope": "function",
@@ -3424,8 +3442,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 419,
-          "end_line": 419,
+          "line": 420,
+          "end_line": 420,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3449,8 +3467,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 406,
-          "end_line": 406,
+          "line": 407,
+          "end_line": 407,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3467,8 +3485,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 410,
-          "end_line": 410,
+          "line": 411,
+          "end_line": 411,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3485,8 +3503,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 414,
-          "end_line": 414,
+          "line": 415,
+          "end_line": 415,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3503,8 +3521,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 418,
-          "end_line": 418,
+          "line": 419,
+          "end_line": 419,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3528,8 +3546,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 405,
-          "end_line": 405,
+          "line": 406,
+          "end_line": 406,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3553,8 +3571,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 412,
-          "end_line": 412,
+          "line": 413,
+          "end_line": 413,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3578,8 +3596,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 417,
-          "end_line": 417,
+          "line": 418,
+          "end_line": 418,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3603,8 +3621,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 408,
-          "end_line": 408,
+          "line": 409,
+          "end_line": 409,
           "symbol": "chooseGameVariant",
           "function": "chooseGameVariant",
           "scope": "function",
@@ -3628,8 +3646,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 672,
-          "end_line": 672,
+          "line": 691,
+          "end_line": 691,
           "symbol": "dialogAlert",
           "function": "dialogAlert",
           "scope": "function",
@@ -3646,8 +3664,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 54,
-          "end_line": 54,
+          "line": 55,
+          "end_line": 55,
           "symbol": "drawMenuFlames",
           "function": "drawMenuFlames",
           "scope": "function",
@@ -3664,8 +3682,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 60,
-          "end_line": 60,
+          "line": 61,
+          "end_line": 61,
           "symbol": "drawMenuFlames",
           "function": "drawMenuFlames",
           "scope": "function",
@@ -3682,8 +3700,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 58,
-          "end_line": 58,
+          "line": 59,
+          "end_line": 59,
           "symbol": "drawMenuFlames",
           "function": "drawMenuFlames",
           "scope": "function",
@@ -3700,8 +3718,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 380,
-          "end_line": 380,
+          "line": 381,
+          "end_line": 381,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3725,8 +3743,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 379,
-          "end_line": 379,
+          "line": 380,
+          "end_line": 380,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3750,8 +3768,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 377,
-          "end_line": 377,
+          "line": 378,
+          "end_line": 378,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3775,8 +3793,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 387,
-          "end_line": 387,
+          "line": 388,
+          "end_line": 388,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3800,8 +3818,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 386,
-          "end_line": 386,
+          "line": 387,
+          "end_line": 387,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3825,8 +3843,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 378,
-          "end_line": 378,
+          "line": 379,
+          "end_line": 379,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3850,8 +3868,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 385,
-          "end_line": 385,
+          "line": 386,
+          "end_line": 386,
           "symbol": "initializeFlyoutMenu",
           "function": "initializeFlyoutMenu",
           "scope": "function",
@@ -3875,8 +3893,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 285,
-          "end_line": 285,
+          "line": 286,
+          "end_line": 286,
           "symbol": "initializeMainMenuButtons",
           "function": "initializeMainMenuButtons",
           "scope": "function",
@@ -3900,8 +3918,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 286,
-          "end_line": 286,
+          "line": 287,
+          "end_line": 287,
           "symbol": "initializeMainMenuButtons",
           "function": "initializeMainMenuButtons",
           "scope": "function",
@@ -3925,8 +3943,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 288,
-          "end_line": 288,
+          "line": 289,
+          "end_line": 289,
           "symbol": "initializeMainMenuButtons",
           "function": "initializeMainMenuButtons",
           "scope": "function",
@@ -3950,8 +3968,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 287,
-          "end_line": 287,
+          "line": 288,
+          "end_line": 288,
           "symbol": "initializeMainMenuButtons",
           "function": "initializeMainMenuButtons",
           "scope": "function",
@@ -3975,8 +3993,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1184,
-          "end_line": 1184,
+          "line": 1203,
+          "end_line": 1203,
           "symbol": "mainBrogueJunction",
           "function": "mainBrogueJunction",
           "scope": "function",
@@ -3993,8 +4011,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1233,
-          "end_line": 1233,
+          "line": 1249,
+          "end_line": 1249,
           "symbol": "mainBrogueJunction",
           "function": "mainBrogueJunction",
           "scope": "function",
@@ -4011,8 +4029,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1261,
-          "end_line": 1261,
+          "line": 1274,
+          "end_line": 1274,
           "symbol": "mainBrogueJunction",
           "function": "mainBrogueJunction",
           "scope": "function",
@@ -4029,8 +4047,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 517,
-          "end_line": 517,
+          "line": 519,
+          "end_line": 519,
           "symbol": "titleMenu",
           "function": "titleMenu",
           "scope": "function",
@@ -4047,8 +4065,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 597,
-          "end_line": 597,
+          "line": 615,
+          "end_line": 615,
           "symbol": "titleMenu",
           "function": "titleMenu",
           "scope": "function",
@@ -4065,8 +4083,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 591,
-          "end_line": 591,
+          "line": 608,
+          "end_line": 608,
           "symbol": "titleMenu",
           "function": "titleMenu",
           "scope": "function",
@@ -4083,8 +4101,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 591,
-          "end_line": 591,
+          "line": 608,
+          "end_line": 608,
           "symbol": "titleMenu",
           "function": "titleMenu",
           "scope": "function",
@@ -4101,8 +4119,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1011,
-          "end_line": 1011,
+          "line": 1030,
+          "end_line": 1030,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4119,8 +4137,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1051,
-          "end_line": 1051,
+          "line": 1070,
+          "end_line": 1070,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4137,8 +4155,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1074,
-          "end_line": 1074,
+          "line": 1093,
+          "end_line": 1093,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4155,8 +4173,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1071,
-          "end_line": 1071,
+          "line": 1090,
+          "end_line": 1090,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4173,8 +4191,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1038,
-          "end_line": 1038,
+          "line": 1057,
+          "end_line": 1057,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4191,8 +4209,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1009,
-          "end_line": 1009,
+          "line": 1028,
+          "end_line": 1028,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4209,8 +4227,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1014,
-          "end_line": 1014,
+          "line": 1033,
+          "end_line": 1033,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4227,8 +4245,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1029,
-          "end_line": 1029,
+          "line": 1048,
+          "end_line": 1048,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4245,8 +4263,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1068,
-          "end_line": 1068,
+          "line": 1087,
+          "end_line": 1087,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4263,8 +4281,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1065,
-          "end_line": 1065,
+          "line": 1084,
+          "end_line": 1084,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4281,8 +4299,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1032,
-          "end_line": 1032,
+          "line": 1051,
+          "end_line": 1051,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4299,8 +4317,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1035,
-          "end_line": 1035,
+          "line": 1054,
+          "end_line": 1054,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4317,8 +4335,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1090,
-          "end_line": 1090,
+          "line": 1109,
+          "end_line": 1109,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4328,8 +4346,8 @@
         },
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1091,
-          "end_line": 1091,
+          "line": 1110,
+          "end_line": 1110,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4346,8 +4364,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1011,
-          "end_line": 1011,
+          "line": 1030,
+          "end_line": 1030,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4364,8 +4382,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1103,
-          "end_line": 1103,
+          "line": 1122,
+          "end_line": 1122,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4382,8 +4400,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1110,
-          "end_line": 1110,
+          "line": 1129,
+          "end_line": 1129,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4400,8 +4418,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1062,
-          "end_line": 1062,
+          "line": 1081,
+          "end_line": 1081,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4418,8 +4436,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1101,
-          "end_line": 1101,
+          "line": 1120,
+          "end_line": 1120,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4443,8 +4461,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1090,
-          "end_line": 1090,
+          "line": 1109,
+          "end_line": 1109,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4454,8 +4472,8 @@
         },
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1091,
-          "end_line": 1091,
+          "line": 1110,
+          "end_line": 1110,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4472,8 +4490,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1020,
-          "end_line": 1020,
+          "line": 1039,
+          "end_line": 1039,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4490,8 +4508,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1017,
-          "end_line": 1017,
+          "line": 1036,
+          "end_line": 1036,
           "symbol": "viewGameStats",
           "function": "viewGameStats",
           "scope": "function",
@@ -4508,8 +4526,8 @@
       "sources": [
         {
           "file": "src/brogue/Movement.c",
-          "line": 1066,
-          "end_line": 1066,
+          "line": 1067,
+          "end_line": 1067,
           "symbol": "playerMoves",
           "function": "playerMoves",
           "scope": "function",
@@ -4526,8 +4544,8 @@
       "sources": [
         {
           "file": "src/brogue/Movement.c",
-          "line": 884,
-          "end_line": 884,
+          "line": 885,
+          "end_line": 885,
           "symbol": "playerMoves",
           "function": "playerMoves",
           "scope": "function",
@@ -4544,8 +4562,8 @@
       "sources": [
         {
           "file": "src/brogue/Movement.c",
-          "line": 1105,
-          "end_line": 1105,
+          "line": 1106,
+          "end_line": 1106,
           "symbol": "playerMoves",
           "function": "playerMoves",
           "scope": "function",
@@ -4562,8 +4580,8 @@
       "sources": [
         {
           "file": "src/brogue/Movement.c",
-          "line": 1089,
-          "end_line": 1089,
+          "line": 1090,
+          "end_line": 1090,
           "symbol": "playerMoves",
           "function": "playerMoves",
           "scope": "function",
@@ -4580,8 +4598,8 @@
       "sources": [
         {
           "file": "src/brogue/Movement.c",
-          "line": 1078,
-          "end_line": 1078,
+          "line": 1079,
+          "end_line": 1079,
           "symbol": "playerMoves",
           "function": "playerMoves",
           "scope": "function",
@@ -5066,8 +5084,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1350,
-          "end_line": 1350,
+          "line": 1342,
+          "end_line": 1342,
           "symbol": "loadSavedGame",
           "function": "loadSavedGame",
           "scope": "function",
@@ -5084,8 +5102,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1509,
-          "end_line": 1509,
+          "line": 1501,
+          "end_line": 1501,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -5234,8 +5252,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1198,
-          "end_line": 1198,
+          "line": 1190,
+          "end_line": 1190,
           "symbol": "saveGame",
           "function": "saveGame",
           "scope": "function",
@@ -5252,8 +5270,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1195,
-          "end_line": 1195,
+          "line": 1187,
+          "end_line": 1187,
           "symbol": "saveGame",
           "function": "saveGame",
           "scope": "function",
@@ -5270,8 +5288,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1204,
-          "end_line": 1204,
+          "line": 1196,
+          "end_line": 1196,
           "symbol": "saveGame",
           "function": "saveGame",
           "scope": "function",
@@ -5288,8 +5306,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1245,
-          "end_line": 1245,
+          "line": 1237,
+          "end_line": 1237,
           "symbol": "saveRecording",
           "function": "saveRecording",
           "scope": "function",
@@ -5306,8 +5324,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1241,
-          "end_line": 1241,
+          "line": 1233,
+          "end_line": 1233,
           "symbol": "saveRecording",
           "function": "saveRecording",
           "scope": "function",
@@ -5360,8 +5378,8 @@
       "sources": [
         {
           "file": "src/brogue/RogueMain.c",
-          "line": 1390,
-          "end_line": 1390,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "enableEasyMode",
           "function": "enableEasyMode",
           "scope": "function",

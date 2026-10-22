@@ -9,7 +9,7 @@ mod values;
 mod worker;
 use js_sys::{Function, Reflect};
 use rogue_display::widgets::TextSize;
-use rogue_raster::Renderer;
+use roguelike_common::Renderer;
 use serde_json::{Value, json};
 use std::{
     cell::{Cell, RefCell},

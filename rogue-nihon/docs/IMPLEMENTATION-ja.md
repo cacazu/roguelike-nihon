@@ -12,7 +12,7 @@
 | プラットフォーム | `rust/crates/platform/` | checkpoint、消費済み入力journal、再生位置、保存envelopeと検証 |
 | ゲーム側の接続 | `rust/src/lib.rs`、`host.rs`、`startup.rs`、`runtime.rs`、`session.rs`、`engine.rs` | C/Rust FFI、型付き開始設定・転送allocation・libc環境サービス、Bevy Appの組立て、各層への状態投影と実行順 |
 | ブラウザー側の判断 | `rust/crates/browser-display/src/controller.rs`、`policies.rs`、`display/src/browser_ui/`、`widgets.rs` | 開始・終了・保存の状態、Worker世代、IME制限、入力検証、表示設定、履歴、配置・フォーカス・カメラ・タイル計画 |
-| ラスタライズ | `rust/crates/raster/` | PNG decode、画像回転・拡大・合成、図形・SVG path・クリップ・透明度、フォント計測・shaping・文字の画素、完成RGBA |
+| ラスタライズ | `../rust-common/` | PNG decode、画像回転・拡大・合成、図形・SVG path・クリップ・透明度、フォント計測・shaping・文字の画素、完成RGBA |
 | ブラウザー資源 | `rust/crates/browser-display/src/browser/` | イベントlistener、完成RGBAの転送、ネイティブ文字入力、画像bytesとcache、Worker/SAB、IndexedDB、保存候補bytes、ファイル・Blobの所有とAPI実行 |
 
 入力は表示が公開する不変の `InputView` を参照する。基本の入力待ち・所持品行と、持ち物の詳細・操作候補を付けた描画用UIは区別する。入力Pluginは翻訳を再実行せず、表示状態や地図Componentを直接変更しない。文字編集の消費byte・未送信byte・表示可能な文字列は入力の `State` が所有し、接続部が表示へ一方向に投影する。開始時に表示する既存値は、空のC編集bufferを埋める入力にはしない。
@@ -79,7 +79,7 @@ Workerの `Transfer` は `rg_alloc / rg_dealloc` で確保元のゲーム側Rust
 
 `browser/values.rs` はブラウザーのUTF-16文字列とRustのUTF-8、JSON値とブラウザーのobject/arrayを変換する。深さ・循環参照・数値を検査し、ブラウザー由来の孤立surrogateには置換文字を使う。`tools/bind_browser.py` は生成bindingの文字列ABIをこのRust codecへ接続し、使用するwasm-bindgenの版と生成形状が一致しない場合に生成を失敗させる。生成JSにJSONの直列化・解析や文字列のencode/decode処理を置かない。
 
-`rogue-raster` は表示層の描画命令を受け取り、tiny-skia・svgtypes・swash・pngを使って全画面のRGBAをRust内で作る。ブラウザーへは `putImageData` で完成画像を一度だけ転送し、Canvasの図形・文字・パス・画像描画や文字計測を使わない。文字計測と描画は同じglyph planとtop基準を使い、同梱Noto Sans JPの400/600とNoto Color EmojiをRustで読み込む。文字幅はOSのフォントに依存させない。ドット絵の32px回転と最近傍拡大を保ち、図形・透明度・クリップ・輪郭もRustで計算する。PNGはbuffer確保前に寸法・画素数・bytes上限を検査する。フォントの取得・解析に失敗した場合はRustが可視の起動エラーと再読み込み操作を出す。
+`roguelike-common` は表示層の描画命令を受け取り、tiny-skia・svgtypes・swash・pngを使って全画面のRGBAをRust内で作る。ブラウザーへは `putImageData` で完成画像を一度だけ転送し、Canvasの図形・文字・パス・画像描画や文字計測を使わない。文字計測と描画は同じglyph planとtop基準を使い、同梱Noto Sans JPの400/600とNoto Color EmojiをRustで読み込む。文字幅はOSのフォントに依存させない。ドット絵の32px回転と最近傍拡大を保ち、図形・透明度・クリップ・輪郭もRustで計算する。PNGはbuffer確保前に寸法・画素数・bytes上限を検査する。フォントの取得・解析に失敗した場合はRustが可視の起動エラーと再読み込み操作を出す。
 
 整数のデバイス座標に置く不透明・無回転の画像は、Rustが最近傍の画素選択と直接転送で描く。各画像は直近の拡大サイズ・左右反転に対応する画素を一組だけ保持し、同じ条件の描画では行単位で転送する。追加cacheは一画像あたり65,536画素までとし、元画像は変更しない。端数座標・半透明・画像回転・上限を超えるサイズは汎用合成経路を使う。入力と共通のメインスレッドで、同じ拡大計算や毎画素の浮動小数点shaderを繰り返さないための分岐で、両経路の拡大・反転・クリップ・alphaを画素で照合する。
 

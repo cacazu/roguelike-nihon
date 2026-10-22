@@ -605,6 +605,37 @@
         }
       ]
     },
+    "browser_platform.brogue_check_snapshot.seed_llu_turn_lu_rng_lu_x_d_y_d_hp_d_depth_d_end.59888489f60f": {
+      "text": "{\"seed\":\"%llu\",\"turn\":%lu,\"rng\":%lu,\"x\":%d,\"y\":%d,\"hp\":%d,\"depth\":%d,\"ended\":%d}",
+      "translatable": false,
+      "kind": "browser_verification_protocol",
+      "sources": [
+        {
+          "file": "src/platform/browser-platform.c",
+          "line": 156,
+          "end_line": 157,
+          "symbol": "brogue_check_snapshot",
+          "function": "brogue_check_snapshot",
+          "scope": "function",
+          "call": "snprintf",
+          "argument_index": 2,
+          "literal_count": 2
+        }
+      ],
+      "placeholders": {
+        "c_format": [
+          "%llu",
+          "%lu",
+          "%lu",
+          "%d",
+          "%d",
+          "%d",
+          "%d",
+          "%d"
+        ],
+        "brogue_tokens": []
+      }
+    },
     "globalsbrogue.blueprintcatalog_brogue.beckoning_obstacle_a_mirrored_totem_guards_the_d.c2b4735f4f21": {
       "text": "Beckoning obstacle -- a mirrored totem guards the door, and glyph are around the doorway.",
       "translatable": false,
@@ -4443,8 +4474,8 @@
       "sources": [
         {
           "file": "src/brogue/IO.c",
-          "line": 3610,
-          "end_line": 3610,
+          "line": 3640,
+          "end_line": 3640,
           "symbol": "decodeMessageColor",
           "function": "decodeMessageColor",
           "scope": "function",
@@ -4461,8 +4492,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 643,
-          "end_line": 643,
+          "line": 644,
+          "end_line": 644,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4479,8 +4510,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 745,
-          "end_line": 745,
+          "line": 746,
+          "end_line": 746,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4505,8 +4536,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 747,
-          "end_line": 747,
+          "line": 748,
+          "end_line": 748,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4531,8 +4562,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 725,
-          "end_line": 725,
+          "line": 726,
+          "end_line": 726,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4555,8 +4586,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 801,
-          "end_line": 801,
+          "line": 802,
+          "end_line": 802,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4580,8 +4611,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 624,
-          "end_line": 624,
+          "line": 625,
+          "end_line": 625,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4604,8 +4635,8 @@
       "sources": [
         {
           "file": "src/brogue/Items.c",
-          "line": 644,
-          "end_line": 644,
+          "line": 645,
+          "end_line": 645,
           "symbol": "populateItems",
           "function": "populateItems",
           "scope": "function",
@@ -4882,8 +4913,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1209,
-          "end_line": 1209,
+          "line": 1228,
+          "end_line": 1228,
           "symbol": "mainBrogueJunction",
           "function": "mainBrogueJunction",
           "scope": "function",
@@ -4900,8 +4931,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1205,
-          "end_line": 1205,
+          "line": 1224,
+          "end_line": 1224,
           "symbol": "mainBrogueJunction",
           "function": "mainBrogueJunction",
           "scope": "function",
@@ -4918,8 +4949,8 @@
       "sources": [
         {
           "file": "src/brogue/MainMenu.c",
-          "line": 1207,
-          "end_line": 1207,
+          "line": 1226,
+          "end_line": 1226,
           "symbol": "mainBrogueJunction",
           "function": "mainBrogueJunction",
           "scope": "function",
@@ -4987,8 +5018,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1409,
-          "end_line": 1409,
+          "line": 1401,
+          "end_line": 1401,
           "symbol": "appendModifierKeyDescription",
           "function": "appendModifierKeyDescription",
           "scope": "function",
@@ -5005,8 +5036,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1412,
-          "end_line": 1412,
+          "line": 1404,
+          "end_line": 1404,
           "symbol": "appendModifierKeyDescription",
           "function": "appendModifierKeyDescription",
           "scope": "function",
@@ -5023,8 +5054,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5041,8 +5072,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5059,8 +5090,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5077,8 +5108,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5095,8 +5126,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1391,
-          "end_line": 1391,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5113,8 +5144,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5131,8 +5162,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5149,8 +5180,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5167,8 +5198,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1391,
-          "end_line": 1391,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5185,8 +5216,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1386,
-          "end_line": 1386,
+          "line": 1378,
+          "end_line": 1378,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5203,8 +5234,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1387,
-          "end_line": 1387,
+          "line": 1379,
+          "end_line": 1379,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5221,8 +5252,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1387,
-          "end_line": 1387,
+          "line": 1379,
+          "end_line": 1379,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5239,8 +5270,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1387,
-          "end_line": 1387,
+          "line": 1379,
+          "end_line": 1379,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5257,8 +5288,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5275,8 +5306,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5293,8 +5324,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5311,8 +5342,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1394,
-          "end_line": 1394,
+          "line": 1386,
+          "end_line": 1386,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5329,8 +5360,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5347,8 +5378,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1391,
-          "end_line": 1391,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5365,8 +5396,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1391,
-          "end_line": 1391,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5383,8 +5414,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5401,8 +5432,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1386,
-          "end_line": 1386,
+          "line": 1378,
+          "end_line": 1378,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5419,8 +5450,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1386,
-          "end_line": 1386,
+          "line": 1378,
+          "end_line": 1378,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5437,8 +5468,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5455,8 +5486,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5473,8 +5504,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5491,8 +5522,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5509,8 +5540,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5527,8 +5558,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5545,8 +5576,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1393,
-          "end_line": 1393,
+          "line": 1385,
+          "end_line": 1385,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5563,8 +5594,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1394,
-          "end_line": 1394,
+          "line": 1386,
+          "end_line": 1386,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5581,8 +5612,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1394,
-          "end_line": 1394,
+          "line": 1386,
+          "end_line": 1386,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5599,8 +5630,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1394,
-          "end_line": 1394,
+          "line": 1386,
+          "end_line": 1386,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5617,8 +5648,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5635,8 +5666,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5653,8 +5684,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5671,8 +5702,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1391,
-          "end_line": 1391,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5689,8 +5720,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5707,8 +5738,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5725,8 +5756,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1386,
-          "end_line": 1386,
+          "line": 1378,
+          "end_line": 1378,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5743,8 +5774,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1387,
-          "end_line": 1387,
+          "line": 1379,
+          "end_line": 1379,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5761,8 +5792,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1388,
-          "end_line": 1388,
+          "line": 1380,
+          "end_line": 1380,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5779,8 +5810,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1391,
-          "end_line": 1391,
+          "line": 1383,
+          "end_line": 1383,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5797,8 +5828,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1392,
-          "end_line": 1392,
+          "line": 1384,
+          "end_line": 1384,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5815,8 +5846,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5833,8 +5864,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1389,
-          "end_line": 1389,
+          "line": 1381,
+          "end_line": 1381,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5851,8 +5882,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1394,
-          "end_line": 1394,
+          "line": 1386,
+          "end_line": 1386,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5869,8 +5900,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1386,
-          "end_line": 1386,
+          "line": 1378,
+          "end_line": 1378,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5887,8 +5918,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1386,
-          "end_line": 1386,
+          "line": 1378,
+          "end_line": 1378,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5905,8 +5936,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1387,
-          "end_line": 1387,
+          "line": 1379,
+          "end_line": 1379,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5923,8 +5954,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1387,
-          "end_line": 1387,
+          "line": 1379,
+          "end_line": 1379,
           "symbol": "descList",
           "function": "describeKeystroke",
           "scope": "initializer",
@@ -5941,8 +5972,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1399,
-          "end_line": 1399,
+          "line": 1391,
+          "end_line": 1391,
           "symbol": "describeKeystroke",
           "function": "describeKeystroke",
           "scope": "function",
@@ -5966,8 +5997,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1401,
-          "end_line": 1401,
+          "line": 1393,
+          "end_line": 1393,
           "symbol": "describeKeystroke",
           "function": "describeKeystroke",
           "scope": "function",
@@ -6059,8 +6090,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1500,
-          "end_line": 1500,
+          "line": 1492,
+          "end_line": 1492,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6087,8 +6118,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1487,
-          "end_line": 1487,
+          "line": 1479,
+          "end_line": 1479,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6112,8 +6143,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1443,
-          "end_line": 1443,
+          "line": 1435,
+          "end_line": 1435,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6130,8 +6161,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1467,
-          "end_line": 1467,
+          "line": 1459,
+          "end_line": 1459,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6159,8 +6190,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1443,
-          "end_line": 1443,
+          "line": 1435,
+          "end_line": 1435,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6177,8 +6208,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1491,
-          "end_line": 1491,
+          "line": 1483,
+          "end_line": 1483,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6201,8 +6232,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1494,
-          "end_line": 1494,
+          "line": 1486,
+          "end_line": 1486,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6219,8 +6250,8 @@
       "sources": [
         {
           "file": "src/brogue/Recordings.c",
-          "line": 1497,
-          "end_line": 1497,
+          "line": 1489,
+          "end_line": 1489,
           "symbol": "parseFile",
           "function": "parseFile",
           "scope": "function",
@@ -6317,8 +6348,8 @@
       "sources": [
         {
           "file": "src/brogue/RogueMain.c",
-          "line": 1197,
-          "end_line": 1197,
+          "line": 1192,
+          "end_line": 1192,
           "symbol": "gameOver",
           "function": "gameOver",
           "scope": "function",
@@ -6390,8 +6421,8 @@
       "sources": [
         {
           "file": "src/brogue/RogueMain.c",
-          "line": 1363,
-          "end_line": 1363,
+          "line": 1354,
+          "end_line": 1354,
           "symbol": "victory",
           "function": "victory",
           "scope": "function",
@@ -6908,48 +6939,6 @@
           "%s",
           "%d",
           "%s"
-        ],
-        "brogue_tokens": []
-      }
-    },
-    "web_platform.gameloop.logfile_started.79939069f817": {
-      "text": "Logfile started\n",
-      "translatable": false,
-      "kind": "diagnostic_text",
-      "sources": [
-        {
-          "file": "src/platform/web-platform.c",
-          "line": 62,
-          "end_line": 62,
-          "symbol": "gameLoop",
-          "function": "gameLoop",
-          "scope": "function",
-          "call": "writeToLog",
-          "argument_index": 0,
-          "literal_count": 1
-        }
-      ]
-    },
-    "web_platform.openlogfile.logfile_not_created_errno_d.6d7aecac598f": {
-      "text": "Logfile not created, errno = %d\n",
-      "translatable": false,
-      "kind": "diagnostic_text",
-      "sources": [
-        {
-          "file": "src/platform/web-platform.c",
-          "line": 77,
-          "end_line": 77,
-          "symbol": "openLogfile",
-          "function": "openLogfile",
-          "scope": "function",
-          "call": "fprintf",
-          "argument_index": 1,
-          "literal_count": 1
-        }
-      ],
-      "placeholders": {
-        "c_format": [
-          "%d"
         ],
         "brogue_tokens": []
       }

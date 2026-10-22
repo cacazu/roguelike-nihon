@@ -105,8 +105,8 @@ extern boolean softwareRendering;
 extern struct brogueConsole cursesConsole;
 #endif
 
-#ifdef BROGUE_WEB
-extern struct brogueConsole webConsole;
+#ifdef BROGUE_BROWSER
+extern struct brogueConsole browserConsole;
 #endif
 
 extern struct brogueConsole nullConsole;

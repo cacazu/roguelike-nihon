@@ -22,6 +22,7 @@
  */
 
 #include "Rogue.h"
+#include "BrowserIO.h"
 #include "GlobalsBase.h"
 #include "Globals.h"
 #include <time.h>
@@ -513,6 +514,7 @@ static void redrawMainMenuButtons(buttonState *menu, screenDisplayBuffer *button
 #define FLYOUT_X 59
 
 static void titleMenu() {
+    BrowserWait previousWait = browserWaitBegin(BROWSER_TITLE, 0, true);
     int verificationMenuFrame = 0;
     if (localeVerifyScreens) localeSetLanguage("en");
     signed short flames[COLS][(ROWS + MENU_FLAME_ROW_PADDING)][3]; // red, green and blue
@@ -560,6 +562,21 @@ static void titleMenu() {
             bPos = getNextGameButtonPos(mainButtons);
             initializeFlyoutMenu(&flyoutMenu, &flyoutShadowBuf, flyoutButtons, (windowpos){FLYOUT_X, bPos.window_y});
         }
+        (void)browserWaitBegin(BROWSER_TITLE, 0, true);
+        browserWaitKey('n'); browserWaitKey('N');
+        browserWaitKey(LANGUAGE_KEY);
+        for (int i = 0; i < MAIN_MENU_BUTTON_COUNT; i++) {
+            if (mainButtons[i].flags & B_ENABLED) {
+                for (int k = 0; k < 10 && mainButtons[i].hotkey[k]; k++) browserWaitKey(mainButtons[i].hotkey[k]);
+            }
+        }
+        if (isFlyoutActive()) {
+            for (int i = 0; i < flyoutMenu.buttonCount; i++) {
+                if (flyoutButtons[i].flags & B_ENABLED) {
+                    for (int k = 0; k < 10 && flyoutButtons[i].hotkey[k]; k++) browserWaitKey(flyoutButtons[i].hotkey[k]);
+                }
+            }
+        }
 
         // Inner input loop until the user selects a button or presses a key. For mouse input, a button
         // is considered selected only on the MOUSE_UP event.
@@ -592,6 +609,7 @@ static void titleMenu() {
                     if (verificationMenuFrame++) {
                         rogue.nextGame = NG_NEW_GAME_WITH_SEED;
                         rogue.nextGameSeed = 42;
+                        browserWaitRestore(previousWait);
                         return;
                     }
                     localeSetLanguage("ja");
@@ -646,6 +664,7 @@ static void titleMenu() {
         } while (theEvent.eventType != MOUSE_UP && theEvent.eventType != KEYSTROKE && (isFlyoutActive() || rogue.nextGame == NG_NOTHING));
     } while (isFlyoutActive() || rogue.nextGame == NG_NOTHING);
     drawMenuFlames(flames, mask);
+    browserWaitRestore(previousWait);
 }
 
 // Closes Brogue without any further prompts, animations, or user interaction.
@@ -1217,9 +1236,6 @@ void mainBrogueJunction() {
                 } else {
                     mainInputLoop();
                 }
-                if(serverMode) {
-                    rogue.nextGame = NG_QUIT;
-                }
                 freeEverything();
                 break;
             case NG_OPEN_GAME:
@@ -1245,9 +1261,6 @@ void mainBrogueJunction() {
                 rogue.playbackMode = false;
                 rogue.playbackOOS = false;
 
-                if(serverMode) {
-                    rogue.nextGame = NG_QUIT;
-                }
                 break;
             case NG_VIEW_RECORDING:
                 rogue.nextGame = NG_NOTHING;
@@ -1303,7 +1316,7 @@ void mainBrogueJunction() {
                 rogue.playbackMode = false;
                 rogue.playbackOOS = false;
 
-                if(serverMode || nonInteractivePlayback) {
+                if(nonInteractivePlayback) {
                     rogue.nextGame = NG_QUIT;
                 }
                 break;

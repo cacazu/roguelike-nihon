@@ -31,3 +31,10 @@ bin/validation/
 !bin/brogue-nihon.cmd
 !bin/brogue-cmd.bat
 __pycache__/
+
+# Web verification modules and local execution evidence
+.local/
+build/game-check.js
+build/game-check.wasm
+build/build-manifest-check.json
+tests/output/

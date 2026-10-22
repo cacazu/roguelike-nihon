@@ -22,6 +22,7 @@
  */
 
 #include "Rogue.h"
+#include "BrowserIO.h"
 #include "GlobalsBase.h"
 #include "Globals.h"
 #include <math.h>
@@ -350,6 +351,17 @@ short buttonInputLoop(brogueButton *buttons,
     
     initializeButtonState(&state, buttons, buttonCount, winX, winY, winWidth, winHeight);
 
+    BrowserWait previousWait = browserWaitButtons();
+    // processButtonInput accepts these cancellation keys for every button
+    // loop, including the stats screen whose only visible hotkeys are R/r.
+    browserWaitKey(ACKNOWLEDGE_KEY);
+    browserWaitKey(ESCAPE_KEY);
+    for (int i = 0; i < buttonCount; i++) {
+        if (buttons[i].flags & B_ENABLED) {
+            for (int k = 0; k < 10 && buttons[i].hotkey[k]; k++) browserWaitKey(buttons[i].hotkey[k]);
+        }
+    }
+
     do {
         screenDisplayBuffer dbuf;
         clearDisplayBuffer(&dbuf);
@@ -376,5 +388,6 @@ short buttonInputLoop(brogueButton *buttons,
 
     restoreRNG;
 
+    browserWaitRestore(previousWait);
     return button;
 }

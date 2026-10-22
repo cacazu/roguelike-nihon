@@ -1356,7 +1356,7 @@ dependencies = [
  "rogue-contract",
  "rogue-display",
  "rogue-platform",
- "rogue-raster",
+ "roguelike-common",
  "serde_json",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -1414,7 +1414,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rogue-raster"
+name = "roguelike-common"
 version = "0.1.0"
 dependencies = [
  "png",

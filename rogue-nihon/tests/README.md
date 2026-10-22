@@ -23,7 +23,7 @@ C出力箇所・文言IDから実際の翻訳処理を通し、未登録ID、引
 ```sh
 python tools/build-browser-tests.py --keep-artifacts
 node --test tests/browser-boundary.test.mjs tests/production-boundary.test.mjs tests/event-queue.test.mjs tests/browser-smoke/host.test.mjs tests/browser-smoke/localization.test.mjs
-node tools/run-clean.mjs cargo test --offline --locked --manifest-path rust/Cargo.toml --workspace --exclude rogue-layers --lib
+node tests/run.mjs native
 python tools/check-rust-layers.py
 python tools/check-rust-layers.py --binary entity-check
 python tools/check-rust-layers.py --binary engine-check

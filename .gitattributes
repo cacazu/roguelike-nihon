@@ -1,0 +1,20 @@
+# Preserve shipped bytes, including generated JavaScript and notice byte offsets.
+brogue-nihon/build/* -text
+brogue-nihon/web/licenses/* -text
+brogue-nihon/web/assets/fonts/*.txt -text
+brogue-nihon/web/assets/DOT-TILES-LICENSE.txt -text
+rogue-nihon/build/browser-ui.js -text
+rogue-nihon/build/browser-ui.wasm -text
+rogue-nihon/build/game.wasm -text
+rogue-nihon/build/build-manifest.json -text
+rogue-nihon/licenses/* -text
+
+# The license archive contains these canonical source texts verbatim.
+rogue-nihon/docs/LICENSES-ja.md text eol=lf
+rogue-nihon/logic/LICENSE.TXT text eol=lf
+rogue-nihon/THIRD-PARTY-NOTICES.md text eol=lf
+
+# Lockfile digests must not depend on the checkout's autocrlf setting.
+rust-common/Cargo.lock text eol=lf
+rogue-nihon/rust/Cargo.lock text eol=lf
+brogue-nihon/rust/Cargo.lock text eol=lf

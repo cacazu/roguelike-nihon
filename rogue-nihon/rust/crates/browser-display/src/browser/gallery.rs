@@ -1,6 +1,6 @@
 //! Asset previews share the Rust PNG decoder and transfer complete RGBA frames only.
 use super::*;
-use rogue_raster::Image;
+use roguelike_common::Image;
 
 thread_local! {
     static GALLERY: RefCell<Option<Rc<Gallery>>> = const { RefCell::new(None) };

@@ -21,21 +21,21 @@
       "ja/composed.json"
     ],
     "compilation": "tools/compile-locales.py",
-    "backend": "SDL"
+    "backend": "SDL and browser"
   },
   "diagnostic_language": "en",
   "classification": "Source-context classification; display strings can have additional consumers. Verify consumers when integrating each entry.",
   "totals": {
-    "files": 45,
-    "literal_tokens": 4935,
-    "logical_strings": 4908,
-    "entries": 3918
+    "files": 46,
+    "literal_tokens": 4934,
+    "logical_strings": 4906,
+    "entries": 3916
   },
   "catalogs": [
     {
       "file": "en/ui.json",
-      "entries": 294,
-      "occurrences": 312
+      "entries": 295,
+      "occurrences": 313
     },
     {
       "file": "en/messages.json",
@@ -64,283 +64,289 @@
     },
     {
       "file": "en/diagnostics.json",
-      "entries": 363,
-      "occurrences": 366
+      "entries": 362,
+      "occurrences": 365
     },
     {
       "file": "en/internal.json",
-      "entries": 785,
-      "occurrences": 1370
+      "entries": 783,
+      "occurrences": 1368
     }
   ],
   "sources": [
     {
       "file": "src/brogue/Architect.c",
-      "sha256": "102add30e7bdf3964e173efa1c84befd8b46fa04c8a2d0d73e651c2e78da6912",
+      "sha256": "7f2ed854b138c0800031d60424e2be3f4b285a8082ca07d3738f6e6a0ccf2230",
       "literal_tokens": 36,
       "logical_strings": 36
     },
     {
       "file": "src/brogue/Buttons.c",
-      "sha256": "621448e8e8d62c731204114f55d567fa6dce039f734cdcdeb3fa6c96eb189a5a",
-      "literal_tokens": 5,
-      "logical_strings": 5
+      "sha256": "ae7eb7b10a82324be76c72922d2ac626cfc41037258463891af85a76aeca9a65",
+      "literal_tokens": 6,
+      "logical_strings": 6
     },
     {
       "file": "src/brogue/Combat.c",
-      "sha256": "5696936f7ac86dd5be13cee963f91b7961410659a079a2e54c04c4a3fbf2bb9a",
+      "sha256": "f3021b8743f714a6e5af97c4e608517b5434f15f2bcf4c49509e94b9265e192d",
       "literal_tokens": 93,
       "logical_strings": 93
     },
     {
       "file": "src/brogue/Dijkstra.c",
-      "sha256": "d40be22ba2078d56a6b6779fbd8766cb802d0d7598b5305a7ed3a4b7ccd63346",
+      "sha256": "7f206cf8c2407d6873635488fb416a7cae13d1e5bd47b01d36a2761bffc92a44",
       "literal_tokens": 3,
       "logical_strings": 3
     },
     {
       "file": "src/brogue/Globals.c",
-      "sha256": "41dc05ffe8164b43af5a43252e95afbfc4037703c0f1e7191ec789bf8fd3b375",
+      "sha256": "14fbafc8b586964273501f1771c8b8588b0f13237af345f7667f7a394b4eea35",
       "literal_tokens": 1421,
       "logical_strings": 1421
     },
     {
       "file": "src/brogue/Globals.h",
-      "sha256": "444074819c3d312ae246745e87263aa0c716eaa4743be36f7ad47624fbb2871d",
+      "sha256": "f7ad5b7610392387fb204c9232c87fbe729a77b76aec17c075cc9a96e56f5279",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
       "file": "src/brogue/GlobalsBase.c",
-      "sha256": "8e567a5a337111abcffac12acaf9a98ef0c8a9421b5023c63478ea42e2c56898",
+      "sha256": "0ff823bb6cf5302825a8e376c6b92dd53000daff57a917428dc096a6415f4bb7",
       "literal_tokens": 1,
       "logical_strings": 1
     },
     {
       "file": "src/brogue/GlobalsBase.h",
-      "sha256": "e5bee4f31f88ac1a4c9fd9da366d7e7cadd5f6a55eee6475407d7c526fd5d239",
+      "sha256": "b0cf450e6d188cda6bf3371b4ce261cb3acc9b2696c36408d90b83f4e48b716c",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
       "file": "src/brogue/Grid.c",
-      "sha256": "3d6e99a7bc9be8135b48bacd0bda51cb90495ef55c753ff9cbb5a32053f24f80",
+      "sha256": "b924a27e9d66b4e0945bbb82a2a713d32ecf278069200f24aabfad0dcc6f6b77",
       "literal_tokens": 3,
       "logical_strings": 3
     },
     {
       "file": "src/brogue/IO.c",
-      "sha256": "2b63e71b7cad41eaa26b7b4ebe3f564634bfe23364b10235ecad164155d6bb05",
-      "literal_tokens": 301,
-      "logical_strings": 301
+      "sha256": "a6a6adab20e8ecc4e7b625cf07b62cd64de76181a9f8d86c82276e1de8aecc4f",
+      "literal_tokens": 303,
+      "logical_strings": 303
     },
     {
       "file": "src/brogue/Items.c",
-      "sha256": "99cf4a8be676f8e50efbf9f4a057e9bfa38f46b6a816e32219e6866c2c9122f8",
-      "literal_tokens": 631,
-      "logical_strings": 631
+      "sha256": "744cc42921b4c531c687bed6f55b02491ce949c27e764044a9b24634054c99eb",
+      "literal_tokens": 632,
+      "logical_strings": 632
     },
     {
       "file": "src/brogue/Light.c",
-      "sha256": "59d7ddd685e6d5f6d1bc024e61778871c2b745f6ed07cf48f094da81a36d2d60",
+      "sha256": "1fd3d1dc8d337232f4bb2effd9f63113383b7e94993a63d591eed1014061f8aa",
       "literal_tokens": 12,
       "logical_strings": 12
     },
     {
       "file": "src/brogue/LocalizationVerification.c",
-      "sha256": "de50fc7ed4a99e4123b5951adda86905181a2c2ac386f2a12d108623c9d5a85f",
+      "sha256": "447b6923d9e0406bb895695712de54bf6b394ff000f3cc3e3cfcbd6227e407ce",
       "literal_tokens": 48,
       "logical_strings": 48
     },
     {
       "file": "src/brogue/LocalizedText.c",
-      "sha256": "b2be27aa6bb13c58987d30e209207cf2a5d0e87322363a99666eb4ffd9831d9b",
+      "sha256": "658435df98016418b943da61ffa2b03d9bf1652a1520190def477905878d1bcf",
       "literal_tokens": 81,
       "logical_strings": 81
     },
     {
       "file": "src/brogue/LocalizedText.h",
-      "sha256": "3ded5c9f0535d0a2279dc54094d1696d8e6a79824825f6fd9a865cf99d935a8c",
+      "sha256": "8b43121ca0600ef7f6d2ad3eabdec0d30306200a1b5fe09f86adca54355229c0",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
       "file": "src/brogue/MainMenu.c",
-      "sha256": "fc341b1ed5e75193b52ec1c14f40e7509b6b95b3c6d590b88c4e6196e48a9d62",
-      "literal_tokens": 119,
-      "logical_strings": 116
+      "sha256": "02261a73044494fcf397e7f08344f806707e23bd225589b395f50b0f6198b138",
+      "literal_tokens": 120,
+      "logical_strings": 117
     },
     {
       "file": "src/brogue/Math.c",
-      "sha256": "810481af6641841064f2dc1f051cfdaa9372e0de61dd0786d9b294c35adcaa69",
+      "sha256": "a7b304e8e805834a8fc8952b291f5a78b2e5e2e252a9a6059b873c933d399104",
       "literal_tokens": 3,
       "logical_strings": 3
     },
     {
       "file": "src/brogue/Monsters.c",
-      "sha256": "2bb681b9c0749390674677db64de863a1d57f370c84318e14ad7f5e3038676f0",
+      "sha256": "86469a8f96c80f7c617d74bfc50b0a62ea45ba6cc5ff688994d4b2a115b022c9",
       "literal_tokens": 145,
       "logical_strings": 145
     },
     {
       "file": "src/brogue/Movement.c",
-      "sha256": "69ea5b07feb70792046b513b0c44a40d5018bcc3ee7bbbdbf20bd865cb4f650b",
-      "literal_tokens": 123,
-      "logical_strings": 123
+      "sha256": "b86e4cba96319ddea95fc5ae6bc4591bd6f95718f0adca8fd85e08bb9ee9c74a",
+      "literal_tokens": 124,
+      "logical_strings": 124
     },
     {
       "file": "src/brogue/PowerTables.c",
-      "sha256": "9254b4a7f1b33ccdf4d1894c20d53b481dd06e14caffb1cfa47fe4a094718a4d",
+      "sha256": "b263d7ec2c5e513eb65c2715fa057f42c024c4e557d23d337bbda1198ca2002c",
       "literal_tokens": 3,
       "logical_strings": 3
     },
     {
       "file": "src/brogue/Recordings.c",
-      "sha256": "c2b70cba766b201e40121203a6b19770c1235ec83da37c8e6d8d0e7bb4b28099",
-      "literal_tokens": 175,
-      "logical_strings": 175
+      "sha256": "bb453321267464e8064e480ba912b0ad50b2b748644a33caac0a8326a9d0bdac",
+      "literal_tokens": 174,
+      "logical_strings": 174
     },
     {
       "file": "src/brogue/Rogue.h",
-      "sha256": "69df2051124d57a17715e3296749523292e743c1ca0fb39d20ccc43beff8e5b6",
+      "sha256": "e9e7e11755c9dd63bd678816f77419710ea15a75c6788a248576aa2e4d25fb1c",
       "literal_tokens": 11,
       "logical_strings": 11
     },
     {
       "file": "src/brogue/RogueMain.c",
-      "sha256": "15a640186cc219a29c2fa7b67ab1251be752f3fc9d8182adbe1705c4ffdfe755",
+      "sha256": "90f11766a72bce1fb28c91ec5c21290494a6a6596e7d4afcdb7e7134bc4d3e6c",
       "literal_tokens": 78,
       "logical_strings": 78
     },
     {
       "file": "src/brogue/SeedCatalog.c",
-      "sha256": "dfe34b515938996423bda7b9d2aa807dc1f078bdd35bdef38bc457bc305bb4e1",
+      "sha256": "0cb7f422478130bba9a058c5800bc31c61525ae7af5f58c3d3038eaa40a73002",
       "literal_tokens": 74,
       "logical_strings": 72
     },
     {
       "file": "src/brogue/Time.c",
-      "sha256": "f74edd00b30ecc128c5455afb8660d6a339b740b57dd68d541b53cf08ff4b1b0",
+      "sha256": "21a017be2d75c1d47137bc44c7a83f0453485186b412511c729d6887f8bf2670",
       "literal_tokens": 98,
       "logical_strings": 98
     },
     {
       "file": "src/brogue/Utilities.c",
-      "sha256": "1316e5bec8f36a8bab1b05cb7537ace278b8eee0ef662c2ba839a7363b2500ee",
+      "sha256": "953cb6821506fe9f5960732276a5b9388584872cd444ff83bec7f8846129927e",
       "literal_tokens": 1,
       "logical_strings": 1
     },
     {
       "file": "src/brogue/Wizard.c",
-      "sha256": "11501aac6571e773754c56920eaea291ac66d70288101240ca1c3ddd66d4129c",
+      "sha256": "031dff170e67dcc545fbe3b69debcddf5de6ed771812ad557b5d58aeb15dd148",
       "literal_tokens": 43,
       "logical_strings": 43
     },
     {
+      "file": "src/platform/browser-platform.c",
+      "sha256": "51a23ffe595d1be3f891c36555595f0487b8b43c95175498611314804f5ef92b",
+      "literal_tokens": 5,
+      "logical_strings": 4
+    },
+    {
+      "file": "src/platform/BrowserIO.h",
+      "sha256": "d5e929686476e95fd289de2da938aa6b54e770c3665d3eed946477bb8fb5b526",
+      "literal_tokens": 0,
+      "logical_strings": 0
+    },
+    {
       "file": "src/platform/curses-platform.c",
-      "sha256": "dd5fca1a6d61b3e65a0964b20821460280167d9f96b4bc958bd384a78b3f2fc4",
+      "sha256": "60c3e7b9b1e38e106ef7ec50c2d30ba17e8b464d39cb4b7affcea45b3cea0bca",
       "literal_tokens": 3,
       "logical_strings": 3
     },
     {
       "file": "src/platform/main.c",
-      "sha256": "13fda9274bfff6699a38e68a0b807d6d4035753d7cd87e912e490bfe36a47ea0",
-      "literal_tokens": 88,
-      "logical_strings": 66
+      "sha256": "d405d12504c471431c010e1e74726961ffd657b6d640617127823717ca04f909",
+      "literal_tokens": 87,
+      "logical_strings": 65
     },
     {
       "file": "src/platform/null-platform.c",
-      "sha256": "8bdf9cf7d7a6a55a237940f73346ca7ca9c29306e5aa9f94b1dd02fc45f57d97",
+      "sha256": "fbc9c37308e743152f926a8550a62f47476c5135b05962c77c39bb1bf50e58af",
       "literal_tokens": 1,
       "logical_strings": 1
     },
     {
       "file": "src/platform/platform.h",
-      "sha256": "6f1e82108eea06574892839aceea185a74dd0a9284d9de029c422c5f07d70216",
+      "sha256": "f9957f1a9726015948fd9a658e6d5d6034dcd60b4722480d4a6afc9006839a53",
       "literal_tokens": 1,
       "logical_strings": 1
     },
     {
       "file": "src/platform/PlatformDefines.h",
-      "sha256": "6f8426c747b980a629282111633ba19adedab89a9926ecbaf09c01e5c0426d22",
+      "sha256": "16308cfb038da96e70690b19e5893817c0e84d75640696fbe5eafd4ece6dd7c2",
       "literal_tokens": 1,
       "logical_strings": 1
     },
     {
       "file": "src/platform/platformdependent.c",
-      "sha256": "ac6dc4d1c51338515b0b8d316e9aaaa84b8295434564ccdd51fa9ab8173763d1",
+      "sha256": "de46d9ff87ab48be287b9e1c2da8f5644f0c410a1c51445042fdb3d6e47b94e8",
       "literal_tokens": 28,
       "logical_strings": 28
     },
     {
       "file": "src/platform/sdl2-platform.c",
-      "sha256": "6671404c1b75eebe2caa858ba096e5163cb44659a92e608af5b81b48ccd00f3f",
+      "sha256": "7584c2d418ea4a902d31925c102510bd71471f41c883b930a54bada140cc528e",
       "literal_tokens": 11,
       "logical_strings": 11
     },
     {
       "file": "src/platform/term.c",
-      "sha256": "1edcf0a09a492de840c3758566c8320856db3326c56369ccac66b23ff057f176",
+      "sha256": "ec713be387e48cbd99a2eba7ac0ee9f9f36b6f14b5c335d86078e91eb7c70097",
       "literal_tokens": 142,
       "logical_strings": 142
     },
     {
       "file": "src/platform/term.h",
-      "sha256": "b22b5e58b7066cad88014c47c2648cfa30209443531ee537d7584cfefa5f975f",
+      "sha256": "3efd24ad2965bb1863a6c8842ee0e2cca53f2d22d55cb0907edd6fbdc82a6408",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
       "file": "src/platform/tiles.c",
-      "sha256": "9001888f496c0902d555ce9420242b50ee78471445caac555b09cdd0837ab6b4",
+      "sha256": "223b45beff7bef9371b131cd7371159c9b8188c94b958588c60c36f017bb2a31",
       "literal_tokens": 71,
       "logical_strings": 71
     },
     {
       "file": "src/platform/tiles.h",
-      "sha256": "4543e3ddf6fec9bc971fea284ab0a37a5648ad8a665748eedfa111765797de13",
+      "sha256": "35ae6a7164dee5fa14c3aa08bc717a97f64cc3d8d4e168b9d64fc38c9128f36d",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
-      "file": "src/platform/web-platform.c",
-      "sha256": "70fedddb240cb208a7504549448724983236df7d2fdb679569dc8da0e6e10cc8",
-      "literal_tokens": 10,
-      "logical_strings": 10
-    },
-    {
       "file": "src/variants/GlobalsBrogue.c",
-      "sha256": "e8903aede4fad21b7823ccc547cf4219c76e87e061543188d8d90141cebffa1e",
+      "sha256": "20c6f31de74ecce6d79b2e5dec1dc901794981d82337cf402a6512ec3ddf4acf",
       "literal_tokens": 357,
       "logical_strings": 357
     },
     {
       "file": "src/variants/GlobalsBrogue.h",
-      "sha256": "dc67580a3cc8d9c3755e6cd6cbeecabb76bcd35cac20a7535bfe20aca708932f",
+      "sha256": "53014beac42f9b956d43ba02301950609da4895905fe73223483c1afd8d2857b",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
       "file": "src/variants/GlobalsBulletBrogue.c",
-      "sha256": "42d9e523a20892b3b474b45a2535b907b7e6caae4acb9a8a31e305a8d5590f14",
+      "sha256": "356a84ca0373b3385859ffd7454fade2787c2691b6e06914db7d436f8f7c33cf",
       "literal_tokens": 357,
       "logical_strings": 357
     },
     {
       "file": "src/variants/GlobalsBulletBrogue.h",
-      "sha256": "761c155546eff7410e8006da5b18cbfbc3c57051d29f6a4a24eee5798af1851b",
+      "sha256": "0ab6c86f8a37ac57a6946cbb3009455cf2dd59cc64a5aa72845e7d77f9f47bde",
       "literal_tokens": 0,
       "logical_strings": 0
     },
     {
       "file": "src/variants/GlobalsRapidBrogue.c",
-      "sha256": "96fabb75cb07d6960e4364e94d3dcf008da71cf99cca54c37cf07de2a34f7594",
+      "sha256": "b498ba316c346758dd6d54933e39ad729f95789540e014345e0029d280232fb9",
       "literal_tokens": 357,
       "logical_strings": 357
     },
     {
       "file": "src/variants/GlobalsRapidBrogue.h",
-      "sha256": "7f94ee10041ea5d9105e9aee3794b18ec23a4a07acbc946f45bd0c7cc209b6f2",
+      "sha256": "8ce3bf63a4294092b69af04d4782ab79a5d4ec57d266fea62852d7c7507ccba0",
       "literal_tokens": 0,
       "logical_strings": 0
     }

@@ -34,12 +34,17 @@ if (list) {
 } else {
   if (!selected.length) throw Error('Select wording, messages, save, native, or test file paths. Use --list to inspect tests.');
   const scope = compilerWorkspace(root, keep || process.env.ROGUE_KEEP_ARTIFACTS === '1');
-  const exec = (command, argv) => run(command, argv, {cwd: root});
+  const exec = (command, argv, options = {}) => run(command, argv, {cwd: root, ...options});
   try {
     for (const test of selected) {
       if (test === 'wording') exec(process.execPath, ['tests/wording.test.mjs']);
       else if (test === 'messages' || test === 'save') exec(pythonExecutable(), [test === 'messages' ? 'tests/build-message-tests.py' : 'tests/build-save-adapter.py']);
-      else if (test === 'native') exec('cargo', ['test', '--offline', '--locked', '--manifest-path', 'rust/Cargo.toml', '--workspace', '--exclude', 'rogue-layers', '--lib']);
+      else if (test === 'native') {
+        exec('cargo', ['test', '--offline', '--locked', '--manifest-path', 'rust/Cargo.toml', '--workspace', '--exclude', 'rogue-layers', '--lib']);
+        exec('cargo', ['test', '--offline', '--locked', '--manifest-path', '../rust-common/Cargo.toml', '--lib'], {
+          env: {...process.env, ROGUELIKE_TEST_FONTS: path.join(root, 'web/assets/fonts')}
+        });
+      }
       else {
         const file = path.resolve(root, test), relative = path.relative(path.join(root, 'tests'), file);
         if (relative.startsWith('..') || path.isAbsolute(relative)) throw Error('Test must be inside tests/: ' + test);

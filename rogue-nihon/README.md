@@ -37,6 +37,8 @@ LANのスマホでは `.\start.ps1 -Lan` を実行し、同じLANから表示さ
 
 ## ビルドと検証
 
+描画の共通実装はルートの [rust-common](../rust-common/README.md) を使い、ゲーム固有のロジック・入力・表示計画・保存はこの作品内で管理します。
+
 ゲーム用Rustのtargetは `wasm32-unknown-emscripten`、UI用は `wasm32-unknown-unknown`。ゲーム本体はCとRustをstandalone `game.wasm` へリンクし、ブラウザー用に `browser-ui.js / browser-ui.wasm` を生成します。依存はCargo.lockで固定し、Rust・Emscripten・NodeとCargo.lockに一致するUI用のwasm-bindgen-cliを使用します。SDKの場所は環境に合わせて指定します。
 
 ```powershell

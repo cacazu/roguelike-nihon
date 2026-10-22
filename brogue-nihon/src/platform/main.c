@@ -10,7 +10,6 @@
 struct brogueConsole currentConsole;
 
 char dataDirectory[BROGUE_FILENAME_MAX] = STRINGIFY(DATADIR);
-boolean serverMode = false;
 boolean nonInteractivePlayback = false;
 boolean hasGraphics = false;
 enum graphicsModes graphicsMode = TEXT_GRAPHICS;
@@ -28,9 +27,6 @@ static void printCommandlineHelp() {
     "-o filename[.broguesave]   open a save file (extension optional)\n"
     "-v recording[.broguerec]   view a recording (extension optional)\n"
     "-vn recording[.broguerec]  view a recording non-interactively (extension optional)\n"
-#ifdef BROGUE_WEB
-    "--server-mode              run the game in web-brogue server mode\n"
-#endif
 #ifdef BROGUE_SDL
     "--size N                   starts the game at font size N (1 to 20)\n"
     "--graphics     -G          enable graphical tiles\n"
@@ -94,8 +90,8 @@ int main(int argc, char *argv[])
 
 #ifdef BROGUE_SDL
     currentConsole = sdlConsole;
-#elif BROGUE_WEB
-    currentConsole = webConsole;
+#elif defined(BROGUE_BROWSER)
+    currentConsole = browserConsole;
 #elif BROGUE_CURSES
     currentConsole = cursesConsole;
 #else
@@ -307,14 +303,6 @@ int main(int argc, char *argv[])
         }
 #endif
 
-#ifdef BROGUE_WEB
-        if(strcmp(argv[i], "--server-mode") == 0) {
-            currentConsole = webConsole;
-            rogue.nextGame = NG_NEW_GAME;
-            serverMode = true;
-            continue;
-        }
-#endif
 
         if (strcmp(argv[i], "--stealth") == 0 || strcmp(argv[i], "-S") == 0) {
             rogue.displayStealthRangeMode = true;
@@ -366,6 +354,11 @@ int main(int argc, char *argv[])
     #ifdef BROGUE_SDL
     if (!localeAuditGameText && (localeVerifyScreens || !strcmp(localeLanguage(), "ja")) && currentConsole.gameLoop != sdlConsole.gameLoop) {
         fprintf(stderr, "Japanese display and screen verification require the SDL backend.\n");
+        return 1;
+    }
+    #elif defined(BROGUE_BROWSER)
+    if (localeVerifyScreens) {
+        fprintf(stderr, "Screen verification requires the SDL backend.\n");
         return 1;
     }
     #else

@@ -44,7 +44,7 @@ node tests/run.mjs --playwright /path/to/playwright --browser /path/to/browser -
 | `input-ownership.mjs` | 通常build・seed 17の持ち物閲覧と装備、投擲方向の取消、UTF-8草稿保存と新Worker復元後の編集、空Enter・先頭 `-`・明示改名、入力journalとC/RNG状態、最新観測と足元操作候補 |
 | `ownership-boundaries.mjs` | 通常buildの保存・実書出し・新Worker復元と次ターン、実IndexedDB read完了の遅延とファイルimportの競合、無効・取消importで以前の保存bytesを保持、画像セットの重複応答 |
 | `startup.mjs` | Node起動、既存origin、ポート競合、HTTPS、保存後の再起動 |
-| `production-boundary.mjs` | 製品ファイルだけの配置、開発tools非依存、開始・保存・書き出し・再開 |
+| `production-boundary.mjs` | 製品ファイルだけの配置、開発tools非依存、開始・持ち物・設定・自動保存・再開 |
 | `game-windows.mjs / space-waits.mjs` | 入力待ちの表示、ページ・一品ずつ・検出・精算の後続操作 |
 | `inventory-actions.mjs / context-controls.mjs / item-selection.mjs / throw-direction.mjs` | コマンドと後続入力、状態別候補、方向・手・文字・識別、取消後の復帰 |
 | `pixels-v2.mjs / wall-blocks.mjs / underfoot.mjs` | 現行画像、倍率、壁・足元・重ね順、クリック移動 |

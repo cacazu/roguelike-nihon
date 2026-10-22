@@ -1,0 +1,386 @@
+{
+  "format": 1,
+  "game": "brogue-ce-1.15.1",
+  "test_hooks": false,
+  "source_eol": "LF",
+  "compiler": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.8 (aeb67926e7de656da38bc807d83050af93578758)",
+  "rust": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "source_inputs": [
+    {
+      "file": "build-web.ps1",
+      "sha256": "2633ed3c976ebf360e73d8a8d79c7ba9d1906327af82c1da386b819416326367"
+    },
+    {
+      "file": "locales/ja/composed.json",
+      "sha256": "bb162d701582021025aa314b49ac9b390ca0ca21c56f1bd3bfec47b618abbbaf"
+    },
+    {
+      "file": "locales/ja/content.json",
+      "sha256": "244aa3e1f0402a234ed1c5cdae3a21ac3b9d50b2ee848ddfd6ac843d1000b7ef"
+    },
+    {
+      "file": "locales/ja/coverage.json",
+      "sha256": "caa7813b395edf5364b3620202bcc0066db29214c8b0ffbaafb1b0ddfe32e9e7"
+    },
+    {
+      "file": "locales/ja/display.json",
+      "sha256": "6466397a594d1b9aa51bdfa1eba8e20887f80039f781ab62c370ba324700ce9a"
+    },
+    {
+      "file": "locales/ja/errors.json",
+      "sha256": "5154ebe468c71deafce345585870a9955ff31b0b6438d8eaf002ecb64bfa6402"
+    },
+    {
+      "file": "locales/ja/help.json",
+      "sha256": "337763c1365fb3fe8749d6105057ad74ce6b9fea390de426bb92158f9706e37f"
+    },
+    {
+      "file": "locales/ja/messages.json",
+      "sha256": "ecf8a1140d5f47ae3657960e0ddea4f8ef92898c0770478872f3efe4235b8b0f"
+    },
+    {
+      "file": "locales/ja/ui.json",
+      "sha256": "d13bea198fa228582c3236e6116a32179b48ca462570b3bb2b7e7c69ebb43054"
+    },
+    {
+      "file": "rust/Cargo.lock",
+      "sha256": "9669025c3f08c34b2e182e699d20725dfbd972699747de8e5965b43c05aee856"
+    },
+    {
+      "file": "rust/Cargo.toml",
+      "sha256": "e6392a61cbbdba8ab05e4c56e2b0ec37a4fbebe3228d60be5827d31183a0dce6"
+    },
+    {
+      "file": "rust/src/browser.rs",
+      "sha256": "03c8ed7dcda89a8f273678a037737953c95ec55e75f0cbadfcff0c1be30052d2"
+    },
+    {
+      "file": "rust/src/files.rs",
+      "sha256": "b1af84226182a3bd5b1a46876a5278509e9469d180ff2dbaf6e00febd50e3b10"
+    },
+    {
+      "file": "rust/src/input.rs",
+      "sha256": "a1fe51b28eb96320e5e71614373b78e642cd652d8ce1eb6df68e65d6f1215197"
+    },
+    {
+      "file": "rust/src/lib.rs",
+      "sha256": "4ddf1902093a85bcbfe4f1f4fa5891aed4d3a60d9d963e927b1bd35dbe2ccd3b"
+    },
+    {
+      "file": "rust/src/presentation.rs",
+      "sha256": "48a3cb497756d5915cb22b791f64ecb4d61855feb088eeed7dc522ffcb3447e8"
+    },
+    {
+      "file": "src/brogue/Architect.c",
+      "sha256": "102add30e7bdf3964e173efa1c84befd8b46fa04c8a2d0d73e651c2e78da6912"
+    },
+    {
+      "file": "src/brogue/Buttons.c",
+      "sha256": "c75aeea89347f25f5434b3daa3cf4a55896092ce698a3be6575d3a8c492e9a32"
+    },
+    {
+      "file": "src/brogue/Combat.c",
+      "sha256": "5696936f7ac86dd5be13cee963f91b7961410659a079a2e54c04c4a3fbf2bb9a"
+    },
+    {
+      "file": "src/brogue/Dijkstra.c",
+      "sha256": "d40be22ba2078d56a6b6779fbd8766cb802d0d7598b5305a7ed3a4b7ccd63346"
+    },
+    {
+      "file": "src/brogue/Globals.c",
+      "sha256": "41dc05ffe8164b43af5a43252e95afbfc4037703c0f1e7191ec789bf8fd3b375"
+    },
+    {
+      "file": "src/brogue/Globals.h",
+      "sha256": "444074819c3d312ae246745e87263aa0c716eaa4743be36f7ad47624fbb2871d"
+    },
+    {
+      "file": "src/brogue/GlobalsBase.c",
+      "sha256": "8e567a5a337111abcffac12acaf9a98ef0c8a9421b5023c63478ea42e2c56898"
+    },
+    {
+      "file": "src/brogue/GlobalsBase.h",
+      "sha256": "e5bee4f31f88ac1a4c9fd9da366d7e7cadd5f6a55eee6475407d7c526fd5d239"
+    },
+    {
+      "file": "src/brogue/Grid.c",
+      "sha256": "3d6e99a7bc9be8135b48bacd0bda51cb90495ef55c753ff9cbb5a32053f24f80"
+    },
+    {
+      "file": "src/brogue/IO.c",
+      "sha256": "d13f3f65bcc53ca4c81e6b2c5cfff13d974cefa286718785ccaf7e31aa73862c"
+    },
+    {
+      "file": "src/brogue/Items.c",
+      "sha256": "56ffc4d41ff0742fa1ef6ddc35444c787429a4296cca1c167b328100b666223d"
+    },
+    {
+      "file": "src/brogue/Light.c",
+      "sha256": "59d7ddd685e6d5f6d1bc024e61778871c2b745f6ed07cf48f094da81a36d2d60"
+    },
+    {
+      "file": "src/brogue/LocalizationVerification.c",
+      "sha256": "de50fc7ed4a99e4123b5951adda86905181a2c2ac386f2a12d108623c9d5a85f"
+    },
+    {
+      "file": "src/brogue/LocalizedText.c",
+      "sha256": "b2be27aa6bb13c58987d30e209207cf2a5d0e87322363a99666eb4ffd9831d9b"
+    },
+    {
+      "file": "src/brogue/LocalizedText.h",
+      "sha256": "3ded5c9f0535d0a2279dc54094d1696d8e6a79824825f6fd9a865cf99d935a8c"
+    },
+    {
+      "file": "src/brogue/LocalizedTextData.h",
+      "sha256": "bb2c0c5e5417f98c58c39c18de49270919152c19827214c3a3c3e84527c0d6bb"
+    },
+    {
+      "file": "src/brogue/MainMenu.c",
+      "sha256": "1d80dcc27c190ecc840c9724e9d6ede58c1c3ab7b7600a5da64384657d05edff"
+    },
+    {
+      "file": "src/brogue/Math.c",
+      "sha256": "810481af6641841064f2dc1f051cfdaa9372e0de61dd0786d9b294c35adcaa69"
+    },
+    {
+      "file": "src/brogue/Monsters.c",
+      "sha256": "2bb681b9c0749390674677db64de863a1d57f370c84318e14ad7f5e3038676f0"
+    },
+    {
+      "file": "src/brogue/Movement.c",
+      "sha256": "f8417aff49cb91248ac5b46762bf8b5a4dd0d05cdab0bad634ada269d882cc77"
+    },
+    {
+      "file": "src/brogue/PowerTables.c",
+      "sha256": "9254b4a7f1b33ccdf4d1894c20d53b481dd06e14caffb1cfa47fe4a094718a4d"
+    },
+    {
+      "file": "src/brogue/Recordings.c",
+      "sha256": "fcbbf55970b5403e007ddde4c0f83742094e25461c98bd622b899df5b5093177"
+    },
+    {
+      "file": "src/brogue/Rogue.h",
+      "sha256": "b24f21771df0d195f84253bf15fc82ed483e3d1a53f9b699f98f534dccb771e8"
+    },
+    {
+      "file": "src/brogue/RogueMain.c",
+      "sha256": "a50de111af176aac9d4e59fd61723987e0da6bffb9cf2318939bbf54d3d6b2c3"
+    },
+    {
+      "file": "src/brogue/SeedCatalog.c",
+      "sha256": "dfe34b515938996423bda7b9d2aa807dc1f078bdd35bdef38bc457bc305bb4e1"
+    },
+    {
+      "file": "src/brogue/Time.c",
+      "sha256": "f74edd00b30ecc128c5455afb8660d6a339b740b57dd68d541b53cf08ff4b1b0"
+    },
+    {
+      "file": "src/brogue/Utilities.c",
+      "sha256": "1316e5bec8f36a8bab1b05cb7537ace278b8eee0ef662c2ba839a7363b2500ee"
+    },
+    {
+      "file": "src/brogue/Wizard.c",
+      "sha256": "11501aac6571e773754c56920eaea291ac66d70288101240ca1c3ddd66d4129c"
+    },
+    {
+      "file": "src/platform/browser-platform.c",
+      "sha256": "6a98bacda2b3f32eaf3f2795887d4227836082400f106c1a9b2f4766dadba606"
+    },
+    {
+      "file": "src/platform/BrowserIO.h",
+      "sha256": "8d92b9b4d241074e522dc3e09516a889695c72ff5a489014fee08bc479fac638"
+    },
+    {
+      "file": "src/platform/curses-platform.c",
+      "sha256": "dd5fca1a6d61b3e65a0964b20821460280167d9f96b4bc958bd384a78b3f2fc4"
+    },
+    {
+      "file": "src/platform/main.c",
+      "sha256": "5f7dc1f5b2da15d5e57b0dd5f8e45a0eeafd9e3dda0486c0d019e0ef42295c36"
+    },
+    {
+      "file": "src/platform/null-platform.c",
+      "sha256": "8bdf9cf7d7a6a55a237940f73346ca7ca9c29306e5aa9f94b1dd02fc45f57d97"
+    },
+    {
+      "file": "src/platform/platform.h",
+      "sha256": "876574d9978af16f1560b0d002b242dd8e8249d2f4d35b4fbfa7be55a91641f7"
+    },
+    {
+      "file": "src/platform/PlatformDefines.h",
+      "sha256": "6f8426c747b980a629282111633ba19adedab89a9926ecbaf09c01e5c0426d22"
+    },
+    {
+      "file": "src/platform/platformdependent.c",
+      "sha256": "ac6dc4d1c51338515b0b8d316e9aaaa84b8295434564ccdd51fa9ab8173763d1"
+    },
+    {
+      "file": "src/platform/sdl2-platform.c",
+      "sha256": "6671404c1b75eebe2caa858ba096e5163cb44659a92e608af5b81b48ccd00f3f"
+    },
+    {
+      "file": "src/platform/term.c",
+      "sha256": "1edcf0a09a492de840c3758566c8320856db3326c56369ccac66b23ff057f176"
+    },
+    {
+      "file": "src/platform/term.h",
+      "sha256": "b22b5e58b7066cad88014c47c2648cfa30209443531ee537d7584cfefa5f975f"
+    },
+    {
+      "file": "src/platform/tiles.c",
+      "sha256": "9001888f496c0902d555ce9420242b50ee78471445caac555b09cdd0837ab6b4"
+    },
+    {
+      "file": "src/platform/tiles.h",
+      "sha256": "4543e3ddf6fec9bc971fea284ab0a37a5648ad8a665748eedfa111765797de13"
+    },
+    {
+      "file": "src/variants/GlobalsBrogue.c",
+      "sha256": "e8903aede4fad21b7823ccc547cf4219c76e87e061543188d8d90141cebffa1e"
+    },
+    {
+      "file": "src/variants/GlobalsBrogue.h",
+      "sha256": "dc67580a3cc8d9c3755e6cd6cbeecabb76bcd35cac20a7535bfe20aca708932f"
+    },
+    {
+      "file": "src/variants/GlobalsBulletBrogue.c",
+      "sha256": "42d9e523a20892b3b474b45a2535b907b7e6caae4acb9a8a31e305a8d5590f14"
+    },
+    {
+      "file": "src/variants/GlobalsBulletBrogue.h",
+      "sha256": "761c155546eff7410e8006da5b18cbfbc3c57051d29f6a4a24eee5798af1851b"
+    },
+    {
+      "file": "src/variants/GlobalsRapidBrogue.c",
+      "sha256": "96fabb75cb07d6960e4364e94d3dcf008da71cf99cca54c37cf07de2a34f7594"
+    },
+    {
+      "file": "src/variants/GlobalsRapidBrogue.h",
+      "sha256": "7f94ee10041ea5d9105e9aee3794b18ec23a4a07acbc946f45bd0c7cc209b6f2"
+    },
+    {
+      "file": "tools/compile-locales.py",
+      "sha256": "299c4a9adcf2b0019ee41da639345c3a8082bcd90b7cefc4e9d883a0bd1828b3"
+    },
+    {
+      "file": "tools/locale-source.py",
+      "sha256": "55a9bce29f6a4848875fe515e2d52627264b05b1aa432691240f052ed8267e3d"
+    },
+    {
+      "file": "web/assets/fonts/metadata.json",
+      "sha256": "4e698812619033ccb0a22f08514a1e36d671b7e79756e312364d40c55c664404"
+    },
+    {
+      "file": "web/assets/illustrations.json",
+      "sha256": "c34cef1eef251e2319ff9ffc6ee90c33da797b20e6e3f2a1c605d21a38ac3151"
+    },
+    {
+      "file": "web/host.js",
+      "sha256": "c88fe5ef838d6167b3b4ad6c283c4bbd19b7f42723863634496b730085a34244"
+    },
+    {
+      "file": "web/index.html",
+      "sha256": "51933b5a6c3ee28e42f4b9d19d5ac05f0566c9796080fdfc8efc2be0600aa072"
+    },
+    {
+      "file": "web/library.js",
+      "sha256": "332877850beefb3b843e66e19d86396e2748a9004d583f64c3d1b1f8d160bf3e"
+    },
+    {
+      "file": "web/style.css",
+      "sha256": "0d51c13ac8a8bd2227458681349e7130d19a62ca148c009896c7c0c24b4d9b41"
+    },
+    {
+      "file": "../rust-common/Cargo.lock",
+      "sha256": "3ccffec9a6fb215a273575992bfe54ae0f943995f4dc5a17dec329856d4b034b"
+    },
+    {
+      "file": "../rust-common/Cargo.toml",
+      "sha256": "741af636a4393abfc851ab404840cc9045e6a8574b6202f10343e2493fc463d4"
+    },
+    {
+      "file": "../rust-common/src/fonts.rs",
+      "sha256": "38da5d7dbadab8b6523252191fac181eeae762099d22318c3639b89802ebf01e"
+    },
+    {
+      "file": "../rust-common/src/images.rs",
+      "sha256": "14e1cde19907fc48e0b8e3ffbdf0bb3bf98de75fe8017410d057452cb474e9ec"
+    },
+    {
+      "file": "../rust-common/src/lib.rs",
+      "sha256": "c502841ff4a6c3f5904d1a111d2f9c44730d7bc2f013782245ae6184ac28ed31"
+    }
+  ],
+  "asset_inputs": [
+    {
+      "file": "web/assets/dot-tiles.png",
+      "bytes": 405688,
+      "sha256": "40bb927cf8f1816f16720e7630e1d004974f7e780c9f137258ad017d554ec7af"
+    },
+    {
+      "file": "web/assets/illustrations.png",
+      "bytes": 2636341,
+      "sha256": "f8e057e276590a0cf068c30a23c6560747e7f7c3fb6757b0083919c3bdbe9418"
+    },
+    {
+      "file": "web/assets/fonts/NotoSansJP.ttf",
+      "bytes": 9589900,
+      "sha256": "c2f3b4d463500a2ddcd3849cded1fceeb9fd6d1c32e6cbecd568453ba50fc68f"
+    },
+    {
+      "file": "web/assets/fonts/NotoColorEmoji.ttf",
+      "bytes": 10730124,
+      "sha256": "15671215ab769fdc7162a045d56fd7d7e477c51b04e6b3c761d914d8fdd6cc44"
+    }
+  ],
+  "c_arguments": [
+    "-Wl,-Map,.\\.local\\web-build\\game.map",
+    "-std=c11",
+    "-O1",
+    "-fwrapv",
+    "-fno-strict-aliasing",
+    "-DBROGUE_BROWSER",
+    "-DDATADIR=.",
+    "-DBROGUE_EXTRA_VERSION=\"\"",
+    "-sASYNCIFY=1",
+    "-sASYNCIFY_STACK_SIZE=131072",
+    "-sALLOW_MEMORY_GROWTH=1",
+    "-sSTACK_SIZE=8388608",
+    "-sINITIAL_MEMORY=67108864",
+    "-sASSERTIONS=1",
+    "-sMODULARIZE=1",
+    "-sEXPORT_ES6=1",
+    "-sEXPORT_NAME=createBrogue",
+    "-sENVIRONMENT=web,worker,node",
+    "-sINVOKE_RUN=0",
+    "-sEXIT_RUNTIME=0",
+    "-sFILESYSTEM=1",
+    "-sEXPORTED_FUNCTIONS=[\"_main\",\"_malloc\",\"_free\"]",
+    "-sEXPORTED_RUNTIME_METHODS=[\"callMain\",\"FS\",\"UTF8ToString\"]",
+    "-sINCOMING_MODULE_JS_API=[\"print\",\"printErr\",\"locateFile\",\"onRuntimeInitialized\",\"onAbort\",\"noInitialRun\",\"wasmBinary\"]",
+    "--js-library",
+    "-o"
+  ],
+  "outputs": [
+    {
+      "file": "game.js",
+      "bytes": 198141,
+      "sha256": "926a08017d1e5fb7006347cc19e916a3334d8592d405e9d994a7f30b471f6581"
+    },
+    {
+      "file": "game.wasm",
+      "bytes": 2815418,
+      "sha256": "2898ea65ce0745589b417d46c7e26b268fc11931dd951f931cf9f7b63f22f961"
+    },
+    {
+      "file": "browser-ui.js",
+      "bytes": 46166,
+      "sha256": "ee00e418d3940d035c815974b859318e4f1d2fb785a9a364de6827383fb706b5"
+    },
+    {
+      "file": "browser-ui.wasm",
+      "bytes": 2541082,
+      "sha256": "22abfe4862fa40b42e03581c8c5e0aca67b2f48a1561da45fdeb17a39ec7ef10"
+    }
+  ]
+}

@@ -19,7 +19,9 @@ Brogue CE 1.15.1 の原文一覧と、SDL版の日本語表示辞書です。ゲ
 日本語表示は現在WindowsのSDL版で検証しています。日本語フォントはOS上の
 Meiryo/MS Gothicを使用し、配布物には含めません。別のCJK対応TTF/OTFを使う場合は
 `BROGUE_FONT` に絶対パスを指定します。Linux/macOSにはフォントの候補パスがありますが、
-今回の動作検証はWindowsのみです。端末版・Web版の日本語描画は未対応です。
+SDL版の動作検証はWindowsのみです。端末版の日本語描画は未対応です。
+Web版は同じ辞書を使い、同梱フォントをRustで描画します。起動と検証範囲は
+[Web実装](../docs/WEB-ja.md)と[検証入口](../tests/README.md)を参照してください。
 
 ## 日本語辞書
 

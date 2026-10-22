@@ -707,6 +707,7 @@ static const LocaleEntry localeEntries[] = {
     {"display.view_dungeon_seed.e0dcd4c0", "~: View dungeon seed", "~: シードを見る", "", 15, {NULL}},
     {"display.omniscience_enabled.2a5b13c4", "Omniscience enabled.", "全知表示を有効にしました。", "", 18, {NULL}},
     {"display.i_display_inventory.132b7ba1", "i: display inventory", "i：持ち物を見る", "", 17, {NULL}},
+    {"io.executekeystroke.png_download_started.a3684ad72641", "PNG download started", "PNGのダウンロードを開始した。", "", 18, {NULL}},
     {"items.populateitems.item_spawn_heat_map.9c3c538bebfa", "Item spawn heat map:", "アイテム出現のヒートマップ：", "", 16, {NULL}},
     {"recordings.loadsavedgame.loading.a8c863e5e0de", "[     Loading...   ]", "[     読み込み中…   ]", "", 7, {NULL}},
     {"time.playerfalls.you_plunge_downward.094da8540c1d", "You plunge downward!", "下へ落下した！", "", 17, {NULL}},

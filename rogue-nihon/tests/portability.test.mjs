@@ -21,6 +21,7 @@ function rustSources(directory){for(const e of readdirSync(directory,{withFileTy
   else if(e.isFile()&&p.endsWith('.rs'))native.push(p);
 }}
 rustSources(path.join(root,'rust/src'));rustSources(path.join(root,'rust/crates'));
+rustSources(path.join(root,'../rust-common/src'));
 const helpers = ['toolchain.mjs', 'compiler-workspace.mjs', 'compiler_workspace.py', 'run-clean.mjs', 'build.py',
   'check-rust-layers.py', 'rust_linker.py', 'temporary-artifacts.mjs', 'temporary_artifacts.py', 'artifact_registry.py', 'verify-japanese.py'].map(f => path.join(root, 'tools', f));
 const hash = file => createHash('sha256').update(readFileSync(file)).digest('hex');

@@ -1,9 +1,18 @@
 brogue-nihon
 ============
 
-Brogue: Community Edition 1.15.1 の日本語表示対応版です。
-Windows版は `bin/brogue-nihon.cmd` で起動します。
-日本語化と検証については [locales/README.md](locales/README.md) を参照してください。
+Brogue: Community Edition 1.15.1 の日本語表示対応版です。PC・スマートフォンのWebブラウザーで遊べます。
+
+```powershell
+# ビルド済みファイルから起動（Node.js）
+.\start.ps1 -SkipBuild
+# C/EmscriptenとRustのUIを再ビルドして起動
+.\start.ps1
+```
+
+ブラウザーで `http://127.0.0.1:4174/` を開きます。PCのキーボード、タッチ操作、オリジナル・ドット絵・イラストの表示を選べます。スマートフォン実機への配信にはHTTPSを使います。ビルド環境は [BUILD.md](BUILD.md)、構造・入力・保存・検証は [Web実装](docs/WEB-ja.md)、画像の出典は [素材一覧](web/assets/SOURCES.md)、再配布する依存物の通知は [THIRD-PARTY.txt](web/licenses/THIRD-PARTY.txt) を参照してください。
+
+WindowsのSDL版は `bin/brogue-nihon.cmd` で起動します。日本語化の正本は [locales/README.md](locales/README.md) です。
 以下は元作品の説明です。
 
 > *Countless adventurers before you have descended this torch-lit staircase,

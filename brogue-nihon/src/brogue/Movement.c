@@ -22,6 +22,7 @@
  */
 
 #include "Rogue.h"
+#include "BrowserIO.h"
 #include "GlobalsBase.h"
 #include "Globals.h"
 
@@ -1698,9 +1699,13 @@ void travel(pos target, boolean autoConfirm) {
             displayRoute(distanceMap, false);
             message("Travel this route? (y/n)", 0);
 
+            BrowserWait previousWait = browserWaitBegin(BROWSER_CONFIRM, 0, true);
+            browserWaitKey('y'); browserWaitKey('Y'); browserWaitKey('n');
+            browserWaitKey(RETURN_KEY); browserWaitKey(ESCAPE_KEY); browserWaitKey(staircaseConfirmKey);
             do {
                 nextBrogueEvent(&theEvent, true, false, false);
             } while (theEvent.eventType != MOUSE_UP && theEvent.eventType != KEYSTROKE);
+            browserWaitRestore(previousWait);
 
             displayRoute(distanceMap, true); // clear route display
             confirmMessages();
