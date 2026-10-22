@@ -365,22 +365,28 @@ const char *brogue_check_features(void) {
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
         if ((preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_KRAKEN_DRY)) {
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE)) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
 
         if ((preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_KRAKEN_DRY))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE))
             featureAppend(",\"nativeDFType\":%d,\"nativeDFChance\":%d", monst->info.DFType, monst->info.DFChance);
 
         if ((preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_KRAKEN_DRY))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE))
             featureAppend(",\"nativeMovementSpeed\":%d,\"nativeAttackSpeed\":%d", monst->info.movementSpeed, monst->info.attackSpeed);
 
         if ((preparedScene >= CHECK_BOG_WET_MOVEMENT && preparedScene <= CHECK_BOG_DEEP_GRIP)
-            || (preparedScene >= CHECK_KRAKEN_WET && preparedScene <= CHECK_KRAKEN_DRY))
+            || (preparedScene >= CHECK_KRAKEN_WET && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE))
             featureAppend(",\"turnsSpentStationary\":%d", monst->turnsSpentStationary);
+
+        if (preparedScene >= CHECK_FLAMEDANCER_CORONA && preparedScene <= CHECK_FLAMEDANCER_CORONA_IMMUNE)
+            featureAppend(",\"nativeDamageClump\":%d,\"nativeTurnsBetweenRegen\":%ld,"
+                          "\"nativeIntrinsicLightType\":%d,\"nativeIsLarge\":%d",
+                          monst->info.damage.clumpFactor, monst->info.turnsBetweenRegen,
+                          monst->info.intrinsicLightType, monst->info.isLarge);
 
         if (preparedScene >= CHECK_AGGRAVATE_MYSTIC && preparedScene <= CHECK_AGGRAVATE_OGRE) {
             featureAppend(",\"nativeBolts\":[");
@@ -1304,6 +1310,22 @@ static void fixtureKrakenInteraction(int scene) {
     fixtureTarget(MK_KRAKEN, 41, 14)->ticksUntilTurn = 3001;
 }
 
+/* Initial native Flamedancer and explicit environmental-only latency.
+ * Preserve generated state and intrinsic statuses; corona and fire run only
+ * after actual player input through the original environment update. */
+static void fixtureFlamedancerCorona(int scene) {
+    fixtureSafeWorld();
+    pmapAt(player.loc)->flags &= ~HAS_PLAYER;
+    player.loc = (pos){39, 14};
+    pmapAt(player.loc)->flags |= HAS_PLAYER;
+    creature *subject = generateMonster(MK_FLAMEDANCER, false, false);
+    subject->loc = (pos){41, 14};
+    pmapAt(subject->loc)->flags |= HAS_MONSTER;
+    subject->ticksUntilTurn = 10000;
+    if (scene == CHECK_FLAMEDANCER_CORONA_IMMUNE)
+        fixtureStatus(STATUS_IMMUNE_TO_FIRE, 1000);
+}
+
 /* Initial native melee actors and optional player protection only.
  * Actual rest input must perform the native attack and independent shield decay. */
 static void fixtureNativeMelee(int scene) {
@@ -2094,7 +2116,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_KRAKEN_DRY) return -1;
+    } else if (scene < 1 || scene > CHECK_FLAMEDANCER_CORONA_IMMUNE) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -2156,6 +2178,7 @@ int brogue_check_fixture(int scene) {
     else if (scene == CHECK_CENTAUR_ARROW || scene == CHECK_CENTAUR_ARROW_BLOCKED) fixtureCentaurArrow(scene);
     else if (scene >= CHECK_UNDERWORM_MELEE && scene <= CHECK_HORROR_SHIELDED) fixtureNativeMelee(scene);
     else if (scene >= CHECK_KRAKEN_WET && scene <= CHECK_KRAKEN_DRY) fixtureKrakenInteraction(scene);
+    else if (scene >= CHECK_FLAMEDANCER_CORONA && scene <= CHECK_FLAMEDANCER_CORONA_IMMUNE) fixtureFlamedancerCorona(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
@@ -2221,11 +2244,15 @@ int brogue_check_fixture(int scene) {
         const color background = {10, 20, 30, 0, 0, 0, 0, false};
         const color foreground[] = {{25, 100, 25, 0, 0, 0, 0, false},
             {30, 5, 40, 0, 0, 0, 0, false}, {2, 5, 2, 0, 0, 0, 0, false}};
-        const enum displayGlyph glyph[] = {G_FOLIAGE, G_BLOODWORT_STALK, G_FOLIAGE};
-        for (short y = 13; y <= 15; y++) for (short x = 58; x <= 64; x++)
+        const enum displayGlyph glyph[] = {G_FOLIAGE, G_BLOODWORT_STALK, G_FOLIAGE,
+            G_FIRE, G_CHARM, G_TOTEM, G_BAD_MAGIC, G_GOOD_MAGIC, G_RING};
+        const short colorIndex[] = {0, 1, 2, 0, 1, 2, 1, 2, 0};
+        /* Keep the real player at public (61, 17) outside the complete guard area. */
+        for (short y = 13; y <= 19; y++) for (short x = 54; x <= 60; x++)
             plotCharWithColor(' ', (windowpos){x, y}, &background, &background);
-        for (short i = 0; i < 3; i++)
-            plotCharWithColor(glyph[i], (windowpos){59 + 2 * i, 14}, &foreground[i], &background);
+        for (short i = 0; i < 9; i++)
+            plotCharWithColor(glyph[i], (windowpos){55 + 2 * (i % 3), 14 + 2 * (i / 3)},
+                &foreground[colorIndex[i]], &background);
     }
 #if defined(BROGUE_BROWSER)
     *initialCommandDisplay = saveDisplayBuffer();

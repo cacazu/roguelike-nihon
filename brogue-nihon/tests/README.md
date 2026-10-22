@@ -193,7 +193,11 @@ CHECKの`nativeAIProbe`は未準備・turn0だけで適格NPCの数値ID/index�
 
 ### Original植物記号の色（CHECK専用）
 
-`node brogue-nihon/tests/original-symbol-colors.mjs` は3variant×PC/タッチエミュレーション6件。Cの公開フレームにFOLIAGE/BLOODWORT_STALKのU+2648と緑・紫・暗い緑、非黒背景を明示するUI専用fixtureを使う。実際のRust canvasで前景色の同一alpha合成・十分な色応答・透明な背景・上下左右のセル境界を検査し、fit/14/24倍率でOriginal→Dot→Illustration→OriginalをDOM操作する。各操作後にC状態・RNG・入力待ちserial・消費入力数の不変を検査する。最後の実入力restのみがCのturnを進める。自然な地形配置・治癒・照明・全記号・実機Safariの合格には使わない。`BROGUE_ORIGINAL_SYMBOL_COLORS` は完全case IDのCSV。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/original-symbol-colors/results.json`、`BROGUE_COMPARE_NAME=original-symbol-colors`、`BROGUE_COMPARE_DOMAINS=none` を指定し `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。原作比較はC状態と入力の一致で、canvas色はブラウザpixel検査の証拠を使う。
+`node brogue-nihon/tests/original-symbol-colors.mjs` は3variant×PC/タッチエミュレーション6件。UI専用fixtureでAriesの緑・紫・暗い緑と、Fire/Charm/Totem/Bad Magic/Good Magic/Ringを原作C glyphのまま公開する。9sampleは列55/57/59×行14/16/18、非黒背景のguardはx54..60/y13..19へ配置し、実player61,17を保持する。原典SDL fontIndexと固定SHAの未加工atlasから独立に求めた全画素形状・C色合成を実Rust canvasと比較する（RGB各±2、alpha255完全一致、coverage0は背景完全一致）。各sampleと全四辺guardの実viewport完全包含を要求し、fit/14/24倍率でOriginal→Dot→Illustration→OriginalをDOM操作する。各操作後にC状態・RNG・入力待ちserial・消費入力数を不変確認し、最後の実periodだけでturnを進める。自然配置・治癒・照明・新定義・実機Safariの合格には使わない。`BROGUE_ORIGINAL_SYMBOL_COLORS` は完全case IDのCSV。原作比較は `BROGUE_FIXTURE_RESULTS=brogue-nihon/.local/feature-verification/original-symbol-colors/results.json`、`BROGUE_COMPARE_NAME=original-symbol-colors`、`BROGUE_COMPARE_DOMAINS=none` を指定して `node brogue-nihon/tests/compare-fixtures.mjs` を実行する。原作比較はC状態と入力の一致で、canvas形状・色の証拠はブラウザー画素を使う。
+
+`tests/original-glyph-mask.mjs` は上の検査とFlamedancerから継続利用する正式oracleで、原作atlasの128×232 font slotを独立PNG decoderで読み、原画coverageの整数box平均とCの前景・背景から期待画素を作る。期待値を実canvasや製品maskから取り出さず、helper・原典42source pin・両source・抽出table・atlas・coverage・期待RGBA・実RGBAのSHAを証拠へ残す。
+
+`node --test brogue-nihon/tests/original-glyph-coverage.test.mjs` は原作公開enum131件をglyphToUnicode、既存UI矢印置換、SDL由来Original mask表または配布2TTFの非zero cmapへ全件対応させる静的回帰。glyph0にinkがあっても収録扱いしない。原典atlasのzoom別coverage、別記号のinkを拒否する形状対照、8bit色合成の丸め上限も検査する。追加依存・asset・fontはない。
 
 
 ### 逃走・追詰め反撃・魔法恐怖の期限（CHECK専用）
@@ -316,3 +320,11 @@ node tests/native-melee.mjs は3種×PC/touch×2種族×防護有無の24ケー�
 ### Krakenの自然潜水・拘束・追撃と岸の対照
 
 node tests/kraken-interactions.mjs は3版×PC/touch×水中/岸の12ケース。人工の7壁とKraken41,14、player40,14の水中/床だけを初期対照とし、原作の全HP120・移動50・攻撃100・FLITS・MA_SEIZESを保持する。初期clock3001で30回の実休息と原作20%潜水更新を観測し、初回AIは31回目のHP不変の拘束、32回目の実15〜20追撃を要求する。岸側は追加8休息で時計13,9,5,1を2周期、評価回数に対応するstationary値と無攻撃を確認する。helper・RNG・潜水/拘束flagの強制は行わない。初期inWater0から水中の最初の実休息で変化する光・描画・乱数も原作どおり保持し、異なる水中/岸の後続RNG一致は要求しない。BROGUE_KRAKEN_INTERACTIONSは完全IDのCSV選択。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=kraken-interactions、BROGUE_COMPARE_DOMAINS=noneを指定してcompare-fixtures.mjs。自然生成・全FLITS・再生/逃走の境界・実機Safari・全機能の証拠にはしない。
+
+### Flamedancerの環境火冠・燃焼と黒曜石
+
+`node tests/flamedancer-corona.mjs` は3版×PC/touch×露出/初期火免疫の12条件を、各8回の実period休息で検査する。初期の安全室・HP100と回復停止・NPC時計10000・対照の火免疫1000は人工条件である。Flamedancerは原作の生成state・HP65・能力・速度・intrinsic status・生成乱数を保持し、AIから独立した環境DFが火を作る。初回着火と次の休息からの実1〜3被害を区別し、火冠末尾の再曝露による燃焼7への復帰を地形・時計・栄養の処理順と結び付ける。火免疫は同じ火床への実露出と燃焼0・HP不変を要求する。
+
+固定した隣接4セルの同一セルで、火からSURFACEの黒曜石へ自然に変わることと、実viewport内の原作glyph・C公開色・PNGを確認する。火U+22CFは原典SDL fontIndex0x83の独立coverageと実canvas全RGBAを比較し、欠字のinkや同色の別形状を拒否する。8休息で未到達なら失敗とし、seed・確率・状態を変更しない。原作の血DF、昇格途中の一時NOTHING、描画によるflag変化はsource順に検査し、疑似frameや強制flushを使わない。実際に要求されたACKだけを別集計し、全消費イベントを原作比較へ渡す。能動AI・bolt・近接着火・全伝播・自然生成・実機Safari・全機能の確認には含めない。
+
+選択は `BROGUE_FLAMEDANCER_CORONA` の完全ID CSV。原作比較は作品フォルダーで `BROGUE_FIXTURE_RESULTS=.local/feature-verification/flamedancer-corona/results.json`、`BROGUE_COMPARE_NAME=flamedancer-corona`、`BROGUE_COMPARE_DOMAINS=none` を指定して `node tests/compare-fixtures.mjs` を実行する。

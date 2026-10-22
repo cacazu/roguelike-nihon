@@ -7,8 +7,16 @@ pub const ROWS: usize = 34;
 pub const STRIDE: usize = 10;
 pub const FIRST_TILE: i32 = 130;
 pub const LAST_TILE: i32 = 258;
-const ARIES_CODEPOINT: i32 = 0x2648;
-const ARIES_FONT_INDEX: u32 = 0x84;
+// Original SDL fontIndex mappings; only native game glyphs use these masks.
+const ORIGINAL_FONT_GLYPHS: &[(i32, u32)] = &[
+    (0x03df, 0x99), // charm
+    (0x22cf, 0x83), // fire
+    (0x2648, 0x84), // foliage and bloodwort stalk
+    (0x26aa, 0x87), // ring
+    (0x26b2, 0x8a), // totem
+    (0x29f2, 0x8c), // bad magic
+    (0x29f3, 0x8d), // good magic
+];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mode {
@@ -162,7 +170,7 @@ pub struct Presentation {
     pub cell_width: u32,
     pub cell_height: u32,
     dot: BTreeMap<i32, Image>,
-    original_aries: Image,
+    original_font: BTreeMap<i32, Image>,
     illustrations: BTreeMap<i32, Image>,
 }
 impl Presentation {
@@ -184,14 +192,15 @@ impl Presentation {
                 sheet.crop(index % 16 * 128, index / 16 * 232, 128, 232)?,
             );
         }
-        // Original SDL fontIndex(U_ARIES)=0x84, in the atlas font half.
-        // Its monochrome coverage retains C colors; the emoji font does not.
-        let original_aries = sheet.crop(
-            ARIES_FONT_INDEX % 16 * 128,
-            ARIES_FONT_INDEX / 16 * 232,
-            128,
-            232,
-        )?;
+        // Native SDL font indices use the atlas font half. Monochrome masks
+        // retain C colors and cover symbols missing from the bundled fonts.
+        let mut original_font = BTreeMap::new();
+        for &(unicode, index) in ORIGINAL_FONT_GLYPHS {
+            original_font.insert(
+                unicode,
+                sheet.crop(index % 16 * 128, index / 16 * 232, 128, 232)?,
+            );
+        }
         drop(sheet);
         let sheet = Image::decode_png(art)?;
         let mut illustrations = BTreeMap::new();
@@ -212,7 +221,7 @@ impl Presentation {
             cell_width: 14,
             cell_height: 22,
             dot: sprites,
-            original_aries,
+            original_font,
             illustrations,
         })
     }
@@ -243,7 +252,7 @@ impl Presentation {
     pub fn render(&mut self) -> Result<(), String> {
         let mut commands = Vec::<Value>::with_capacity(COLS * ROWS * 2);
         let mut tinted = BTreeMap::new();
-        let mut original_mask: Option<Image> = None;
+        let mut original_masks = BTreeMap::new();
         let (cw, ch) = (self.cell_width, self.cell_height);
         // Paint all cell backgrounds before any foreground. A Japanese glyph
         // covers two cells and its continuation background must not erase it.
@@ -258,24 +267,23 @@ impl Presentation {
             if cell[0] == 0x110000 || cell[1] <= 32 {
                 continue;
             }
-            if self.mode == Mode::Original
-                && cell[1] == ARIES_CODEPOINT
-                && (FIRST_TILE..LAST_TILE).contains(&cell[0])
-            {
-                let key = format!("original:aries:{}:{}:{}", cell[2], cell[3], cell[4]);
-                if !tinted.contains_key(&key) {
-                    if original_mask.is_none() {
-                        original_mask = Some(scale_font_mask(&self.original_aries, cw, ch)?);
+            if self.mode == Mode::Original && (FIRST_TILE..LAST_TILE).contains(&cell[0]) {
+                if let Some(source) = self.original_font.get(&cell[1]) {
+                    let key = format!("original:{}:{}:{}:{}", cell[1], cell[2], cell[3], cell[4]);
+                    if !tinted.contains_key(&key) {
+                        if !original_masks.contains_key(&cell[1]) {
+                            original_masks.insert(cell[1], scale_font_mask(source, cw, ch)?);
+                        }
+                        tinted.insert(
+                            key.clone(),
+                            tint_font_mask(original_masks.get(&cell[1]).unwrap(), &cell[2..5])?,
+                        );
                     }
-                    tinted.insert(
-                        key.clone(),
-                        tint_font_mask(original_mask.as_ref().unwrap(), &cell[2..5])?,
+                    commands.push(
+                        json!({"op":"image","set":"brogue","image":key,"rect":rect,"pixelArt":false}),
                     );
+                    continue;
                 }
-                commands.push(
-                    json!({"op":"image","set":"brogue","image":key,"rect":rect,"pixelArt":false}),
-                );
-                continue;
             }
             let sprites = match self.mode {
                 Mode::Original => None,
@@ -411,6 +419,22 @@ fn scale_tinted(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // Independent original-atlas 3x4 coverage, including each output box.
+    // The wide magic symbols legitimately have no completely clear pixel here.
+    fn original_tiny_coverage(unicode: i32) -> [u8; 12] {
+        match unicode {
+            0x03df => [0, 14, 0, 50, 91, 17, 13, 81, 47, 0, 27, 0],
+            0x22cf => [0, 0, 0, 0, 80, 0, 35, 114, 38, 22, 0, 21],
+            0x2648 => [0, 0, 0, 75, 96, 75, 55, 70, 54, 0, 14, 0],
+            0x26aa => [0, 0, 0, 44, 61, 44, 59, 61, 59, 0, 0, 0],
+            0x26b2 => [0, 4, 0, 67, 50, 66, 15, 98, 16, 0, 15, 0],
+            0x29f2 => [14, 66, 15, 49, 68, 51, 52, 66, 53, 14, 68, 15],
+            0x29f3 => [14, 66, 15, 72, 208, 77, 78, 214, 82, 14, 68, 15],
+            _ => panic!("No original tiny-shape golden for {unicode:x}"),
+        }
+    }
+
     #[test]
     fn every_game_tile_has_an_explicit_illustration_setting() {
         for glyph in FIRST_TILE..LAST_TILE {
@@ -562,13 +586,15 @@ mod tests {
                             );
                         }
                     }
-                    assert!(own_ink > 0, "Glyph {unicode} must remain visible at {cw}x{ch}");
+                    assert!(
+                        own_ink > 0,
+                        "Glyph {unicode} must remain visible at {cw}x{ch}"
+                    );
                     for (nx, ny) in [(52, 10), (50, 11)] {
                         assert!(
                             (ny * ch as usize..(ny + 1) * ch as usize).any(|y| {
-                                (nx * cw as usize..(nx + 1) * cw as usize).any(|x| {
-                                    ink[(y * width + x) * 4..][..4] != [26, 51, 77, 255]
-                                })
+                                (nx * cw as usize..(nx + 1) * cw as usize)
+                                    .any(|x| ink[(y * width + x) * 4..][..4] != [26, 51, 77, 255])
                             }),
                             "Closing a glyph clip must retain later neighbor ink"
                         );
@@ -589,6 +615,119 @@ mod tests {
         assert!(Mode::parse("hybrid").is_err());
         assert_eq!(rgb(&[-1, 50, 200]), "#0080ff");
     }
+
+    #[test]
+    fn original_atlas_symbols_have_native_shapes_and_skip_missing_glyphs() {
+        let assets = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../web/assets");
+        let mut view = Presentation::new(
+            std::fs::read(assets.join("fonts/NotoSansJP.ttf")).unwrap(),
+            std::fs::read(assets.join("fonts/NotoColorEmoji.ttf")).unwrap(),
+            &std::fs::read(assets.join("dot-tiles.png")).unwrap(),
+            &std::fs::read(assets.join("illustrations.png")).unwrap(),
+        )
+        .unwrap();
+        let header = include_str!("../../src/brogue/Rogue.h");
+        let block = header
+            .split_once("enum displayGlyph {")
+            .unwrap()
+            .1
+            .split_once("};")
+            .unwrap()
+            .0;
+        let names: Vec<_> = block
+            .lines()
+            .map(str::trim)
+            .filter(|line| line.starts_with("G_"))
+            .collect();
+        let id = |name: &str| {
+            128 + names
+                .iter()
+                .position(|line| line.trim_end_matches(',') == name)
+                .unwrap() as i32
+        };
+        // Independent 14x22 coverage goldens from the original atlas's font half:
+        // SDL fontIndex 83/99/8a/8c/8d/87/84, not the game-sprite half.
+        // Atlas SHA256 40bb927cf8f1816f16720e7630e1d004974f7e780c9f137258ad017d554ec7af.
+        // Hash all 308 grayscale coverage pixels, including transparent backing.
+        // Fixed goldens must not be recomputed with the production mask helpers.
+        let samples: [(&str, i32, u64); 7] = [
+            ("G_FIRE", 0x22cf, 0x50ec_eea7_099a_e6f4),
+            ("G_CHARM", 0x03df, 0xa1c4_10f0_6627_395a),
+            ("G_TOTEM", 0x26b2, 0x4cc6_7869_1d06_7f43),
+            ("G_BAD_MAGIC", 0x29f2, 0x66b2_7a0a_1231_b2c3),
+            ("G_GOOD_MAGIC", 0x29f3, 0x5b43_f7a8_c140_6871),
+            ("G_RING", 0x26aa, 0xce0d_d28e_86d7_d08d),
+            ("G_FOLIAGE", 0x2648, 0x12e5_9257_04c6_5546),
+        ];
+        let white_cell = |raw, unicode| [raw, unicode, 100, 100, 100, 0, 0, 0, 0, 0];
+        for (i, (name, unicode, _)) in samples.iter().enumerate() {
+            for (column, row) in [(25 + 2 * i, 10), (3 + 2 * i, 8)] {
+                let at = (row * COLS + column) * STRIDE;
+                view.cells[at..at + STRIDE].copy_from_slice(&white_cell(id(name), *unicode));
+            }
+        }
+        view.cells[..STRIDE].copy_from_slice(&white_cell(0, 0x10ffff));
+        // Same Unicode outside the native game-glyph range remains font text.
+        view.cells[2 * STRIDE..3 * STRIDE].copy_from_slice(&white_cell(0, 0x22cf));
+        let cells = view.cells.clone();
+        view.render().unwrap();
+        assert_eq!(view.cells, cells);
+        let width = view.size().0 as usize;
+        let cell_pixels = |column: usize, row: usize| {
+            (row * 22..(row + 1) * 22)
+                .flat_map(|y| {
+                    let at = (y * width + column * 14) * 4;
+                    view.renderer.rgba()[at..at + 14 * 4].to_vec()
+                })
+                .collect::<Vec<_>>()
+        };
+        let missing = cell_pixels(0, 0);
+        assert_eq!(
+            cell_pixels(2, 0),
+            missing,
+            "The native-symbol mask must not replace ordinary Unicode text"
+        );
+        for (i, (name, _, expected)) in samples.iter().enumerate() {
+            let map = cell_pixels(25 + 2 * i, 10);
+            let sidebar = cell_pixels(3 + 2 * i, 8);
+            assert_eq!(map, sidebar, "Native {name} changed shape in the sidebar");
+            assert_ne!(map, missing, "Native {name} rendered the missing-glyph box");
+            let mut coverage_hash = 0xcbf2_9ce4_8422_2325_u64;
+            for pixel in map.chunks_exact(4) {
+                assert_eq!(pixel[3], 255);
+                assert_eq!(pixel[0], pixel[1], "{name} ignored monochrome white");
+                assert_eq!(pixel[0], pixel[2], "{name} ignored monochrome white");
+                coverage_hash =
+                    (coverage_hash ^ u64::from(pixel[0])).wrapping_mul(0x0000_0100_0000_01b3);
+            }
+            assert_eq!(
+                coverage_hash, *expected,
+                "Native {name} must match its original atlas font shape"
+            );
+        }
+        view.cell_width = 3;
+        view.cell_height = 4;
+        view.render().unwrap();
+        assert_eq!(view.cells, cells);
+        let width = view.size().0 as usize;
+        for (i, (name, unicode, _)) in samples.iter().enumerate() {
+            let expected = original_tiny_coverage(*unicode);
+            for (column, row) in [(25 + 2 * i, 10), (3 + 2 * i, 8)] {
+                for y in 0..4 {
+                    for x in 0..3 {
+                        let at = ((row * 4 + y) * width + column * 3 + x) * 4;
+                        let alpha = expected[y * 3 + x];
+                        assert_eq!(
+                            &view.renderer.rgba()[at..at + 4],
+                            &[alpha, alpha, alpha, 255],
+                            "Native {name} changed original tiny coverage at {x},{y}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
     #[test]
     fn original_aries_keeps_c_foreground_background_and_cell_bounds() {
         let assets = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../web/assets");
@@ -618,19 +757,34 @@ mod tests {
                 .position(|line| line.trim_end_matches(',') == name)
                 .unwrap() as i32
         };
-        let samples = [
-            (id("G_FOLIAGE"), [25, 100, 25]),
-            (id("G_BLOODWORT_STALK"), [30, 5, 40]),
-            (id("G_FOLIAGE"), [2, 5, 2]),
+        let mut samples = vec![
+            (id("G_FOLIAGE"), 0x2648, [25, 100, 25]),
+            (id("G_BLOODWORT_STALK"), 0x2648, [30, 5, 40]),
+            (id("G_FOLIAGE"), 0x2648, [2, 5, 2]),
         ];
+        // Ring first: the old emoji path loses the C foreground even though
+        // the font covers it. The other new symbols are missing from both fonts.
+        for (name, unicode) in [
+            ("G_RING", 0x26aa),
+            ("G_FIRE", 0x22cf),
+            ("G_CHARM", 0x03df),
+            ("G_TOTEM", 0x26b2),
+            ("G_BAD_MAGIC", 0x29f2),
+            ("G_GOOD_MAGIC", 0x29f3),
+            ("G_FOLIAGE", 0x2648),
+        ] {
+            for color in [[100, 20, 0], [20, 60, 100]] {
+                samples.push((id(name), unicode, color));
+            }
+        }
         let background = [26u8, 51, 77, 255]; // C percentages 10/20/30, non-black.
         for cell in view.cells.chunks_exact_mut(STRIDE) {
             cell[5..8].copy_from_slice(&[10, 20, 30]);
         }
-        for (i, (glyph, color)) in samples.iter().enumerate() {
+        for (i, (glyph, unicode, color)) in samples.iter().enumerate() {
             let at = (10 * COLS + 25 + 2 * i) * STRIDE;
             view.cells[at..at + STRIDE].copy_from_slice(&[
-                *glyph, 0x2648, color[0], color[1], color[2], 10, 20, 30, 0, 0,
+                *glyph, *unicode, color[0], color[1], color[2], 10, 20, 30, 0, 0,
             ]);
         }
         for (cw, ch) in [(3, 4), (12, 18), (14, 22), (24, 36)] {
@@ -640,7 +794,7 @@ mod tests {
             view.render().unwrap();
             let width = view.size().0 as usize;
             let pixel = |x: usize, y: usize| &view.renderer.rgba()[(y * width + x) * 4..][..4];
-            for (i, (_, color)) in samples.iter().enumerate() {
+            for (i, (_, unicode, color)) in samples.iter().enumerate() {
                 let foreground = [channel(color[0]), channel(color[1]), channel(color[2])];
                 let mut ink = 0;
                 let mut clear = 0;
@@ -680,17 +834,41 @@ mod tests {
                         }
                     }
                 }
-                assert!(ink > 0, "Original Aries must have visible ink at {cw}x{ch}");
+                assert!(
+                    ink > 0,
+                    "Original atlas symbol must have visible ink at {cw}x{ch}"
+                );
                 assert!(
                     maximum_coverage > 0.1,
                     "Original symbol must respond to C foreground at {cw}x{ch}: {color:?}, coverage {maximum_coverage}"
                 );
-                assert!(
-                    clear > 0,
-                    "Font background must stay transparent at {cw}x{ch}"
-                );
+                if (cw, ch) == (3, 4) {
+                    let expected_clear = original_tiny_coverage(*unicode)
+                        .iter()
+                        .filter(|&&alpha| {
+                            // Count expected background-colored pixels after
+                            // source-over rounding, not just source alpha0.
+                            (0..3).all(|c| {
+                                let alpha = u32::from(alpha);
+                                let ink = (u32::from(foreground[c]) * alpha + 127) / 255;
+                                let backing =
+                                    (u32::from(background[c]) * (255 - alpha) + 127) / 255;
+                                ink + backing == u32::from(background[c])
+                            })
+                        })
+                        .count();
+                    assert_eq!(
+                        clear, expected_clear,
+                        "Tiny clear pixels must match original coverage for {unicode:x}"
+                    );
+                } else {
+                    assert!(
+                        clear > 0,
+                        "Font background must stay transparent at {cw}x{ch}"
+                    );
+                }
             }
-            for column in [24, 26, 28, 30] {
+            for column in std::iter::once(24).chain((0..samples.len()).map(|i| 26 + 2 * i)) {
                 for y in 9 * ch as usize..12 * ch as usize {
                     for x in column * cw as usize..(column + 1) * cw as usize {
                         assert_eq!(
@@ -701,7 +879,7 @@ mod tests {
                     }
                 }
             }
-            for column in [25, 27, 29] {
+            for column in (0..samples.len()).map(|i| 25 + 2 * i) {
                 for row in [9, 11] {
                     for y in row * ch as usize..(row + 1) * ch as usize {
                         for x in column * cw as usize..(column + 1) * cw as usize {

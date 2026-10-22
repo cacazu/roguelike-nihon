@@ -1,51 +1,49 @@
-// Public C palette -> production Rust pixels; no terrain effect is fabricated.
+// Public native C glyph/palette -> independent atlas shape -> production Rust pixels.
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {runFixtureSuite,sceneGroups as S} from './fixture-browser.mjs';
-const hash=a=>createHash('sha256').update(Buffer.from(a)).digest('hex');
-const samples=[{x:59,glyph:200,color:[25,100,25]},{x:61,glyph:225,color:[30,5,40]},{x:63,glyph:200,color:[2,5,2]}];
-const background=[26,51,77,255],channel=v=>Math.floor((v*255+50)/100);
-function checkPixels(capture){
- const stats=[];
- for(let i=0;i<samples.length;i++){
-  const foreground=samples[i].color.map(channel),pixels=capture.samples[i];let ink=0,clear=0,maximumCoverage=0;
-  const reference=[0,1,2].sort((a,b)=>Math.abs(foreground[b]-background[b])-Math.abs(foreground[a]-background[a]))[0];
-  for(let p=0;p<pixels.length;p+=4){const pixel=pixels.slice(p,p+4);assert.equal(pixel[3],255);if(pixel.every((v,c)=>v===background[c])){clear++;continue;}ink++;
-   const alpha=(pixel[reference]-background[reference])/(foreground[reference]-background[reference]);maximumCoverage=Math.max(maximumCoverage,alpha);assert.ok(alpha>=-.01&&alpha<=1.01);
-   for(let c=0;c<3;c++){assert.ok(Math.abs(pixel[c]-(background[c]+alpha*(foreground[c]-background[c])))<=2,`RGB must share alpha for ${samples[i].color}: ${pixel}`);assert.ok(pixel[c]>=Math.min(background[c],foreground[c])-1&&pixel[c]<=Math.max(background[c],foreground[c])+1);}
-  }
-  assert.ok(ink>0&&clear>0);assert.ok(maximumCoverage>.1,'C foreground must cause a visible response, not a fixed near-background color');stats.push({color:samples[i].color,ink,clear,maximumCoverage,sha256:hash(pixels)});
- }
- for(const cell of capture.guards)for(let p=0;p<cell.length;p+=4)assert.deepEqual(cell.slice(p,p+4),background,'Symbol escaped its cell or opaque black replaced C background');
- return stats;
+import {readNativeGlyphSources,assertNativeGlyphPixels,nativeOracleProvenance,colorChannel} from './original-glyph-mask.mjs';
+const hash=a=>createHash('sha256').update(Buffer.from(a)).digest('hex'),native=readNativeGlyphSources();
+const colors=[[25,100,25],[30,5,40],[2,5,2]],symbols=['G_FOLIAGE','G_BLOODWORT_STALK','G_FOLIAGE','G_FIRE','G_CHARM','G_TOTEM','G_BAD_MAGIC','G_GOOD_MAGIC','G_RING'],colorIndex=[0,1,2,0,1,2,1,2,0];
+const samples=symbols.map((symbol,i)=>({symbol,x:55+2*(i%3),y:14+2*Math.floor(i/3),glyph:native.glyphs.get(symbol),unicode:native.unicode.get(symbol),color:colors[colorIndex[i]]}));
+const background=[10,20,30].map(colorChannel).concat(255);
+function checkPixels(capture,palette){
+ const stats=[];for(let i=0;i<samples.length;i++)stats.push({symbol:samples[i].symbol,color:samples[i].color,...assertNativeGlyphPixels({pixels:capture.samples[i],width:capture.cw,height:capture.ch,cell:palette[i]})});
+ for(const cell of capture.guards)for(let p=0;p<cell.length;p+=4)assert.deepEqual(cell.slice(p,p+4),background,'Glyph escaped its cell or opaque black replaced C backing');return stats;
 }
 export function createOriginalSymbolColorCases({variants=['brogue','rapid_brogue','bullet_brogue']}={}){
- return variants.flatMap(variant=>['pc-keyboard','touch'].map(input_path=>({id:variant+'-'+input_path+'-original-symbol-colors',variant,input_path,fixture_id:S.ORIGINAL_SYMBOL_COLORS,feature_ids:['cmd.graphics','cmd.rest'],targets:[],source_refs:['platform/sdl2-platform.c:fontIndex(U_ARIES)=0x84','rust/src/presentation.rs:Original Aries mask'],assertions:[
-  'Explicit UI-only C palette publishes foliage/bloodwort Aries with green/purple/dim foreground and non-black background. This does not prove natural terrain placement, healing, lighting or all symbols.',
-  'Actual production Rust canvas in Original has common-alpha C foreground composition, nonzero response, transparent backing and four-sided cell bounds. PC and Chromium touch emulation each use fit/14/24 zoom and Original/Dot/Illustration/Original DOM selections with identical C state, RNG, wait serial and consumed event count.',
-  'One actual rest after display checks drives original C; native comparison covers state/input parity, not canvas pixels. Real phone/Safari remain unverified.'
+ return variants.flatMap(variant=>['pc-keyboard','touch'].map(input_path=>({id:variant+'-'+input_path+'-original-symbol-colors',variant,input_path,fixture_id:S.ORIGINAL_SYMBOL_COLORS,feature_ids:['cmd.graphics','cmd.rest'],targets:[],source_refs:['platform/sdl2-platform.c:fontIndex native Original slots','tests/original-glyph-mask.mjs:pinned native atlas independent shape oracle'],assertions:[
+  'UI-only C palette publishes nine native glyph probes: Aries green/purple/dim, Fire/Charm/Totem/BadMagic/GoodMagic/Ring with the same three literal colors and non-black background. This proves no natural terrain, lighting, healing or new definition.',
+  'All actual Rust Original canvas pixels must match independently decoded native SDL font atlas coverage and public C foreground/background within2 RGB units, alpha255 exact. Every sample and complete four-sided blank guard rectangle is within the actual viewport; the native player remains outside at61,17.',
+  'PC and Chromium touch emulation use fit/14/24 zoom and Original/Dot/Illustration/Original DOM selection with unchanged full C state/RNG/wait serial/consumed inputs. Only one final real period advances C. Real Safari/phone remain unverified.'
  ],execute:async d=>{
-  const before=await d.state(),wait=await d.wait(),events=(await d.trace()).native_trace.length;d.entry.pixel_checks=[];
-  for(const sample of samples){const cell=await d.publicCell(sample.x,14);assert.deepEqual(cell.slice(0,8),[sample.glyph,0x2648,...sample.color,10,20,30]);}
-  d.entry.public_palette=await Promise.all(samples.map(s=>d.publicCell(s.x,14)));
+  const before=await d.state(),wait=await d.wait(),events=(await d.trace()).native_trace.length;d.entry.pixel_checks=[];d.entry.oracle_ref=nativeOracleProvenance();
+  assert.ok(before.x+21>60||before.x+21<54||before.y+3<13||before.y+3>19,'Real player must remain outside the complete uniform guard rectangle');
+  for(const sample of samples){const cell=await d.publicCell(sample.x,sample.y);assert.deepEqual(cell.slice(0,8),[sample.glyph,sample.unicode,...sample.color,10,20,30]);}
+  const palette=await Promise.all(samples.map(s=>d.publicCell(s.x,s.y)));d.entry.public_palette=palette;d.entry.sample_positions=samples;
+  const player=await d.publicCell(before.x+21,before.y+3);assert.equal(player[0],native.glyphs.get('G_PLAYER'),'Palette must preserve the actual public player for center-player');
   const unchanged=async()=>{assert.deepEqual(await d.state(),before,'Display operation changed C state/RNG');assert.equal((await d.wait()).serial,wait.serial);assert.equal((await d.trace()).native_trace.length,events);};
   for(const zoom of ['fit','14','24']){
    await d.page.locator('#zoom').selectOption(zoom);await unchanged();
-   if(input_path==='touch')await d.page.locator('#center-player').tap();else await d.page.locator('#center-player').click();await unchanged();
-   const visible=await d.page.evaluate(xs=>{const c=document.querySelector('#game').getBoundingClientRect(),v=document.querySelector('#viewport').getBoundingClientRect();return xs.every(x=>c.x+x*c.width/100>=v.x&&c.x+(x+1)*c.width/100<=v.right&&c.y+14*c.height/34>=v.y&&c.y+15*c.height/34<=v.bottom);},samples.map(s=>s.x));assert.equal(visible,true,'All palette cells must be inside the actual viewport before screenshots');let original;
+   if(input_path==='touch')await d.page.locator('#center-player').tap();else await d.page.locator('#center-player').click();await unchanged();let original;
    const modeHashes=[];
    for(const [step,mode]of ['original','dot','illustration','original'].entries()){
     await d.page.locator('#display-mode').selectOption(mode);await d.page.waitForFunction(value=>document.querySelector('#game').dataset.displayMode===value,mode);await unchanged();
-    const capture=await d.page.evaluate(xs=>{const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d'),cw=canvas.width/100,ch=canvas.height/34;const cell=(x,y)=>Array.from(ctx.getImageData(x*cw,y*ch,cw,ch).data),guards=[];for(let y=13;y<=15;y++)for(let x=58;x<=64;x++)if(y!==14||!xs.includes(x))guards.push(cell(x,y));return {cw,ch,viewport_width:document.querySelector('#viewport').clientWidth,samples:xs.map(x=>cell(x,14)),guards};},samples.map(s=>s.x));
+    const capture=await d.page.evaluate(samples=>{const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d'),cw=canvas.width/100,ch=canvas.height/34,canvasRect=canvas.getBoundingClientRect(),viewport=document.querySelector('#viewport'),v=viewport.getBoundingClientRect(),vv=visualViewport;
+     const cell=(x,y)=>Array.from(ctx.getImageData(x*cw,y*ch,cw,ch).data),guards=[],clip={left:Math.max(v.left+viewport.clientLeft,0,vv?.offsetLeft??0),top:Math.max(v.top+viewport.clientTop,0,vv?.offsetTop??0),right:Math.min(v.left+viewport.clientLeft+viewport.clientWidth,innerWidth,(vv?.offsetLeft??0)+(vv?.width??innerWidth)),bottom:Math.min(v.top+viewport.clientTop+viewport.clientHeight,innerHeight,(vv?.offsetTop??0)+(vv?.height??innerHeight))},rect={left:canvasRect.left+54*canvasRect.width/100,right:canvasRect.left+61*canvasRect.width/100,top:canvasRect.top+13*canvasRect.height/34,bottom:canvasRect.top+20*canvasRect.height/34};
+     for(let y=13;y<=19;y++)for(let x=54;x<=60;x++)if(!samples.some(s=>s.x===x&&s.y===y))guards.push(cell(x,y));
+     return {cw,ch,viewport_width:viewport.clientWidth,viewport_height:viewport.clientHeight,clip,rect,samples:samples.map(s=>cell(s.x,s.y)),guards};
+    },samples);
+    assert.ok(capture.rect.left>=capture.clip.left&&capture.rect.right<=capture.clip.right&&capture.rect.top>=capture.clip.top&&capture.rect.bottom<=capture.clip.bottom,'All nine samples and every four-sided blank guard must lie completely within the actual viewport');
     const expectedWidth=zoom==='fit'?Math.max(3,Math.floor(Math.max(100,capture.viewport_width)/100)):Number(zoom);
-    assert.equal(capture.cw,expectedWidth,'Selected zoom must change actual canvas cell width');assert.equal(capture.ch,Math.max(Math.floor(expectedWidth*11/7),expectedWidth+1),'Selected zoom must change actual canvas cell height');const signature=hash(capture.samples.flat());modeHashes.push(signature);
-    const entry={zoom,mode,step,cell_width:capture.cw,cell_height:capture.ch,sha256:signature};
-    if(mode==='original'){entry.stats=checkPixels(capture);if(original)assert.equal(signature,original,'Returning to Original changed fixed public palette pixels');else original=signature;}
+    assert.equal(capture.cw,expectedWidth,'Zoom must change actual canvas cell width');assert.equal(capture.ch,Math.max(Math.floor(expectedWidth*11/7),expectedWidth+1),'Zoom must change actual canvas cell height');assert.equal(capture.guards.length,40);
+    const signature=hash(capture.samples.flat());modeHashes.push(signature);const entry={zoom,mode,step,cell_width:capture.cw,cell_height:capture.ch,viewport_width:capture.viewport_width,viewport_height:capture.viewport_height,clip:capture.clip,guard_rect:capture.rect,guard_cells:capture.guards.length,sha256:signature};
+    if(mode==='original'){entry.stats=checkPixels(capture,palette);if(original)assert.equal(signature,original,'Returning to Original changed fixed C palette pixels');else original=signature;}
     d.entry.pixel_checks.push(entry);await d.screenshot('palette-'+zoom+'-'+step+'-'+mode);await unchanged();
    }
-   assert.equal(new Set(modeHashes.slice(0,3)).size,3,'Three actual display modes must produce distinct plant images');
+   assert.equal(new Set(modeHashes.slice(0,3)).size,3,'Three actual display modes must remain distinct');
   }
   d.effect(()=>assert.equal(d.entry.pixel_checks.length,12));await d.input('.');await d.settle();assert.equal((await d.state()).turn,before.turn+1);
  }})));

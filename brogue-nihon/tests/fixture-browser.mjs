@@ -34,7 +34,7 @@ const adapter=`
     test.cells=Array.from(cells);const result=frame(cells,...metadata);
     if(test.active){
       const s=snapshot(),observation={turn:s.turn,absoluteTurnNumber:s.absoluteTurnNumber,rng:s.rng,x:s.x,y:s.y,hp:s.hp,depth:s.depth,statuses:s.statuses,maxStatuses:s.maxStatuses,playerCell:s.playerCell,spawnCell:s.spawnCell,mapMetrics:s.mapMetrics,
-        nativeAI:s.nativeAI,...(s.portal?{portal:s.portal}:{}),stealthRange:s.stealthRange,gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
+        nativeAI:s.nativeAI,...(test.observeFullCells?{cells:s.cells}:{}),...(s.portal?{portal:s.portal}:{}),stealthRange:s.stealthRange,gases:s.cells.filter(c=>c.gas&&c.volume>0),surfaces:s.cells.filter(c=>c.surface),monsters:s.monsters,
         messageRows:Array.from({length:3},(_,y)=>Array.from({length:79},(_,i)=>{const at=(y*100+i+21)*10;return Math.max(...test.cells.slice(at+2,at+5))<20?' ':String.fromCodePoint(test.cells[at+1]||32);}).join(''))};
       const signature=JSON.stringify(observation);
       if(signature!==test.lastObservation){
@@ -166,6 +166,7 @@ export async function runFixtureSuite({name,createCases,filter=process.env.BROGU
           }
            // Opt in only after native startup/rejection checks: record genuine preparation publishes.
            // No synthetic observation or forced C flush; the normal frame wrapper keeps signature dedup.
+           if(test.observe_full_cells===true){await page.evaluate(()=>{__brogueFixture.observeFullCells=true;});if(!prefix)entry.observe_full_cells=true;}
            if(test.observe_preparation_frames===true){await page.evaluate(()=>{__brogueFixture.active=true;});if(!prefix)entry.observe_preparation_frames=true;}
           assert.equal(await page.evaluate(id=>__brogueFixture.module._brogue_check_fixture(id),scene),scene,'Fixture not accepted');
           d.startup=startup;d.origin={x:startup.x,y:startup.y,depth:startup.depth};
