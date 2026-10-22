@@ -285,3 +285,8 @@ Brogueの文字描画は通常1セル・全角日本語2セルの範囲に収め
 jelly-armor.mjs はnative Acidic Jellyの通常攻撃を、保護なし／保護された既知の皮鎧に対して3variant×PC/touchの12条件で実行する。皮鎧の原作raw30・必要筋力10・生成chargeを保持し、player筋力12の防御35から開始する。実際のperiod休止を20回以内で送り、最初の2〜6被害で即停止する。保護なしは鎧−1・防御25、保護ありは実被弾して鎧0・防御35を要求し、空振りだけの保護例を合格にしない。HP更新とspecialHitの間の描画は区別し、厳密な鎧結果は入力待ちの完了時に判定する。血は被害側playerのRED_BLOODのみ。装着コマンド、他防具の固有効果、自然配置、全AIの確認とは別である。
 
 実行は作品フォルダーから node tests/jelly-armor.mjs。絞り込みは BROGUE_JELLY_ARMOR に完全case IDのCSVを指定する。同じ作品フォルダーから原作比較を行う場合は BROGUE_FIXTURE_RESULTS=.local/feature-verification/jelly-armor/results.json、BROGUE_COMPARE_NAME=jelly-armor、BROGUE_COMPARE_DOMAINS=none を指定して node tests/compare-fixtures.mjs を実行する。原作固定ソースとコンパイラーは既存の設定を使う。
+
+
+`imp-blink.mjs` は native Imp による実攻撃・盗みから逃走、AIの瞬間移動までを、開放／7壁の条件と3 variant、PC／touchの12候補ケースを定義する。既定実行は10ケースで、CEの開放2ケースは盗み後に43,18で待機し、12rest内の瞬間移動が未到達だったため除外する。両ケースは完全IDを明示すれば同じ厳密条件で実行できる。未到達の初回12件記録はローカルの診断証拠として保持し、CEでの瞬間移動を合格扱いしない。プレイヤーHP100・防御0・未装備のdart5本と位置36,14は検証専用の初期状態。Impの能力・命中225・被害4〜9・HP35・再生・boltを保持し、最初の実restで3本を盗ませる。開放では追加12rest以内の同一入力での2セル以上の跳躍と新しい公開メッセージを要求し、未到達を合格にしない。7壁では追加8restのすべてで実被害を要求し、動かないだけの検証を避ける。原作のidle時計33と瞬間移動中の一時的な占有解除を許容し、厳密な所持数・占有・状態は入力待ちの境界で判定する。原作の30%確率分布、自然配置、盗品の回収、全AI、実機Safariの確認とは区別する。
+
+作品フォルダーから `node tests/imp-blink.mjs` を実行する。絞り込みは `BROGUE_IMP_BLINK` に完全case IDをCSV指定する。同じ作品フォルダーで `BROGUE_FIXTURE_RESULTS=.local/feature-verification/imp-blink/results.json`、`BROGUE_COMPARE_NAME=imp-blink`、`BROGUE_COMPARE_DOMAINS=none` を指定し、`node tests/compare-fixtures.mjs` で原作比較する。固定原作ソースとコンパイラーは既存設定を使う。

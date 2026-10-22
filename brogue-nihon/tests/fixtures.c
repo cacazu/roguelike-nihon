@@ -365,17 +365,17 @@ const char *brogue_check_features(void) {
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
         if ((preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ACID_JELLY_ARMOR_PROTECTED)) {
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_IMP_BLINK_BLOCKED)) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
 
         if ((preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ACID_JELLY_ARMOR_PROTECTED))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_IMP_BLINK_BLOCKED))
             featureAppend(",\"nativeDFType\":%d,\"nativeDFChance\":%d", monst->info.DFType, monst->info.DFChance);
 
         if ((preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_ACID_JELLY_ARMOR_PROTECTED))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_IMP_BLINK_BLOCKED))
             featureAppend(",\"nativeMovementSpeed\":%d,\"nativeAttackSpeed\":%d", monst->info.movementSpeed, monst->info.attackSpeed);
 
         if (preparedScene >= CHECK_BOG_WET_MOVEMENT && preparedScene <= CHECK_BOG_DEEP_GRIP)
@@ -1195,6 +1195,25 @@ static void fixtureNativeJellyArmor(int scene) {
     updateEncumbrance();
 }
 
+/* Initial data only. Actual theft, flight, safety-map selection and blink are
+ * reached exclusively through real rest input. Native creation RNG is retained. */
+static void fixtureNativeImpBlink(int scene) {
+    fixtureSafeWorld();
+    rogue.strength = 12;
+    player.weaknessAmount = 0;
+    player.info.defense = 0; /* Declared artificial unarmored target. */
+    pmapAt(player.loc)->flags &= ~HAS_PLAYER;
+    player.loc = (pos){36, 14};
+    pmapAt(player.loc)->flags |= HAS_PLAYER;
+    give(WEAPON, DART, 'a', true)->quantity = 5;
+    fixtureTarget(MK_IMP, 37, 14)->ticksUntilTurn = 1;
+    if (scene == CHECK_IMP_BLINK_BLOCKED) {
+        const pos walls[] = {{36,13},{37,13},{38,13},{38,14},{38,15},{37,15},{36,15}};
+        for (int i = 0; i < 7; i++) pmapAt(walls[i])->layers[DUNGEON] = WALL;
+    }
+    updateEncumbrance();
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -1972,7 +1991,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_ACID_JELLY_ARMOR_PROTECTED) return -1;
+    } else if (scene < 1 || scene > CHECK_IMP_BLINK_BLOCKED) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -2027,6 +2046,7 @@ int brogue_check_fixture(int scene) {
     else if (scene >= CHECK_HORDE_THRESHOLD && scene <= CHECK_HORDE_BLOCKED) fixtureHordeMutation(scene);
     else if (scene >= CHECK_ACID_JELLY_OPEN && scene <= CHECK_BLACK_JELLY_BLOCKED) fixtureNativeJelly(scene);
     else if (scene == CHECK_ACID_JELLY_ARMOR || scene == CHECK_ACID_JELLY_ARMOR_PROTECTED) fixtureNativeJellyArmor(scene);
+    else if (scene == CHECK_IMP_BLINK_OPEN || scene == CHECK_IMP_BLINK_BLOCKED) fixtureNativeImpBlink(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);
