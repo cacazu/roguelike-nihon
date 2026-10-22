@@ -365,17 +365,17 @@ const char *brogue_check_features(void) {
         if (preparedScene >= CHECK_DISTANCE_CLOSE && preparedScene <= CHECK_DISTANCE_KOBOLD)
             featureDistanceObservation(monst);
         if ((preparedScene >= CHECK_EMBEDDED_ARROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_OGRE_TOTEM_FULL)) {
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_CENTAUR_ARROW_BLOCKED)) {
             featureDistanceObservation(monst);
             featureAppend(",\"nativeBloodType\":%d", monst->info.bloodType);
         }
 
         if ((preparedScene >= CHECK_PIT_BLOAT_THROW && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_OGRE_TOTEM_FULL))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_CENTAUR_ARROW_BLOCKED))
             featureAppend(",\"nativeDFType\":%d,\"nativeDFChance\":%d", monst->info.DFType, monst->info.DFChance);
 
         if ((preparedScene >= CHECK_HORDE_THRESHOLD && preparedScene <= CHECK_HORDE_BLOCKED)
-            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_OGRE_TOTEM_FULL))
+            || (preparedScene >= CHECK_ACID_JELLY_OPEN && preparedScene <= CHECK_CENTAUR_ARROW_BLOCKED))
             featureAppend(",\"nativeMovementSpeed\":%d,\"nativeAttackSpeed\":%d", monst->info.movementSpeed, monst->info.attackSpeed);
 
         if (preparedScene >= CHECK_BOG_WET_MOVEMENT && preparedScene <= CHECK_BOG_DEEP_GRIP)
@@ -1272,6 +1272,23 @@ static void fixtureOgreTotem(int scene) {
     if (scene == CHECK_OGRE_TOTEM_INJURED) recipient->currentHP = 10;
 }
 
+/* Initial terrain and native Centaur only. Eight native LIQUID chasms
+ * constrain movement; real rest input alone invokes original AI and arrows. */
+static void fixtureCentaurArrow(int scene) {
+    fixtureSafeWorld();
+    player.info.defense = 0;
+    rogue.strength = 12;
+    player.weaknessAmount = 0;
+    pmapAt(player.loc)->flags &= ~HAS_PLAYER;
+    player.loc = (pos){39, 14};
+    pmapAt(player.loc)->flags |= HAS_PLAYER;
+    for (int y = 13; y <= 15; y++) for (int x = 42; x <= 44; x++)
+        if (x != 43 || y != 14) pmap[x][y].layers[LIQUID] = CHASM;
+    if (scene == CHECK_CENTAUR_ARROW_BLOCKED)
+        pmap[40][14].layers[DUNGEON] = PORTCULLIS_CLOSED;
+    fixtureTarget(MK_CENTAUR, 43, 14)->ticksUntilTurn = 1;
+}
+
 /* Native runic preparation only. Combat and proc RNG are never called here. */
 static void fixtureWeaponRunic(int kind, boolean plain, boolean inanimate) {
     fixtureSafeWorld();
@@ -2049,7 +2066,7 @@ int brogue_check_fixture(int scene) {
         const int enumCount = category == POTION ? POTION_LICHEN + 1 : category == CHARM ? CHARM_NEGATION + 1
             : category == SCROLL ? SCROLL_SUMMON_MONSTER + 1 : category == RING ? NUMBER_RING_KINDS : category == STAFF ? STAFF_PROTECTION + 1 : WAND_EMPOWERMENT + 1;
         if (category && category != WEAPON && category != ARMOR && (kind < 0 || kind >= enumCount || kind >= itemKindCount(category, 0))) return -1;
-    } else if (scene < 1 || scene > CHECK_OGRE_TOTEM_FULL) return -1;
+    } else if (scene < 1 || scene > CHECK_CENTAUR_ARROW_BLOCKED) return -1;
     if (group == CHECK_NATIVE_AI || group == CHECK_NATIVE_SCENT) {
         creature *subject; pos destination, playerDestination, route[9];int routeCount=0;
         if (group == CHECK_NATIVE_SCENT) {
@@ -2108,6 +2125,7 @@ int brogue_check_fixture(int scene) {
     else if (scene == CHECK_ZOMBIE_GAS_PLAIN || scene == CHECK_ZOMBIE_GAS_RESPIRATION) fixtureNativeZombieGas(scene);
     else if (scene == CHECK_GOBLIN_TOTEM_TRACKING || scene == CHECK_GOBLIN_TOTEM_WANDERING) fixtureGoblinTotem(scene);
     else if (scene == CHECK_OGRE_TOTEM_INJURED || scene == CHECK_OGRE_TOTEM_FULL) fixtureOgreTotem(scene);
+    else if (scene == CHECK_CENTAUR_ARROW || scene == CHECK_CENTAUR_ARROW_BLOCKED) fixtureCentaurArrow(scene);
     else if (scene <= 8) fixtureInventory();
     else if (scene >= CHECK_SLAYING_MATCH && scene <= CHECK_VISIBILITY_MEMORY) fixtureContracts(scene);
     else if (scene >= CHECK_KEY_COORDINATE && scene < CHECK_NATIVE_LEVELS) fixtureAdvanced(scene);

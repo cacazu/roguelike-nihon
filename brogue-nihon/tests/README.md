@@ -303,3 +303,7 @@ node tests/goblin-totem.mjs は3種×PC/touch×TRACKING/WANDERINGの12ケース�
 ### Ogre Totemの徘徊中の味方への回復
 
 node tests/ogre-totem.mjs は3種×PC/touch×負傷/満HPの12ケース。両方の味方OgreはWANDERING、原作の性別選択・自然回復20・clockを保持する。実詠唱と隣接画面の+27を最大40実休息で要求し、20休息ごとの自然回復+1は魔法と数えない。400tickの詠唱機会は1,5,...37の10回、未到達は失敗。満HP55は8休息の否定対照。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=ogre-totem、BROGUE_COMPARE_DOMAINS=noneでcompare-fixtures.mjs。BROGUE_OGRE_TOTEMは完全IDのCSV絞り込み。人工の負傷・隊列・遅延clock・PORTは自然生成/実際の負傷/自身のAIの証拠にせず、SLOW・移動不能flag・自然回復の未観測境界・実機Safari・全機能を合格扱いしない。
+
+### Centaurの原作の矢と透明な射線遮断
+
+node tests/centaur-arrow.mjs は3種×PC/touch×開放/透明PORTの12ケース。原作の全HP35・移動速度50・攻撃速度100・性別・能力・30%判定を保持する。人工のCHASM8セルは自身の移動を制限するだけで、AI・矢・命中・被害を直接呼ばない。最大40実休息で実際の矢と4〜8の被害、隣接する公開frameのHP変化を要求し、未到達は失敗。防御0に対する命中率は100%なので発射のみを空振りとして通さない。透明PORTは8休息で無発射と13,9,5,1のclock周期を要求する。全観測でTRACKING・FOV・距離4でstealth range 4以上（休息で影の7が4になる原作処理を含む）、PC/touchと初期対照の状態・RNG、実画面のCと色を検査する。原作比較はBROGUE_FIXTURE_RESULTS、BROGUE_COMPARE_NAME=centaur-arrow、BROGUE_COMPARE_DOMAINS=noneでcompare-fixtures.mjs。BROGUE_CENTAUR_ARROWは完全IDのCSV。自然生成・逃走・自由移動・確率分布・CHASM回避の汎用機能・実機Safari・全機能の証拠にはしない。
