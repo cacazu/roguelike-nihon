@@ -1,8 +1,0 @@
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\fov\fov.c:1574:30: warning: using integer absolute value function 'abs' when argument is of floating point type [-Wabsolute-value]
- 1574 |         dy += (float)(((int)(abs(dx) + 0.5f)) & 1) * (0.5f - (float)(sx & 1));
-      |                              ^
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\fov\fov.c:1574:30: note: use function 'fabsf' instead
- 1574 |         dy += (float)(((int)(abs(dx) + 0.5f)) & 1) * (0.5f - (float)(sx & 1));
-      |                              ^~~
-      |                              fabsf
-1 warning generated.

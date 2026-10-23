@@ -1,3 +1,0 @@
-   Compiling cdda-cosmetic-presentation-source v0.1.0 (C:\Users\kit\Documents\Codex\2026-10-02\task-8\cosmetic-purity-overlay\build-plan)
-    Finished `test` profile [unoptimized] target(s) in 0.48s
-     Running unittests ..\rust\src\lib.rs (cosmetic-purity-overlay\build-plan\target\x86_64-pc-windows-gnu\debug\deps\cdda_cosmetic_presentation_source-effa677d58422739.exe)

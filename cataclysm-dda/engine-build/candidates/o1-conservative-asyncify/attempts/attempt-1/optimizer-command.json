@@ -1,6 +1,0 @@
-{
-  "timestampUtc": "2026-10-02T18:37:21.1346944Z",
-  "pid": 46316,
-  "parentPid": 50796,
-  "ownedCommandLine": "C:/Users/kit/emsdk/upstream\\bin\\wasm-opt --asyncify --pass-arg=asyncify-propagate-addlist --pass-arg=asyncify-imports@env.invoke_*,env.__asyncjs__*,*.fd_sync,*.emscripten_promise_await,*.emscripten_promise_await_unchecked,*.__syscall_poll,*.__syscall_epoll_pwait,*.emscripten_idb_load,*.emscripten_idb_store,*.emscripten_idb_delete,*.emscripten_idb_exists,*.emscripten_idb_clear,*.emscripten_sleep,*.emscripten_wget_data,*.emscripten_scan_registers,*.emscripten_fiber_swap,*._emval_await C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-8\\engine-build\\candidates\\o1-conservative-asyncify\\output\\cataclysm-tiles.wasm -o C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-8\\engine-build\\candidates\\o1-conservative-asyncify\\output\\cataclysm-tiles.wasm --mvp-features --enable-threads --enable-bulk-memory --enable-bulk-memory-opt --enable-call-indirect-overlong --enable-multivalue --enable-mutable-globals --enable-nontrapping-float-to-int --enable-reference-types --enable-sign-ext"
-}

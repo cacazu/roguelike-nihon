@@ -1,1 +1,0 @@
-{"result":"pass","checks":6,"remaining":["Current DRLP lacks enemy UID/HP and registered player-kill counters: correlated hostile death is observed; exact player kill attribution and fullworld state are not asserted."],"output":"C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-9\\port\\tests\\output\\original-combat"}

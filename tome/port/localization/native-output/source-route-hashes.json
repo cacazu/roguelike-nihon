@@ -1,9 +1,0 @@
-{
-  "engine/BootErrorHandler.lua": "2f1c214e0ad86df9545aa392c5b9fc65b9f2348a4ed06454d0b3ae2ed1d199c4",
-  "engine/class.lua": "e65f81d273090e02c29855d1d5b0b0452878399f7d6a8bd024ef3ec6fc498928",
-  "engine/Game.lua": "7c8c458c142289fe8b4e59e5c16376303f9a10d34e858fabc48d84c6aa04e523",
-  "engine/Module.lua": "40ded1b049c1e3072bda90bd49697c17bfc5ba58afdba7adb60fddaac8f24cbc",
-  "engine/dialogs/ShowErrorStack.lua": "aa02037ab03c9353e9ef6443290ca88737f6b377b7cf0b642b098c4da124068e",
-  "engine/interface/GameMusic.lua": "3e159d22d041d415463ce0a6d510bb701f69b34cc8c902d212a86630ee49e6f5",
-  "engine/interface/GameSound.lua": "bc443d1f1d3d07df936e32544f11d3726ccc338075922e4b6f586f7a77cf6a58"
-}

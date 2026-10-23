@@ -1,8 +1,0 @@
-In file included from C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\physfs\physfs.c:14:
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\physfs\physfs.h:7:9: warning: 'PHYSFS_NO_CDROM_SUPPORT' macro redefined [-Wmacro-redefined]
-    7 | #define PHYSFS_NO_CDROM_SUPPORT
-      |         ^
-<command line>:7:9: note: previous definition is here
-    7 | #define PHYSFS_NO_CDROM_SUPPORT 1
-      |         ^
-1 warning generated.

@@ -1,7 +1,0 @@
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\particles.c:441:2: warning: comparison of distinct pointer types ('GLshort *' (aka 'short *') and 'GLfloat *' (aka 'float *')) [-Wcompare-distinct-pointer-types]
-  441 |         glTexCoordPointer(2, GL_SHORT, 0, texcoords);
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\tgl.h:86:10: note: expanded from macro 'glTexCoordPointer'
-   86 |         if ((p) != gl_c_texcoords_ptr || (nb) != gl_c_colors_nb) { glTexCoordPointer((nb), (t), (v), (p)); gl_c_texcoords_ptr=(p); gl_c_texcoords_nb = (nb); } \
-      |             ~~~ ^  ~~~~~~~~~~~~~~~~~~
-1 warning generated.

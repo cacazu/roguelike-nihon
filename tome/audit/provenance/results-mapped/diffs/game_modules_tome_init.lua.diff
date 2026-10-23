@@ -1,9 +1,0 @@
-diff --git "a/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_modules_tome_init.lua.git" "b/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_modules_tome_init.lua.release"
-index d2c8556..271c3cd 100644
---- "a/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_modules_tome_init.lua.git"
-+++ "b/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_modules_tome_init.lua.release"
-@@ -192,3 +192,4 @@ score_formatters = {
- 	}
- }
- 
-+version_desc = '1.7.6'

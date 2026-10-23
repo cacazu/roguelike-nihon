@@ -1,1 +1,0 @@
-Actual autorun RunDelay=0 and Escape cancellation passed. Combat acquisition stopped at Look Mode caption oracle. Native VTIG root origin resolves the Point(...,1) caption to browser row1 and the Point(...,2) description to row2. Corrected test only; core unchanged.

@@ -1,9 +1,0 @@
-Selected original source: upstream/wasi-libc/libc-top-half/musl/src/math/exp_data.c
-Pinned wasi-libc: 2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13
-
-/*
- * Shared data between exp, exp2 and pow.
- *
- * Copyright (c) 2018, Arm Limited.
- * SPDX-License-Identifier: MIT
- */

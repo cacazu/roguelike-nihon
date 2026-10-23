@@ -1,9 +1,0 @@
-warn: could not canonicalize path C:\Users\kit
-    Checking serde_core v1.0.229
-    Checking zmij v1.0.23
-    Checking itoa v1.0.18
-    Checking memchr v2.8.3
-    Checking serde_json v1.0.151
-    Checking serde v1.0.229
-    Checking dcss-boundary v0.1.0 (C:\Users\kit\Documents\Codex\2026-10-02\task-6\dcss-v3-gate-h-work\worktree\port)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.38s

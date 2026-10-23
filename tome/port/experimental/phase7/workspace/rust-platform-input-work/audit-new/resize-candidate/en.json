@@ -1,9 +1,0 @@
-{
-  "platform.resize.fresh": "Open a fresh session to initialize the original display.",
-  "platform.resize.selector": "The original display canvas is unavailable.",
-  "platform.resize.unavailable": "The original display dimensions are unavailable.",
-  "platform.resize.dimensions": "The original display and window dimensions do not match.",
-  "platform.resize.viewport": "Wait until the original display has finished drawing.",
-  "platform.resize.logical": "Wait until the original game has finished resizing.",
-  "platform.resize.busy": "Wait until the current action or save has finished."
-}

@@ -1,9 +1,0 @@
-{
-  "original_source_commit": "843eb4a6ac1e7c995c0af626c88639e4b1aeaf0d",
-  "original_sha256": "fdc007d255c5318ea9bb6284548ceb551b4343b017af10765afda2e06a370237",
-  "patched_sha256": "3ef61fb08ac1da563565bb72afdda30876245a82435ac8ad742faf71c15dfe41",
-  "change": "WASI external-linker heap begins at __heap_base, not __stack_pointer",
-  "stack_bounds": "probe/main must set System.StackBottom separately to linker __stack_low after unit initialization",
-  "validation": "authored, compile/execute pending shared-memory heavy-job release",
-  "shared_toolchain_modified": false
-}

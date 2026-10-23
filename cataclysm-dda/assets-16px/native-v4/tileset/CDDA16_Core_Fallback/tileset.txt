@@ -1,4 +1,0 @@
-NAME: cdda16_core_fallback
-VIEW: CDDA Native 16px core with diagnostic stencils
-JSON: tile_config.json
-TILESET: tiles.png

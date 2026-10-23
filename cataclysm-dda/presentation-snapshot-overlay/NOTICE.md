@@ -1,5 +1,0 @@
-This derivative source preparation targets official Cataclysm: Dark Days Ahead 0.I-1, repository <https://github.com/CleverRaven/Cataclysm-DDA>, commit `7b2efa5cea38e4d4d97dd0e63b28b9148623da59`.
-
-Attribution and copyright remain with Cataclysm:DDA contributors and the original credited authors. Native excerpts and derivative source retain Creative Commons Attribution-ShareAlike 3.0 Unported terms. `LICENSE-UPSTREAM.txt` is an exact retained upstream license document with bundled-component notices; no broader asset rights are granted.
-
-Prepared changes observe actual SDL text-window submissions and presentation commits, retaining raw border/CJK cell bytes, colors, damage, font and geometry metadata in bounded owned buffers. The Rust source mirrors the pinned original first-codepoint and line-decision rules. No gameplay rules, original graphics, fonts or assets change. Source/Node checks do not establish native/Rust compilation, runtime rendering, input takeover or complete-game migration. No assets or executables are distributed by this slice.

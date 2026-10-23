@@ -1,5 +1,0 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><title>DRL Lua ABI 検証</title><h1>Lua 5.1.5 WASI ABI 検証</h1><p>原作ゲームではありません。Pascal との結合は別途検証します。</p><pre id="result">実行中</pre><script type="module">
-import {runLuaProbe} from './browser-host.mjs';
-const mixed=new URL(location.href).searchParams.get('mode')==='mixed';
-try{window.luaProbe=await runLuaProbe(await (await fetch(mixed?'./mixed-build/mixed-probe.wasm':'./build/lua-probe.wasm')).arrayBuffer(),{virtualFiles:mixed});document.querySelector('#result').textContent=JSON.stringify(window.luaProbe,null,2);}catch(error){window.luaProbeError=String(error.stack??error);document.querySelector('#result').textContent=window.luaProbeError;}
-</script></html>

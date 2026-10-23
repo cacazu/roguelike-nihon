@@ -1,8 +1,0 @@
-    Checking serde_core v1.0.229
-    Checking zmij v1.0.23
-    Checking memchr v2.8.3
-    Checking itoa v1.0.18
-    Checking serde_json v1.0.151
-    Checking serde v1.0.229
-    Checking nethack-layers v0.1.0 (C:\Users\kit\Documents\Codex\2026-10-02\task-11\nethack\rust)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 11.69s

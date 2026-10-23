@@ -1,5 +1,0 @@
-AssertionError [ERR_ASSERTION]: Original wizard policy must actually authorize this fixture
-    at file:///C:/Users/kit/Documents/Codex/2026-10-02/task-11/nethack/tests/browser-host-semantic-native-producers.mjs:229:12
-    at async step (file:///C:/Users/kit/Documents/Codex/2026-10-02/task-11/nethack/tests/browser-host-semantic-native-producers.mjs:25:22)
-    at async file:///C:/Users/kit/Documents/Codex/2026-10-02/task-11/nethack/tests/browser-host-semantic-native-producers.mjs:213:3
-RESULT failed: 0 passed, 1 failed. C:\Users\kit\Documents\Codex\2026-10-02\task-11\nethack\build\browser-semantic-native-verification.json

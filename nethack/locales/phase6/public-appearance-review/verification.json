@@ -1,9 +1,0 @@
-{
-  "status": "source-public-identity-verified",
-  "assertions": 1136,
-  "error_count": 0,
-  "errors": [],
-  "authored_sha256": "a0914b1e80c3ee391881c72ce416e54d0d73555abc49cc3ef201c153869bd4ab",
-  "runtime_approved": 0,
-  "composition_review_required": "Bare public attributes require original captured public-class noun/connector recipes; no whole-name or runtime Japanese approval."
-}

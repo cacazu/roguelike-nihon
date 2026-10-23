@@ -1,7 +1,0 @@
-{
-  "schemaVersion": 1,
-  "plan": "../../integration-overlay/build-plan/next-consumer-build-plan.json",
-  "note": "Workspace-relative plan integration-overlay/build-plan/next-consumer-build-plan.json owns the sequential source-only proposal; no compiler started",
-  "planSha256": "107cb15e7d3b8179376e3bd0d03a5021623e50ff138b10dce5899aabae952ebf",
-  "originalSourceUntouched": true
-}

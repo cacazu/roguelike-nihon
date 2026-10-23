@@ -1,9 +1,0 @@
-/cache/
-/ports/
-/objects*/
-/logs/
-/output/
-/.emscripten
-/compile-results*.json
-/copied-sdk-archives.json
-/link-objects.rsp

@@ -1,8 +1,0 @@
-{
-  "error.lua.adapter.argument_limit": "Lua packed argument limit",
-  "error.lua.adapter.argument_missing": "Lua format argument missing",
-  "error.lua.adapter.string_type": "Lua %s argument type mismatch",
-  "error.lua.adapter.integer_type": "Lua integer argument type mismatch",
-  "error.lua.adapter.float_type": "Lua %f argument type mismatch",
-  "error.lua.adapter.pointer_type": "Lua %p argument type mismatch"
-}

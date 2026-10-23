@@ -1,9 +1,0 @@
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\wait.c:141:71: warning: format specifies type 'int' but the argument has type 'float' [-Wformat]
-  141 |                 printf("Make wait background texture %d : %dx%d (%d, %d)\n", bkg_t, w, h, bkg_realw, bkg_realh);
-      |                                                           ~~                        ^
-      |                                                           %f
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\wait.c:141:74: warning: format specifies type 'int' but the argument has type 'float' [-Wformat]
-  141 |                 printf("Make wait background texture %d : %dx%d (%d, %d)\n", bkg_t, w, h, bkg_realw, bkg_realh);
-      |                                                              ~~                        ^
-      |                                                              %f
-2 warnings generated.

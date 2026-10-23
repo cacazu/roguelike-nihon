@@ -1,4 +1,0 @@
-pure/mock browser source: 47/47 passed
-existing compiled platform regression: 6/6 passed
-actual compiled semantic boundary: 14/14 passed
-Verified 67 serial checks; WASM edec818a055454895c9d70cad5358ac211792f636bf7e517eeb7a911e660fc59; build/browser-semantic-compiled-verification.json

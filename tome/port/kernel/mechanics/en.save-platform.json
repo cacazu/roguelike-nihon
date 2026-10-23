@@ -1,6 +1,0 @@
-{
-  "platform.save.worker_unavailable": "Browser save service is unavailable.",
-  "platform.save.worker_not_ready": "Browser save service is not ready.",
-  "platform.save.operation_failed": "Browser save operation failed.",
-  "platform.save.invalid_status": "Browser save service returned an invalid status."
-}

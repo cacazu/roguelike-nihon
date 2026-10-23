@@ -1,4 +1,0 @@
-
-#define EMSCRIPTEN 1
-#define __EMSCRIPTEN__ 1
-

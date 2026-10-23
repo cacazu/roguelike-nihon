@@ -1,1 +1,0 @@
-{"op":"eval","expression":"(() => { const d=window.cddaBaselineDiagnostics;return {phase:d?.phase,menuReady:d?.menuReady,events:d?.events?.slice(-8),logs:d?.logs?.slice(-12),persistenceLoaded:d?.persistenceLoaded,profileSeeded:d?.profileSeeded,rustBridge:d?.rustBridge,canvas:d?.canvas,unsaved:window.game_unsaved};})()"}

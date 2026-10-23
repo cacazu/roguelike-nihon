@@ -1,6 +1,0 @@
-# Source-prepared std-only lock; actual offline/locked acceptance pending.
-version = 4
-
-[[package]]
-name = "cdda-cosmetic-presentation-source"
-version = "0.1.0"

@@ -1,4 +1,0 @@
-file_packager: warning: Remember to build the main file with `-sFORCE_FILESYSTEM` so that it includes support for loading this file package
-compressing package of size 175162548
-compressed package into 116219695
-compressed in 1110 ms

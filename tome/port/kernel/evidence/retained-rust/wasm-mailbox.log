@@ -1,2 +1,0 @@
-WASM bridge tests passed: exact original command transport, one native callback per action, pure locale/view, protected input
-Native callbacks in this test are synthetic protocol fixtures; real retained-core boot/gameplay proof remains separate.

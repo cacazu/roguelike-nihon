@@ -1,9 +1,0 @@
-{
-  "stage": "actual-original-context-rustfmt-workcopy-preview",
-  "decision": "launch",
-  "freshCounters": {
-    "physicalFreeBytes": 6337896448,
-    "exactCommitHeadroomBytes": 10460381184,
-    "counter": "GlobalMemoryStatusEx + GetPerformanceInfo exact committed/limit pages"
-  }
-}

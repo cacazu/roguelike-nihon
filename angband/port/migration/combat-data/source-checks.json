@@ -1,8 +1,0 @@
-{
-  "kind": "source-only-contract-checks",
-  "tests": 16,
-  "failures": 0,
-  "errors": 0,
-  "compiled_or_executed_engine": false,
-  "upstream_commit": "f3082213b73f3e463e3d0d60bff4b00462beae6e"
-}

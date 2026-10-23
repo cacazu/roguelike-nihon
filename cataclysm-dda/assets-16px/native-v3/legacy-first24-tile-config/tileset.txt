@@ -1,4 +1,0 @@
-NAME: cdda16_original
-VIEW: CDDA Native 16px (partial artwork)
-JSON: tile_config.json
-TILESET: tiles.png

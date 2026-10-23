@@ -1,4 +1,0 @@
-NAME: cdda16_core_ready
-VIEW: CDDA Native16 core base families
-JSON: tile_config.json
-TILESET: tiles.png

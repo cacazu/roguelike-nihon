@@ -1,7 +1,0 @@
-# Prepared for this isolated std-only package without running Cargo.
-# Acceptance is pending the explicitly reserved --offline --locked run.
-version = 4
-
-[[package]]
-name = "cdda-native-text-snapshot-source"
-version = "0.1.0"

@@ -1,3 +1,0 @@
-# Supported stable settings; the original preview config remains unchanged.
-edition = "2024"
-newline_style = "Unix"

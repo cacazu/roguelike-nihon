@@ -1,7 +1,0 @@
-# Workcopy-only Rustfmt preview
-
-`run-preview.py` reads the actual root-level `../FORMAT-CLIPPY-NEXT.json`, checks its exact hash against the reviewed preview plan, and selects only its `parameter-rustfmt-workcopy-preview` command. It hash-loads the unchanged owner0b04ccd and uses its exercised run_owned cleanup; this file adds no process/job/termination implementation.
-
-Launch requires an explicit parent reservation and fresh4/6 counters,1GiB owned private/working-set caps,2GiB running floors and180seconds. No launch is authorized by preparation. The wrapper archives exact before bytes, creates a fresh owned `workcopy/src/{lib,tests}.rs`, and invokes pinned direct rustfmt with edition2024, the pinned configuration, and skip_children=true. There is no Cargo formatter, --all, shared dependency traversal or actual-source copyback. An existing workcopy fails before tool launch; retries require new reviewed preparation.
-
-Preserve raw stdout/stderr as separate hashed logs; never interpret them as source. Require guarded exit0, exactly the two UTF8 candidate files, unchanged archived before bytes, and a decisive final before/after hash comparison of protected source/cache/proof bytes. Unexpected files or symlinks fail. Capture both candidate hashes and the ordinary unified diff. Root reviews any diagnostics plus that diff and hashes before authorizing a separate copy/refresh. Preview success establishes no compiler, test, Clippy, browser, producer/FFI or game acceptance.

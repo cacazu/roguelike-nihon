@@ -1,7 +1,0 @@
-{
-  "parentWindowExplicitlyReleased": true,
-  "wholeGameConsumption": false,
-  "status": "failed-stopped-owned-stage",
-  "failure": "RuntimeError(\"native-cpp-selector-fixture-build: AssertionError('stage returned 1; inspect owned logs')\")",
-  "stagesPassed": 2
-}

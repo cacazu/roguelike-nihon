@@ -1,1 +1,0 @@
-{"cFiles":211,"outputs":[{"name":"game.js","bytes":220131,"sha256":"d6c5476953ddc78679a8a5ff3bbddf97e6775fadd9c13c0c5103c97d39fed382"},{"name":"game.wasm","bytes":4405807,"sha256":"754a311090a1d647014aaa93a96e2b8b0c955aa4b376f3363cbdae5778fcb0cd"},{"name":"game.data","bytes":1279735,"sha256":"c5c37e803506c1fab26b5950960d53ccf11d8d251f46967afc92684430af8ae2"}]}

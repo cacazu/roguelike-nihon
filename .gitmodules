@@ -1,0 +1,24 @@
+[submodule "rogue-nihon"]
+	path = rogue-nihon
+	url = https://github.com/cacazu/rogue-nihon.git
+[submodule "brogue-nihon"]
+	path = brogue-nihon
+	url = https://github.com/cacazu/brogue-nihon.git
+[submodule "nethack"]
+	path = nethack
+	url = https://github.com/cacazu/nethack-nihon.git
+[submodule "drl"]
+	path = drl
+	url = https://github.com/cacazu/drl-nihon.git
+[submodule "dcss"]
+	path = dcss
+	url = https://github.com/cacazu/dcss-nihon.git
+[submodule "angband"]
+	path = angband
+	url = https://github.com/cacazu/angband-nihon.git
+[submodule "tome"]
+	path = tome
+	url = https://github.com/cacazu/tome-nihon.git
+[submodule "cataclysm-dda"]
+	path = cataclysm-dda
+	url = https://github.com/cacazu/cataclysm-dda-nihon.git

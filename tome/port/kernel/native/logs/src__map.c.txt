@@ -1,8 +1,0 @@
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\map.c:1685:26: warning: absolute value function 'fabsf' given an argument of type 'double' but has parameter of type 'float' which may cause truncation of value [-Wabsolute-value]
- 1685 |                                 float where = (0.5 - fabsf(m->move_step / (float)m->move_max - 0.5)) * 2;
-      |                                                      ^
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\map.c:1685:26: note: use function 'fabs' instead
- 1685 |                                 float where = (0.5 - fabsf(m->move_step / (float)m->move_max - 0.5)) * 2;
-      |                                                      ^~~~~
-      |                                                      fabs
-1 warning generated.

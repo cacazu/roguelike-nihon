@@ -1,7 +1,0 @@
-{
-  "original": "C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\save-resume-work\\generated\\baseline-birth-driver.lua",
-  "original_sha256": "c67efcbe257c4e23097d8e7fbbca627630ee047e5e2c49e3b117dcc4d18e3330",
-  "derived_sha256": "db98294c89dff46c0073b0e85b8849b5c742943f59192f188f1587ff830227bb",
-  "reverse_byte_equal": true,
-  "scope": "Additive first-load guards only, no game rule change"
-}

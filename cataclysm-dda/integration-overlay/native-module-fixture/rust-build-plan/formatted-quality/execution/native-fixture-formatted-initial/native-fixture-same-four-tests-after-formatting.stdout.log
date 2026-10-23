@@ -1,9 +1,0 @@
-
-running 4 tests
-test tests::actual_module_json_is_accepted_at_all_prepared_boundaries ... ok
-test tests::actual_restoration_and_owned_old_records_remain_distinct ... ok
-test tests::frozen_consumer_rejects_invalid_utf8_size_and_identity ... ok
-test tests::native_controls_cjk_and_raw_username_match_frozen_rust_rules ... ok
-
-test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
-

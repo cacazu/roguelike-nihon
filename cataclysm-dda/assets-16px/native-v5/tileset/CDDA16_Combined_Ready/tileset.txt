@@ -1,4 +1,0 @@
-NAME: cdda16_combined_ready
-VIEW: CDDA Native16 Combined Ready
-JSON: tile_config.json
-TILESET: core-tiles.png

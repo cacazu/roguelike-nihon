@@ -1,5 +1,0 @@
-Exception: C:\Users\kit\Documents\Codex\2026-10-02\task-9\tools\amend-source-metadata.ps1:138
-Line |
- 138 |  … rop.Name])){throw ('Base plan/public manifest metadata differs: '+$pr …
-     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | Base plan/public manifest metadata differs: archiveDelta

@@ -1,9 +1,0 @@
-# Parameterized original dialog content
-
-`locales/ui-content-en.json` and `ui-content-ja.json` are exact copies of the four reviewed entries from `mechanics-audit-work/ui-roundtrip/en.json` and `ja.json`. They contain `ui.roundtrip.title`, `body`, `yes`, and `no`. Only the body declares `{character_name}`. Existing `locales/en.json`, `ja.json`, and the 54-ID static `labels()` contract are unchanged.
-
-`ui_catalog::UiContentCatalog` parses duplicate-safe semantic IDs, validates balanced named placeholders, and requires exact EN/JA ID coverage and placeholder name/count contracts. `templates(locale)` exposes the selected immutable templates. The environment's `ui_catalog()` combines those checked templates with static labels for `render_ui`; its response labels remain the original 54 static IDs. Parameterized content is available before a host catalogue request.
-
-The existing `ui_catalog` request remains compatible for declared content IDs. Duplicate IDs are rejected during deserialization. Host overlays must refer to the four declared content IDs and preserve each placeholder contract; they cannot override static labels or introduce undeclared content. Original typed `UiArgument::External` values are appended as-is by `resolve_text`, so user names containing braces, markup-like text, or Japanese remain external text. The browser renderer must continue assigning rendered values with `textContent`.
-
-Four meaningful new tests are prepared: bilingual coverage/placeholder validation; actual body parameter behavior; environment dialog projection/language purity with an external name; and host duplicate/wrong-parameter/static-override rejection. Source formatting was performed. Builds, clippy, WASM refresh, and actual native dialog roundtrip verification are reserved for the parent's sequential resource slot. This catalogue integration does not claim complete original dialogs or replace their callbacks, input routing, gameplay, or RNG.

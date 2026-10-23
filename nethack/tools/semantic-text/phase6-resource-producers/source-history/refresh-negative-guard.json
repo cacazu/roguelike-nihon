@@ -1,8 +1,0 @@
-{
-  "status": "passed",
-  "changed_authors_rejected_without_explicit_flag": true,
-  "complete_generated_file_set_and_bytes_unchanged": true,
-  "compiler_node_browser_runs": 0,
-  "returncode": 1,
-  "generator_sha256": "bf0d05cbba702f0dece50db429084ffdb0e7ae9f397099ebe7e865198905c405"
-}

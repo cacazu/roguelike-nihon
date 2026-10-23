@@ -1,9 +1,0 @@
-In file included from C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\lpeg\lpcap.c:9:
-In file included from C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\lpeg\lpcap.h:9:
-C:\Users\kit\gameme\jnethack\jrouge\tome\upstream\t-engine4-src-1.7.6\src\lpeg\lptypes.h:13:9: warning: 'NDEBUG' macro redefined [-Wmacro-redefined]
-   13 | #define NDEBUG
-      |         ^
-<command line>:3:9: note: previous definition is here
-    3 | #define NDEBUG 1
-      |         ^
-1 warning generated.

@@ -1,5 +1,0 @@
-{
-  "base_sha256": "63f46d8f0c696dada65818092ef5dcb56017950b169397f4bde7d3eef52290d2",
-  "derived_sha256": "1c949a1e228b457af9ea60f047923c40ff4e311f34a63b17c115999c8d5434c2",
-  "scope": "Additive mutual exclusion only; shared/default source unchanged"
-}

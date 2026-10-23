@@ -1,4 +1,0 @@
-NAME: cdda16_overmap_ready
-VIEW: CDDA Native16 overmap base families
-JSON: tile_config.json
-TILESET: tiles.png

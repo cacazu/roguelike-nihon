@@ -1,4 +1,0 @@
-__pycache__/
-output/*.jsonl
-output/*.pot
-output/cpp-files.txt

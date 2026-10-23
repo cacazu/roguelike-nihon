@@ -1,6 +1,0 @@
-{
-  "input_sha256": "0ea331b50b44ca1dafe6b88d42e523e9965dd5fc56fb74cd41c853dfa320c17e",
-  "output_sha256": "44ed4d16fcde7c1336eefee3cf8cee02de9ca63173906c35734239181fd5e602",
-  "reverse_byte_equal": true,
-  "scope": "Diagnostic nested container now preserves original child KeyBind handled return; original Dialog/KeyBind unchanged"
-}

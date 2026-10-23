@@ -1,9 +1,0 @@
-{
-  "platform.resize.fresh": "新しいセッションを開いて、原作の画面を初期化してください。",
-  "platform.resize.selector": "原作の描画キャンバスを利用できません。",
-  "platform.resize.unavailable": "原作の画面サイズを取得できません。",
-  "platform.resize.dimensions": "原作の画面サイズとウィンドウサイズが一致していません。",
-  "platform.resize.viewport": "原作の描画が終わるまでお待ちください。",
-  "platform.resize.logical": "原作の画面サイズ変更が終わるまでお待ちください。",
-  "platform.resize.busy": "現在の操作または保存が終わるまでお待ちください。"
-}

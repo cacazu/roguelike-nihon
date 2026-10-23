@@ -1,4 +1,0 @@
-# Explicit owned config prevents inherited formatting configuration.
-edition = "2024"
-make_backup = false
-newline_style = "Unix"

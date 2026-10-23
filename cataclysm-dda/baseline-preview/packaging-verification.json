@@ -1,9 +1,0 @@
-{
-  "passed": true,
-  "metadataEntries": 7938,
-  "expectedEntries": 7938,
-  "allDataAndGfxFilesPresent": true,
-  "allSourceAssetSizesMatched": true,
-  "compiledJapaneseMoPresent": true,
-  "sourceCommit": "7b2efa5cea38e4d4d97dd0e63b28b9148623da59"
-}

@@ -1,9 +1,0 @@
-{
-  "selected_semantic_ids": 82,
-  "selected_call_sites": 92,
-  "console_records_separate": 202,
-  "unselected_lua_values": 160,
-  "source_files_with_output_candidates": 22,
-  "en_ja_key_and_placeholder_coverage_for_selected_seed": "pass",
-  "runtime_integration": "not performed"
-}

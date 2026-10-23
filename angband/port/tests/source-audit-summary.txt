@@ -1,1 +1,0 @@
-{"files":589,"identicalFiles":576,"modifiedFiles":["cmd-cave.c","cmd-core.c","cmd-core.h","load.c","player-util.c","player-util.h","save.c","savefile.c","savefile.h","target.c","target.h","ui-display.c","ui-game.c"]}

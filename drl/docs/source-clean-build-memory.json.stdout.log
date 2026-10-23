@@ -1,5 +1,0 @@
-{"stage":"external-standard-prerequisites","exit_code":0}
-{"stage":"original-game-clean-build","exit_code":0}
-{"stage":"empty-cache-offline-cargo-metadata","exit_code":0}
-{"stage":"rust-adapter-clean-build","exit_code":0}
-{"result":"compiled-artifact-differs","root":"C:\\Users\\kit\\AppData\\Local\\Temp\\drl-source-verify-6ec7a4a638014112a25607fda0b9eb89\\drl-original-core","core_byte_exact":true,"adapter_byte_exact":false,"error":null}

@@ -1,8 +1,0 @@
-{
-  "error.lua.adapter.argument_limit": "Lua に渡す引数が上限を超えています",
-  "error.lua.adapter.argument_missing": "Lua の書式に必要な引数がありません",
-  "error.lua.adapter.string_type": "Lua の %s 引数に文字列以外が指定されています",
-  "error.lua.adapter.integer_type": "Lua の整数引数の型が一致していません",
-  "error.lua.adapter.float_type": "Lua の %f 引数に数値以外が指定されています",
-  "error.lua.adapter.pointer_type": "Lua の %p 引数の型が一致していません"
-}

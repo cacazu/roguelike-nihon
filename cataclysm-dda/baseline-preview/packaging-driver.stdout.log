@@ -1,2 +1,0 @@
-{"totalFiles":7937,"totalBytes":154947658,"groups":[{"source":"data","virtual":"/data","files":7711,"bytes":94978139},{"source":"gfx","virtual":"/gfx","files":225,"bytes":59969291},{"source":"lang/json","virtual":"/lang/json","files":1,"bytes":228}]}
-{"packaged":true,"webRoot":"C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-8\\baseline-preview\\web","totalPackageBytes":257151163,"files":121,"dataBytes":116219695,"delivery":"NODE LOCALHOST ONLY; reference engine, original-game browser and full Rust integration gates pending"}

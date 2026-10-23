@@ -1,9 +1,0 @@
-{
-  "status": "passed",
-  "candidate_engine_wasm_sha256": "b3865a77f28419229c66f1f740619b772378e5f229f8d3a3d4e8c96067365659",
-  "engine_manifest_sha256": "e96e32bfd35100d6a40a9c0062d2a7f91e39bad734397215bc0f5c97a8d708c3",
-  "archive_sha256": "7f0d7158ec306ee86f4dec80819aec6e407470599080098ca63342f3c0f659f7",
-  "consumer_report_sha256": "028d27d1dc7ee30d4478f7c5588e66181888b0388add9bb8403a92e155244275",
-  "generator_manifest_sha256": "0deafe73506e7f393e261a9a8b652703a09bed75b87aa24b71fed598289e1952",
-  "datafile_expected_actual_bytes": 1484736
-}

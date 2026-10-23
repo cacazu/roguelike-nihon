@@ -1,3 +1,0 @@
-cache:INFO: generating port: sysroot\lib\wasm32-emscripten\libSDL2_image-png.a... (this will be cached in "C:\Users\kit\emsdk\upstream\emscripten\cache\sysroot\lib\wasm32-emscripten\libSDL2_image-png.a" for subsequent builds)
-system_libs:INFO: compiled 19 inputs in 4.91s
-cache:INFO:  - ok

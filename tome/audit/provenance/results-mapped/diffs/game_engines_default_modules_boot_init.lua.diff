@@ -1,9 +1,0 @@
-diff --git "a/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_engines_default_modules_boot_init.lua.git" "b/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_engines_default_modules_boot_init.lua.release"
-index b92347d..aacd281 100644
---- "a/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_engines_default_modules_boot_init.lua.git"
-+++ "b/C:\\Users\\kit\\Documents\\Codex\\2026-10-02\\task-10\\provenance-work\\results-mapped\\diffs\\game_engines_default_modules_boot_init.lua.release"
-@@ -49,3 +49,4 @@ keep_background_texture = true
- 
- font_package_id = function() config.settings.tome = config.settings.tome or {} if not config.settings.tome.fonts then config.settings.tome.fonts = {type="fantasy", size="normal"} end return config.settings.tome.fonts.type end
- font_package_size = function() config.settings.tome = config.settings.tome or {} if not config.settings.tome.fonts then config.settings.tome.fonts = {type="fantasy", size="normal"} end return config.settings.tome.fonts.size end
-+version_desc = '1.7.6'

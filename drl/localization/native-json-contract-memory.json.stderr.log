@@ -1,6 +1,0 @@
-Exception: C:\Users\kit\Documents\Codex\2026-10-02\task-9\localization\run-native-probe.ps1:85
-Line |
-  85 |  … ord.passed){throw ('Actual native '+$Probe+' fixture failed; inspect  …
-     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | Actual native json-contract fixture failed; inspect result/logs above. A failed JSON-contract diagnostic is not
-     | a passed test.

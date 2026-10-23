@@ -1,4 +1,0 @@
-NAME: cdda16_overmap
-VIEW: CDDA Native 16px overmap (partial artwork)
-JSON: tile_config.json
-TILESET: tiles.png

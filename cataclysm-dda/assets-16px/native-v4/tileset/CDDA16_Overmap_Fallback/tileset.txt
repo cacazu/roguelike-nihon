@@ -1,4 +1,0 @@
-NAME: cdda16_overmap_fallback
-VIEW: CDDA Native 16px overmap with diagnostic stencils
-JSON: tile_config.json
-TILESET: tiles.png

@@ -1,6 +1,0 @@
-{
-  "platform.save.worker_unavailable": "ブラウザーの保存機能を利用できません。",
-  "platform.save.worker_not_ready": "ブラウザーの保存機能の準備ができていません。",
-  "platform.save.operation_failed": "ブラウザーでの保存に失敗しました。",
-  "platform.save.invalid_status": "ブラウザーの保存機能から不正な状態が返されました。"
-}

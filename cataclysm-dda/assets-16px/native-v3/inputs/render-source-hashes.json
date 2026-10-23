@@ -1,8 +1,0 @@
-{
-  "doc/TILESET.md": "c11e79485ffbcc25e4739f1d62d0f41e5c84aa9fd382947cb35f1aa75c2cd092",
-  "src/cata_tiles.cpp": "d7256ee02edda003082e9b86ec41c5bd8cff8d999ade3613bd9798e6db052992",
-  "src/sdltiles.cpp": "22a75ef59b4bf193aef823ce768021356780897e64ab32882d1fbec25e173d7b",
-  "tools/json_tools/generate_overlay_ids.py": "ed94940a3d291292b66c7b3aff0751993fe33611fc88940dd468de3d748f8615",
-  "gfx/RetroDaysTileset/tile_config.json": "2cc9251c6fef235a85900ea2084b9adaa2a394c8989706c88f9ec544e0aafc6d",
-  "gfx/RetroDaysTileset/tileset.txt": "1894a7c63429b48be2b4a90297c3bf35ced920cae10ce37a903b05b3f34b65fa"
-}

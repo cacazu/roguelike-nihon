@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "C:\Users\kit\AppData\Local\Temp\nh6r4\nethack\tools\check-phase6-source-replay.py", line 62, in <module>
-    main()
-    ~~~~^^
-  File "C:\Users\kit\AppData\Local\Temp\nh6r4\nethack\tools\check-phase6-source-replay.py", line 24, in main
-    assert not output.exists()
-           ^^^^^^^^^^^^^^^^^^^
-AssertionError

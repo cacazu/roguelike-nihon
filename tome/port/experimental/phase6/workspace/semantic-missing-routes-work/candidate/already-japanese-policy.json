@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "source_commit": "624a67329fe2ad440c5b344785a9c73fcf22ae63",
-  "observed_keys": 953,
-  "observed_exact_official_target_equalities": 877,
-  "new_translations_added": 0,
-  "reverse_japanese_replacement": false,
-  "scope": "Repeated native translation inputs are retained unchanged. Producer identity/parameter routes for dynamic decorated text require a separate future audit."
-}
