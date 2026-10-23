@@ -20,3 +20,14 @@
 /experiments/**/mixed-rtl/
 /experiments/**/bin/
 /docs/core-source-package-plan.json
+
+# Local dependency caches and credentials.
+**/node_modules/
+**/target/
+**/em-cache/
+**/__pycache__/
+**/.pytest_cache/
+*.py[cod]
+.env
+.env.local
+.env.*.local

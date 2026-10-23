@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../rogue-nihon");
+const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDirectories = ["web", "build", "locales", "docs", "distribution"];
 const mime = new Map([[".html", "text/html; charset=utf-8"], [".js", "text/javascript; charset=utf-8"], [".mjs", "text/javascript; charset=utf-8"], [".css", "text/css; charset=utf-8"], [".json", "application/json; charset=utf-8"], [".png", "image/png"], [".wasm", "application/wasm"], [".txt", "text/plain; charset=utf-8"], [".md", "text/plain; charset=utf-8"]]);
 

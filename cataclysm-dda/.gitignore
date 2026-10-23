@@ -36,3 +36,9 @@
 **/browser-profiles/
 **/.env
 **/.env.local
+
+# Local dependency caches and credentials.
+**/em-cache/
+**/.pytest_cache/
+*.py[cod]
+.env.*.local

@@ -31,3 +31,13 @@ bin/validation/
 !bin/brogue-nihon.cmd
 !bin/brogue-cmd.bat
 __pycache__/
+
+# Local dependency caches and credentials.
+**/node_modules/
+**/target/
+**/em-cache/
+**/.pytest_cache/
+*.py[cod]
+.env
+.env.local
+.env.*.local
